@@ -16,7 +16,9 @@ docker compose up -d
 ```
 
 - Backend: http://localhost:8001/health
-- Postgres: `localhost:5433` (usuário/senha/db: `cashtrail`)
+- Postgres: `localhost:5544` (usuário/senha/db: `cashtrail`)
+
+> Nota: as portas padrão (5432, 8000) foram remapeadas porque já havia um PostgreSQL nativo do Windows e uma reserva de porta do sistema usando-as nesta máquina. Ajuste `docker-compose.yml`/`.env` se seu ambiente for diferente.
 
 Frontend (fora do Docker Compose por enquanto):
 

@@ -7,7 +7,7 @@ services:
       POSTGRES_PASSWORD: cashtrail
       POSTGRES_DB: cashtrail
     ports:
-      - "5433:5432"
+      - "5544:5432"
     volumes:
       - cashtrail_db_data:/var/lib/postgresql/data
     healthcheck:

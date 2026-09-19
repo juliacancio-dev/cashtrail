@@ -19,5 +19,11 @@ class Settings(BaseSettings):
     # Marco 2: origem do frontend local por padrão; sobrescrever via env em produção.
     cors_allowed_origins: list[str] = ["http://localhost:3000"]
 
+    # Marco 5: desligado por padrão de propósito — o job usa SessionLocal (bound ao
+    # DATABASE_URL real), não o get_db override dos testes; se ligado por padrão,
+    # TestClient(app) dispararia o job contra o banco de verdade a cada teste.
+    # Produção liga via env var ENABLE_SCHEDULER=true.
+    enable_scheduler: bool = False
+
 
 settings = Settings()

@@ -10,6 +10,7 @@ const links = [
   { href: "/transactions", label: "Lançamentos" },
   { href: "/budgets", label: "Orçamentos" },
   { href: "/goals", label: "Metas" },
+  { href: "/recurring", label: "Recorrências" },
 ];
 
 export function AppNav() {

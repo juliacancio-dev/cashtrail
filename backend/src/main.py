@@ -1,16 +1,47 @@
+from contextlib import asynccontextmanager
+
+from apscheduler.schedulers.background import BackgroundScheduler
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from src.core.config import settings
+from src.core.database import SessionLocal
 from src.features.accounts.router import router as accounts_router
 from src.features.auth.router import router as auth_router
 from src.features.budgets.router import router as budgets_router
 from src.features.categories.router import router as categories_router
 from src.features.dashboard.router import router as dashboard_router
 from src.features.goals.router import router as goals_router
+from src.features.recurring import service as recurring_service
+from src.features.recurring.router import router as recurring_router
 from src.features.transactions.router import router as transactions_router
 
-app = FastAPI(title="CashTrail API")
+
+def _run_recurring_job() -> None:
+    """ADR-005: APScheduler roda dentro do processo da API, sem worker dedicado."""
+    db = SessionLocal()
+    try:
+        recurring_service.generate_due_transactions(db)
+    finally:
+        db.close()
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    scheduler = BackgroundScheduler()
+    if settings.enable_scheduler:
+        # Roda uma vez já na subida: o Container App escala a zero quando ocioso
+        # (05-integrations.md), então esperar 24h pelo primeiro `interval` deixaria
+        # recorrências vencidas esperando o próximo acesso à API por muito tempo.
+        _run_recurring_job()
+        scheduler.add_job(_run_recurring_job, "interval", days=1, id="generate_recurring_transactions")
+        scheduler.start()
+    yield
+    if settings.enable_scheduler:
+        scheduler.shutdown()
+
+
+app = FastAPI(title="CashTrail API", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
@@ -27,6 +58,7 @@ app.include_router(transactions_router)
 app.include_router(dashboard_router)
 app.include_router(goals_router)
 app.include_router(budgets_router)
+app.include_router(recurring_router)
 
 
 @app.get("/health")

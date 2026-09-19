@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 from src.features.accounts import service as accounts_service
 from src.features.categories import service as categories_service
 from src.features.transactions import repository
-from src.features.transactions.models import Transaction, TransactionType
+from src.features.transactions.models import Transaction, TransactionSource, TransactionType
 
 
 class TransactionNotFoundError(Exception):
@@ -52,12 +52,15 @@ def create_transaction(
     description: str | None,
     occurred_at: date,
     goal_id: uuid.UUID | None = None,
+    source: TransactionSource = TransactionSource.MANUAL,
+    recurring_transaction_id: uuid.UUID | None = None,
 ) -> Transaction:
     """RB-001: lançamento pertence a exatamente uma conta e uma categoria do próprio usuário.
 
-    `goal_id` não é validado aqui de propósito: transactions não depende de goals
-    (09-vertical-slices.md) — quem chama com um goal_id (a slice goals, via
-    create_contribution) já garantiu que a meta pertence ao usuário.
+    `goal_id`/`recurring_transaction_id` não são validados aqui de propósito:
+    transactions não depende de goals nem de recurring (09-vertical-slices.md) —
+    quem chama com esses ids (goals.create_contribution, recurring's scheduled
+    job) já garantiu a posse antes de chamar.
     """
     try:
         account = accounts_service.get_account(db, user_id, account_id)
@@ -82,6 +85,8 @@ def create_transaction(
         description=description,
         occurred_at=occurred_at,
         goal_id=goal_id,
+        source=source,
+        recurring_transaction_id=recurring_transaction_id,
     )
 
 

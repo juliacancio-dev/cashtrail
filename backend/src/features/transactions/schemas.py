@@ -4,7 +4,7 @@ from decimal import Decimal
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from src.features.transactions.models import TransactionType
+from src.features.transactions.models import TransactionSource, TransactionType
 
 
 class TransactionCreate(BaseModel):
@@ -23,7 +23,9 @@ class TransactionRead(BaseModel):
     account_id: uuid.UUID
     category_id: uuid.UUID
     goal_id: uuid.UUID | None
+    recurring_transaction_id: uuid.UUID | None
     type: TransactionType
+    source: TransactionSource
     amount: Decimal
     description: str | None
     occurred_at: date

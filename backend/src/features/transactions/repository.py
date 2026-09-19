@@ -5,7 +5,7 @@ from decimal import Decimal
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
-from src.features.transactions.models import Transaction, TransactionType
+from src.features.transactions.models import Transaction, TransactionSource, TransactionType
 
 
 def list_by_user(
@@ -40,13 +40,17 @@ def create(
     description: str | None,
     occurred_at: date,
     goal_id: uuid.UUID | None = None,
+    source: TransactionSource = TransactionSource.MANUAL,
+    recurring_transaction_id: uuid.UUID | None = None,
 ) -> Transaction:
     transaction = Transaction(
         user_id=user_id,
         account_id=account_id,
         category_id=category_id,
         goal_id=goal_id,
+        recurring_transaction_id=recurring_transaction_id,
         type=type,
+        source=source,
         amount=amount,
         description=description,
         occurred_at=occurred_at,

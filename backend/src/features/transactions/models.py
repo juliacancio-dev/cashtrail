@@ -14,10 +14,17 @@ class TransactionType(str, enum.Enum):
     EXPENSE = "expense"
 
 
+class TransactionSource(str, enum.Enum):
+    MANUAL = "manual"
+    RECURRING = "recurring"
+    IMPORT = "import"
+
+
 class Transaction(Base):
-    """Colunas de source/import/recurring do 10-data-model.md ficam de fora até
-    as slices statement_import/recurring existirem (Marcos 5/7) — evita FK pra
-    tabela que ainda não existe. `goal_id` chegou no Marco 4 junto com `goals`.
+    """Coluna de import_fitid do 10-data-model.md fica de fora até a slice
+    statement_import existir (Marco 7) — evita campo sem uso real ainda.
+    `goal_id` chegou no Marco 4 junto com `goals`; `source`/`recurring_transaction_id`
+    chegaram no Marco 5 junto com `recurring`.
     """
 
     __tablename__ = "transactions"
@@ -36,7 +43,16 @@ class Transaction(Base):
     goal_id: Mapped[uuid.UUID | None] = mapped_column(
         Uuid, ForeignKey("goals.id", ondelete="SET NULL"), index=True, nullable=True
     )
+    recurring_transaction_id: Mapped[uuid.UUID | None] = mapped_column(
+        Uuid, ForeignKey("recurring_transactions.id", ondelete="SET NULL"), index=True, nullable=True
+    )
     type: Mapped[TransactionType] = mapped_column(Enum(TransactionType, name="transaction_type"), nullable=False)
+    source: Mapped[TransactionSource] = mapped_column(
+        Enum(TransactionSource, name="transaction_source"),
+        nullable=False,
+        default=TransactionSource.MANUAL,
+        server_default=TransactionSource.MANUAL.name,
+    )
     amount: Mapped[Decimal] = mapped_column(Numeric(12, 2), nullable=False)
     description: Mapped[str | None] = mapped_column(String(255), nullable=True)
     occurred_at: Mapped[date] = mapped_column(Date, nullable=False)

@@ -16,6 +16,8 @@ from src.main import app
 # Importar os models de cada slice registra as tabelas em Base.metadata.
 from src.features.accounts.models import Account  # noqa: F401
 from src.features.auth.models import User  # noqa: F401
+from src.features.categories.models import Category  # noqa: F401
+from src.features.transactions.models import Transaction  # noqa: F401
 
 
 @pytest.fixture(scope="session")

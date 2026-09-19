@@ -46,7 +46,7 @@ export function AccountForm({ onCreate }: { onCreate: (values: CreateAccountForm
           control={control}
           name="type"
           render={({ field }) => (
-            <Select value={field.value} onValueChange={field.onChange}>
+            <Select value={field.value} onValueChange={field.onChange} items={accountTypeOptions}>
               <SelectTrigger className="w-48">
                 <SelectValue />
               </SelectTrigger>

@@ -6,16 +6,16 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { AppNav } from "@/components/app-nav";
 import { useAuth } from "@/features/auth/auth-context";
-import { AccountForm } from "@/features/accounts/account-form";
-import { AccountList } from "@/features/accounts/account-list";
-import { archiveAccount, createAccount, listAccounts } from "@/features/accounts/api";
-import type { Account, CreateAccountFormValues } from "@/features/accounts/schemas";
+import { CategoryForm } from "@/features/categories/category-form";
+import { CategoryList } from "@/features/categories/category-list";
+import { archiveCategory, createCategory, listCategories } from "@/features/categories/api";
+import type { Category, CreateCategoryFormValues } from "@/features/categories/schemas";
 
-export default function AccountsPage() {
+export default function CategoriesPage() {
   const { user, isLoading, logout } = useAuth();
   const router = useRouter();
-  const [accounts, setAccounts] = useState<Account[]>([]);
-  const [isLoadingAccounts, setIsLoadingAccounts] = useState(true);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [isLoadingCategories, setIsLoadingCategories] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -26,29 +26,29 @@ export default function AccountsPage() {
 
   useEffect(() => {
     if (!user) return;
-    listAccounts()
-      .then(setAccounts)
-      .catch(() => setError("nao foi possivel carregar as contas"))
-      .finally(() => setIsLoadingAccounts(false));
+    listCategories()
+      .then(setCategories)
+      .catch(() => setError("nao foi possivel carregar as categorias"))
+      .finally(() => setIsLoadingCategories(false));
   }, [user]);
 
-  async function handleCreate(values: CreateAccountFormValues) {
+  async function handleCreate(values: CreateCategoryFormValues) {
     setError(null);
     try {
-      const account = await createAccount(values.name, values.type);
-      setAccounts((current) => [...current, account]);
+      const category = await createCategory(values.name);
+      setCategories((current) => [...current, category]);
     } catch {
-      setError("nao foi possivel criar a conta");
+      setError("nao foi possivel criar a categoria");
     }
   }
 
   async function handleArchive(id: string) {
     setError(null);
     try {
-      const updated = await archiveAccount(id);
-      setAccounts((current) => current.map((a) => (a.id === id ? updated : a)));
+      const updated = await archiveCategory(id);
+      setCategories((current) => current.map((c) => (c.id === id ? updated : c)));
     } catch {
-      setError("nao foi possivel arquivar a conta");
+      setError("nao foi possivel arquivar a categoria");
     }
   }
 
@@ -70,18 +70,18 @@ export default function AccountsPage() {
       </div>
 
       <div>
-        <h1 className="text-2xl font-semibold">Minhas contas</h1>
+        <h1 className="text-2xl font-semibold">Categorias</h1>
         <p className="text-muted-foreground text-sm">{user.email}</p>
       </div>
 
-      <AccountForm onCreate={handleCreate} />
+      <CategoryForm onCreate={handleCreate} />
 
       {error && <p className="text-destructive text-sm">{error}</p>}
 
-      {isLoadingAccounts ? (
-        <p className="text-muted-foreground text-sm">Carregando contas...</p>
+      {isLoadingCategories ? (
+        <p className="text-muted-foreground text-sm">Carregando categorias...</p>
       ) : (
-        <AccountList accounts={accounts} onArchive={handleArchive} />
+        <CategoryList categories={categories} onArchive={handleArchive} />
       )}
     </main>
   );

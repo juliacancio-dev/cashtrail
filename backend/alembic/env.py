@@ -9,6 +9,8 @@ from src.core.config import settings
 from src.core.database import Base
 from src.features.accounts.models import Account  # noqa: F401
 from src.features.auth.models import User  # noqa: F401
+from src.features.categories.models import Category  # noqa: F401
+from src.features.transactions.models import Transaction  # noqa: F401
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

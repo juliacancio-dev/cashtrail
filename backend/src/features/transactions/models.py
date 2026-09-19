@@ -15,9 +15,9 @@ class TransactionType(str, enum.Enum):
 
 
 class Transaction(Base):
-    """Colunas de source/import/recurring/goal do 10-data-model.md ficam de fora até
-    as slices statement_import/recurring/goals existirem (Marcos 4/5/7) — evita FK
-    pra tabela que ainda não existe.
+    """Colunas de source/import/recurring do 10-data-model.md ficam de fora até
+    as slices statement_import/recurring existirem (Marcos 5/7) — evita FK pra
+    tabela que ainda não existe. `goal_id` chegou no Marco 4 junto com `goals`.
     """
 
     __tablename__ = "transactions"
@@ -32,6 +32,9 @@ class Transaction(Base):
     )
     category_id: Mapped[uuid.UUID] = mapped_column(
         Uuid, ForeignKey("categories.id", ondelete="RESTRICT"), index=True, nullable=False
+    )
+    goal_id: Mapped[uuid.UUID | None] = mapped_column(
+        Uuid, ForeignKey("goals.id", ondelete="SET NULL"), index=True, nullable=True
     )
     type: Mapped[TransactionType] = mapped_column(Enum(TransactionType, name="transaction_type"), nullable=False)
     amount: Mapped[Decimal] = mapped_column(Numeric(12, 2), nullable=False)

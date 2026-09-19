@@ -8,6 +8,8 @@ const links = [
   { href: "/accounts", label: "Contas" },
   { href: "/categories", label: "Categorias" },
   { href: "/transactions", label: "Lançamentos" },
+  { href: "/budgets", label: "Orçamentos" },
+  { href: "/goals", label: "Metas" },
 ];
 
 export function AppNav() {

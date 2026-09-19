@@ -51,8 +51,14 @@ def create_transaction(
     amount: Decimal,
     description: str | None,
     occurred_at: date,
+    goal_id: uuid.UUID | None = None,
 ) -> Transaction:
-    """RB-001: lançamento pertence a exatamente uma conta e uma categoria do próprio usuário."""
+    """RB-001: lançamento pertence a exatamente uma conta e uma categoria do próprio usuário.
+
+    `goal_id` não é validado aqui de propósito: transactions não depende de goals
+    (09-vertical-slices.md) — quem chama com um goal_id (a slice goals, via
+    create_contribution) já garantiu que a meta pertence ao usuário.
+    """
     try:
         account = accounts_service.get_account(db, user_id, account_id)
     except accounts_service.AccountNotFoundError:
@@ -75,4 +81,15 @@ def create_transaction(
         amount=amount,
         description=description,
         occurred_at=occurred_at,
+        goal_id=goal_id,
     )
+
+
+def sum_by_goal(db: Session, user_id: uuid.UUID, goal_id: uuid.UUID) -> Decimal:
+    return repository.sum_by_goal(db, user_id, goal_id)
+
+
+def sum_by_category_period(
+    db: Session, user_id: uuid.UUID, category_id: uuid.UUID, start_date: date, end_date: date
+) -> Decimal:
+    return repository.sum_by_category_period(db, user_id, category_id, start_date, end_date)

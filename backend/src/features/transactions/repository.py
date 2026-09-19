@@ -2,7 +2,7 @@ import uuid
 from datetime import date
 from decimal import Decimal
 
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from src.features.transactions.models import Transaction, TransactionType
@@ -39,11 +39,13 @@ def create(
     amount: Decimal,
     description: str | None,
     occurred_at: date,
+    goal_id: uuid.UUID | None = None,
 ) -> Transaction:
     transaction = Transaction(
         user_id=user_id,
         account_id=account_id,
         category_id=category_id,
+        goal_id=goal_id,
         type=type,
         amount=amount,
         description=description,
@@ -53,3 +55,27 @@ def create(
     db.commit()
     db.refresh(transaction)
     return transaction
+
+
+def sum_by_goal(db: Session, user_id: uuid.UUID, goal_id: uuid.UUID) -> Decimal:
+    total = db.scalar(
+        select(func.coalesce(func.sum(Transaction.amount), 0)).where(
+            Transaction.user_id == user_id, Transaction.goal_id == goal_id
+        )
+    )
+    return Decimal(total)
+
+
+def sum_by_category_period(
+    db: Session, user_id: uuid.UUID, category_id: uuid.UUID, start_date: date, end_date: date
+) -> Decimal:
+    total = db.scalar(
+        select(func.coalesce(func.sum(Transaction.amount), 0)).where(
+            Transaction.user_id == user_id,
+            Transaction.category_id == category_id,
+            Transaction.type == TransactionType.EXPENSE,
+            Transaction.occurred_at >= start_date,
+            Transaction.occurred_at <= end_date,
+        )
+    )
+    return Decimal(total)

@@ -11,7 +11,13 @@ from sqlalchemy.orm import sessionmaker
 from testcontainers.community.postgres import PostgresContainer
 
 from src.core.database import Base, get_db
+from src.core.rate_limit import limiter
 from src.main import app
+
+# SEC-006 é sobre proteger produção de força bruta, não sobre limitar quantos
+# logins um teste pode fazer — sem isso, a suíte inteira trombaria no limite
+# de 5/min já nos primeiros testes (cada teste loga pelo menos uma vez).
+limiter.enabled = False
 
 # Importar os models de cada slice registra as tabelas em Base.metadata.
 from src.features.accounts.models import Account  # noqa: F401

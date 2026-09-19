@@ -1,3 +1,23 @@
+def test_login_is_rate_limited_after_five_attempts(client):
+    """SEC-006: rate limiting no endpoint de login contra força bruta."""
+    from src.core.rate_limit import limiter
+
+    payload = {"email": "ratelimit@example.com", "password": "supersecret1"}
+    client.post("/auth/register", json=payload)
+
+    limiter.enabled = True
+    try:
+        for _ in range(5):
+            client.post("/auth/login", json=payload)
+
+        response = client.post("/auth/login", json=payload)
+
+        assert response.status_code == 429
+    finally:
+        limiter.reset()
+        limiter.enabled = False
+
+
 def test_register_creates_user_without_exposing_password(client):
     response = client.post(
         "/auth/register", json={"email": "new@example.com", "password": "supersecret1"}
@@ -58,18 +78,51 @@ def test_me_returns_current_user_with_valid_access_token(client):
     assert response.json()["email"] == "me@example.com"
 
 
+def _frontend_headers() -> dict[str, str]:
+    return {"X-Requested-With": "CashTrail"}
+
+
 def test_refresh_issues_new_access_token_from_cookie(client):
     payload = {"email": "refresh@example.com", "password": "supersecret1"}
     client.post("/auth/register", json=payload)
     client.post("/auth/login", json=payload)
 
-    response = client.post("/auth/refresh")
+    response = client.post("/auth/refresh", headers=_frontend_headers())
 
     assert response.status_code == 200
     assert "access_token" in response.json()
 
 
 def test_refresh_without_cookie_returns_401(client):
-    response = client.post("/auth/refresh")
+    response = client.post("/auth/refresh", headers=_frontend_headers())
 
     assert response.status_code == 401
+
+
+def test_refresh_without_custom_header_returns_403(client):
+    """CSRF defesa em profundidade (11-security.md): rota que só depende do cookie
+    exige um header que um site de terceiro não consegue forjar numa CSRF simples.
+    """
+    payload = {"email": "refreshheader@example.com", "password": "supersecret1"}
+    client.post("/auth/register", json=payload)
+    client.post("/auth/login", json=payload)
+
+    response = client.post("/auth/refresh")
+
+    assert response.status_code == 403
+
+
+def test_logout_without_custom_header_returns_403(client):
+    response = client.post("/auth/logout")
+
+    assert response.status_code == 403
+
+
+def test_logout_with_custom_header_clears_cookie(client):
+    payload = {"email": "logoutheader@example.com", "password": "supersecret1"}
+    client.post("/auth/register", json=payload)
+    client.post("/auth/login", json=payload)
+
+    response = client.post("/auth/logout", headers=_frontend_headers())
+
+    assert response.status_code == 204

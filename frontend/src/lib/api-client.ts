@@ -11,6 +11,9 @@ export async function refreshAccessToken(): Promise<boolean> {
   const response = await fetch(`${API_BASE_URL}/auth/refresh`, {
     method: "POST",
     credentials: "include",
+    // CSRF defesa em profundidade (11-security.md) — exigido pelo backend em
+    // rotas que dependem só do cookie de refresh, sem Bearer token.
+    headers: { "X-Requested-With": "CashTrail" },
   });
 
   if (!response.ok) {
@@ -27,6 +30,9 @@ async function request(path: string, options: RequestInit = {}, allowRetry = tru
   const headers = new Headers(options.headers);
   if (accessToken) headers.set("Authorization", `Bearer ${accessToken}`);
   if (options.body && !headers.has("Content-Type")) headers.set("Content-Type", "application/json");
+  // CSRF defesa em profundidade (11-security.md) — exigido pelo backend nas rotas
+  // que dependem só do cookie de refresh (auth/refresh, auth/logout).
+  headers.set("X-Requested-With", "CashTrail");
 
   const response = await fetch(`${API_BASE_URL}${path}`, {
     ...options,

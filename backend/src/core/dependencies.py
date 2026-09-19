@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, Header, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy.orm import Session
 
@@ -43,3 +43,16 @@ def get_current_user(
 
 
 CurrentUser = Annotated[User, Depends(get_current_user)]
+
+
+def require_frontend_header(x_requested_with: Annotated[str | None, Header()] = None) -> None:
+    """CSRF defesa em profundidade (11-security.md): SameSite=Strict já bloqueia a
+    grande maioria dos casos, mas rotas que dependem só do cookie de refresh (sem
+    Bearer token) também exigem este header — um site de terceiro não consegue
+    definir headers customizados numa requisição CSRF simples.
+    """
+    if x_requested_with != "CashTrail":
+        raise HTTPException(status.HTTP_403_FORBIDDEN, detail="requisicao nao autorizada")
+
+
+RequireFrontendHeader = Depends(require_frontend_header)

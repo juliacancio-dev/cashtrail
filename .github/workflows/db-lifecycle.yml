@@ -1,0 +1,45 @@
+name: DB Lifecycle
+
+on:
+  schedule:
+    # 03:00 UTC (00:00 em Brasília) — todo dia, garante que não fica ligado à noite.
+    - cron: "0 3 * * *"
+  workflow_dispatch:
+    inputs:
+      action:
+        description: "start ou stop"
+        required: true
+        type: choice
+        options: [start, stop]
+        default: stop
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  RESOURCE_GROUP: cashtrail-rg
+  SERVER_NAME: cashtrail-db-16143
+
+jobs:
+  db-lifecycle:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Azure login (OIDC)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Stop Postgres (scheduled run)
+        if: github.event_name == 'schedule'
+        run: az postgres flexible-server stop --resource-group $RESOURCE_GROUP --name $SERVER_NAME
+
+      - name: Start Postgres (manual)
+        if: github.event_name == 'workflow_dispatch' && inputs.action == 'start'
+        run: az postgres flexible-server start --resource-group $RESOURCE_GROUP --name $SERVER_NAME
+
+      - name: Stop Postgres (manual)
+        if: github.event_name == 'workflow_dispatch' && inputs.action == 'stop'
+        run: az postgres flexible-server stop --resource-group $RESOURCE_GROUP --name $SERVER_NAME

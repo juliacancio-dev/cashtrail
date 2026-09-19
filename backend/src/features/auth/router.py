@@ -1,11 +1,12 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Cookie, Depends, HTTPException, Response, status
+from fastapi import APIRouter, Cookie, Depends, HTTPException, Request, Response, status
 from sqlalchemy.orm import Session
 
 from src.core.config import settings
 from src.core.database import get_db
-from src.core.dependencies import CurrentUser
+from src.core.dependencies import CurrentUser, RequireFrontendHeader
+from src.core.rate_limit import limiter
 from src.features.auth import service
 from src.features.auth.schemas import AccessTokenResponse, LoginRequest, RegisterRequest, UserRead
 
@@ -38,8 +39,12 @@ def register(payload: RegisterRequest, db: Annotated[Session, Depends(get_db)]) 
 
 
 @router.post("/login", response_model=AccessTokenResponse)
+@limiter.limit("5/minute")
 def login(
-    payload: LoginRequest, response: Response, db: Annotated[Session, Depends(get_db)]
+    request: Request,
+    payload: LoginRequest,
+    response: Response,
+    db: Annotated[Session, Depends(get_db)],
 ) -> AccessTokenResponse:
     try:
         user = service.authenticate_user(db, payload.email, payload.password)
@@ -51,7 +56,7 @@ def login(
     return AccessTokenResponse(access_token=access_token)
 
 
-@router.post("/refresh", response_model=AccessTokenResponse)
+@router.post("/refresh", response_model=AccessTokenResponse, dependencies=[RequireFrontendHeader])
 def refresh(
     db: Annotated[Session, Depends(get_db)],
     refresh_token: Annotated[str | None, Cookie(alias=REFRESH_COOKIE_NAME)] = None,
@@ -67,7 +72,7 @@ def refresh(
     return AccessTokenResponse(access_token=access_token)
 
 
-@router.post("/logout", status_code=status.HTTP_204_NO_CONTENT)
+@router.post("/logout", status_code=status.HTTP_204_NO_CONTENT, dependencies=[RequireFrontendHeader])
 def logout(response: Response) -> None:
     response.delete_cookie(REFRESH_COOKIE_NAME, path=REFRESH_COOKIE_PATH)
 

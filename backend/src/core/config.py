@@ -25,5 +25,10 @@ class Settings(BaseSettings):
     # Produção liga via env var ENABLE_SCHEDULER=true.
     enable_scheduler: bool = False
 
+    # SHA do commit, injetado pelo deploy.yml. Exposto no /health para o deploy
+    # confirmar que a revisão nova está no ar (ambiente Express não expõe
+    # nome/estado de revisão de forma confiável).
+    app_version: str = "dev"
+
 
 settings = Settings()

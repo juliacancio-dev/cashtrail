@@ -71,4 +71,4 @@ app.include_router(recurring_router)
 
 @app.get("/health")
 def health() -> dict[str, str]:
-    return {"status": "ok"}
+    return {"status": "ok", "version": settings.app_version}

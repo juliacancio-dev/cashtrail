@@ -70,30 +70,24 @@ jobs:
         run: |
           az containerapp update -g "$RESOURCE_GROUP" -n "$BACKEND_APP" \
             --image "$ACR_NAME.azurecr.io/cashtrail-backend:$IMAGE_TAG" \
-            --set-env-vars ENABLE_SCHEDULER=true \
-            --revision-suffix "gh${{ github.run_number }}-${{ github.run_attempt }}" \
+            --set-env-vars ENABLE_SCHEDULER=true "APP_VERSION=$IMAGE_TAG" \
             --only-show-errors -o none
 
-      - name: Wait for backend revision to be healthy
+      # Ambiente Express não aceita revision suffix nem preenche
+      # latestReadyRevisionName, então a prova de que a versão nova subiu
+      # (migrations incluídas) é o /health devolver o SHA deste deploy.
+      - name: Wait for new backend version to be live
         run: |
-          revision="$BACKEND_APP--gh${{ github.run_number }}-${{ github.run_attempt }}"
           fqdn=$(az containerapp show -g "$RESOURCE_GROUP" -n "$BACKEND_APP" --query properties.configuration.ingress.fqdn -o tsv --only-show-errors)
-          for i in $(seq 1 30); do
-            # O curl também acorda o app caso esteja escalado a zero.
-            curl -fsS --max-time 10 "https://$fqdn/health" > /dev/null 2>&1 || true
-            status=$(az containerapp revision show -g "$RESOURCE_GROUP" -n "$BACKEND_APP" --revision "$revision" \
-              --query "join('/', [properties.provisioningState, properties.runningState, properties.healthState])" -o tsv --only-show-errors)
-            echo "[$i] $revision: $status"
-            case "$status" in
-              *Failed*) echo "::error::Revision $revision failed. Check the Log stream."; exit 1 ;;
-              *Healthy*)
-                if curl -fsS --max-time 10 "https://$fqdn/health"; then
-                  echo; echo "Backend healthy on revision $revision"; exit 0
-                fi ;;
+          for i in $(seq 1 40); do
+            body=$(curl -sS --max-time 15 "https://$fqdn/health" 2>&1 || true)
+            echo "[$i] $body"
+            case "$body" in
+              *"\"version\":\"$IMAGE_TAG\""*) echo "Backend live on $IMAGE_TAG"; exit 0 ;;
             esac
-            sleep 10
+            sleep 15
           done
-          echo "::error::Revision $revision did not become healthy (last: $status). Check the Log stream (migration failure? DB stopped? invalid env var?)."
+          echo "::error::Backend never reported version $IMAGE_TAG. Check the Log stream (migration failure? DB stopped? invalid env var?)."
           exit 1
 
       # NEXT_PUBLIC_API_URL é embutida no build (static export), então vem do
@@ -112,7 +106,6 @@ jobs:
         run: |
           az containerapp update -g "$RESOURCE_GROUP" -n "$FRONTEND_APP" \
             --image "$ACR_NAME.azurecr.io/cashtrail-frontend:$IMAGE_TAG" \
-            --revision-suffix "gh${{ github.run_number }}-${{ github.run_attempt }}" \
             --only-show-errors -o none
           fqdn=$(az containerapp show -g "$RESOURCE_GROUP" -n "$FRONTEND_APP" --query properties.configuration.ingress.fqdn -o tsv)
           echo "Frontend: https://$fqdn" >> "$GITHUB_STEP_SUMMARY"

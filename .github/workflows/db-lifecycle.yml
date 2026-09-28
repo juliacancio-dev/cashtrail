@@ -32,14 +32,17 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-      - name: Stop Postgres (scheduled run)
-        if: github.event_name == 'schedule'
-        run: az postgres flexible-server stop --resource-group $RESOURCE_GROUP --name $SERVER_NAME
-
-      - name: Start Postgres (manual)
-        if: github.event_name == 'workflow_dispatch' && inputs.action == 'start'
-        run: az postgres flexible-server start --resource-group $RESOURCE_GROUP --name $SERVER_NAME
-
-      - name: Stop Postgres (manual)
-        if: github.event_name == 'workflow_dispatch' && inputs.action == 'stop'
-        run: az postgres flexible-server stop --resource-group $RESOURCE_GROUP --name $SERVER_NAME
+      # start/stop falham se o servidor já está no estado pedido, então checa antes.
+      - name: Start or stop Postgres
+        env:
+          ACTION: ${{ github.event_name == 'schedule' && 'stop' || inputs.action }}
+        run: |
+          state=$(az postgres flexible-server show --resource-group $RESOURCE_GROUP --name $SERVER_NAME --query state -o tsv)
+          echo "Action: $ACTION | current state: $state"
+          if [ "$ACTION" = "start" ] && [ "$state" = "Stopped" ]; then
+            az postgres flexible-server start --resource-group $RESOURCE_GROUP --name $SERVER_NAME
+          elif [ "$ACTION" = "stop" ] && [ "$state" = "Ready" ]; then
+            az postgres flexible-server stop --resource-group $RESOURCE_GROUP --name $SERVER_NAME
+          else
+            echo "Nothing to do."
+          fi

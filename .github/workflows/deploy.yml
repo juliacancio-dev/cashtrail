@@ -1,0 +1,105 @@
+name: Deploy
+
+# Manual de propósito: deploys são feitos em lote, não a cada push na main.
+on:
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
+env:
+  RESOURCE_GROUP: cashtrail-rg
+  ACR_NAME: acrcashtrail
+  DB_SERVER_NAME: cashtrail-db-16143
+  BACKEND_APP: cashtrail-backend
+  FRONTEND_APP: cashtrail-frontend
+  IMAGE_TAG: ${{ github.sha }}
+
+jobs:
+  ci:
+    uses: ./.github/workflows/ci.yml
+
+  deploy:
+    needs: ci
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Azure login (OIDC)
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Install containerapp extension
+        run: az extension add --name containerapp --upgrade --only-show-errors
+
+      # O db-lifecycle desliga o banco toda noite; o backend roda as migrations
+      # na subida e quebra se o Postgres estiver parado.
+      - name: Ensure Postgres is running
+        run: |
+          state=$(az postgres flexible-server show -g "$RESOURCE_GROUP" -n "$DB_SERVER_NAME" --query state -o tsv)
+          echo "Postgres state: $state"
+          if [ "$state" = "Stopped" ]; then
+            az postgres flexible-server start -g "$RESOURCE_GROUP" -n "$DB_SERVER_NAME"
+          fi
+
+      - name: Build backend image
+        working-directory: backend
+        run: |
+          az acr build --registry "$ACR_NAME" \
+            --image "cashtrail-backend:$IMAGE_TAG" \
+            --image cashtrail-backend:latest \
+            --file Dockerfile .
+
+      - name: Deploy backend
+        run: |
+          az containerapp update -g "$RESOURCE_GROUP" -n "$BACKEND_APP" \
+            --image "$ACR_NAME.azurecr.io/cashtrail-backend:$IMAGE_TAG" \
+            --set-env-vars ENABLE_SCHEDULER=true \
+            --only-show-errors -o none
+
+      - name: Wait for backend revision to be healthy
+        run: |
+          fqdn=$(az containerapp show -g "$RESOURCE_GROUP" -n "$BACKEND_APP" --query properties.configuration.ingress.fqdn -o tsv)
+          for i in $(seq 1 30); do
+            # O curl também acorda o app caso esteja escalado a zero.
+            curl -fsS --max-time 10 "https://$fqdn/health" > /dev/null 2>&1 || true
+            latest=$(az containerapp show -g "$RESOURCE_GROUP" -n "$BACKEND_APP" --query properties.latestRevisionName -o tsv)
+            ready=$(az containerapp show -g "$RESOURCE_GROUP" -n "$BACKEND_APP" --query properties.latestReadyRevisionName -o tsv)
+            echo "[$i] latest=$latest ready=$ready"
+            if [ "$latest" = "$ready" ] && curl -fsS --max-time 10 "https://$fqdn/health"; then
+              echo; echo "Backend healthy on revision $latest"
+              exit 0
+            fi
+            sleep 10
+          done
+          echo "::error::Backend revision $latest did not become healthy. Check the Log stream (migration failure? invalid env var?)."
+          exit 1
+
+      # NEXT_PUBLIC_API_URL é embutida no build (static export), então vem do
+      # FQDN real do backend em vez de ficar hardcoded aqui.
+      - name: Build frontend image
+        working-directory: frontend
+        run: |
+          fqdn=$(az containerapp show -g "$RESOURCE_GROUP" -n "$BACKEND_APP" --query properties.configuration.ingress.fqdn -o tsv)
+          az acr build --registry "$ACR_NAME" \
+            --image "cashtrail-frontend:$IMAGE_TAG" \
+            --image cashtrail-frontend:latest \
+            --build-arg "NEXT_PUBLIC_API_URL=https://$fqdn" \
+            --file Dockerfile .
+
+      - name: Deploy frontend
+        run: |
+          az containerapp update -g "$RESOURCE_GROUP" -n "$FRONTEND_APP" \
+            --image "$ACR_NAME.azurecr.io/cashtrail-frontend:$IMAGE_TAG" \
+            --only-show-errors -o none
+          fqdn=$(az containerapp show -g "$RESOURCE_GROUP" -n "$FRONTEND_APP" --query properties.configuration.ingress.fqdn -o tsv)
+          echo "Frontend: https://$fqdn" >> "$GITHUB_STEP_SUMMARY"

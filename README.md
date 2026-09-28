@@ -79,6 +79,14 @@ pytest
 
 Testes de integração usam Testcontainers (Postgres real via Docker), não mocks — cobrem os fluxos críticos: autenticação, isolamento por usuário em toda slice, RB-001 a RB-004, rate limiting e CSRF.
 
+## CI/CD
+
+- **CI** ([`ci.yml`](.github/workflows/ci.yml)): testes do backend + lint/build do frontend a cada push/PR.
+- **Deploy** ([`deploy.yml`](.github/workflows/deploy.yml)): disparado manualmente (Actions → Deploy → Run workflow). Roda o CI, garante o Postgres ligado, builda as imagens no ACR (`az acr build`, tag = SHA do commit), atualiza os dois Container Apps e espera a nova revisão do backend ficar saudável. As migrations do Alembic rodam na subida do container do backend.
+- **DB Lifecycle** ([`db-lifecycle.yml`](.github/workflows/db-lifecycle.yml)): desliga o Postgres toda noite para economizar custo; start manual.
+
+Autenticação no Azure via OIDC (federated credential), sem segredo de longa duração no GitHub.
+
 ## Status
 
 MVP (Marcos 1-6 do roadmap, ver [`docs/planning/13-roadmap.md`](docs/planning/13-roadmap.md)) implementado e testado localmente ponta a ponta. Deploy em produção no Azure: backend e frontend do Marco 2 já validados ao vivo; Marcos 3-6 aguardando um próximo deploy em lote (link de demo será adicionado aqui quando isso acontecer).

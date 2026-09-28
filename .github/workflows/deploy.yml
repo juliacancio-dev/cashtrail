@@ -45,11 +45,18 @@ jobs:
       # na subida e quebra se o Postgres estiver parado.
       - name: Ensure Postgres is running
         run: |
-          state=$(az postgres flexible-server show -g "$RESOURCE_GROUP" -n "$DB_SERVER_NAME" --query state -o tsv)
-          echo "Postgres state: $state"
-          if [ "$state" = "Stopped" ]; then
-            az postgres flexible-server start -g "$RESOURCE_GROUP" -n "$DB_SERVER_NAME"
-          fi
+          # Estados transitórios (Stopping/Starting/Updating): espera assentar antes de decidir.
+          for i in $(seq 1 60); do
+            state=$(az postgres flexible-server show -g "$RESOURCE_GROUP" -n "$DB_SERVER_NAME" --query state -o tsv)
+            echo "[$i] Postgres state: $state"
+            case "$state" in
+              Ready) exit 0 ;;
+              Stopped) az postgres flexible-server start -g "$RESOURCE_GROUP" -n "$DB_SERVER_NAME" -o none; exit 0 ;;
+              *) sleep 15 ;;
+            esac
+          done
+          echo "::error::Postgres did not reach Ready/Stopped state in time (last: $state)."
+          exit 1
 
       - name: Build backend image
         working-directory: backend
@@ -64,24 +71,29 @@ jobs:
           az containerapp update -g "$RESOURCE_GROUP" -n "$BACKEND_APP" \
             --image "$ACR_NAME.azurecr.io/cashtrail-backend:$IMAGE_TAG" \
             --set-env-vars ENABLE_SCHEDULER=true \
+            --revision-suffix "gh${{ github.run_number }}-${{ github.run_attempt }}" \
             --only-show-errors -o none
 
       - name: Wait for backend revision to be healthy
         run: |
-          fqdn=$(az containerapp show -g "$RESOURCE_GROUP" -n "$BACKEND_APP" --query properties.configuration.ingress.fqdn -o tsv)
+          revision="$BACKEND_APP--gh${{ github.run_number }}-${{ github.run_attempt }}"
+          fqdn=$(az containerapp show -g "$RESOURCE_GROUP" -n "$BACKEND_APP" --query properties.configuration.ingress.fqdn -o tsv --only-show-errors)
           for i in $(seq 1 30); do
             # O curl também acorda o app caso esteja escalado a zero.
             curl -fsS --max-time 10 "https://$fqdn/health" > /dev/null 2>&1 || true
-            latest=$(az containerapp show -g "$RESOURCE_GROUP" -n "$BACKEND_APP" --query properties.latestRevisionName -o tsv)
-            ready=$(az containerapp show -g "$RESOURCE_GROUP" -n "$BACKEND_APP" --query properties.latestReadyRevisionName -o tsv)
-            echo "[$i] latest=$latest ready=$ready"
-            if [ "$latest" = "$ready" ] && curl -fsS --max-time 10 "https://$fqdn/health"; then
-              echo; echo "Backend healthy on revision $latest"
-              exit 0
-            fi
+            status=$(az containerapp revision show -g "$RESOURCE_GROUP" -n "$BACKEND_APP" --revision "$revision" \
+              --query "join('/', [properties.provisioningState, properties.runningState, properties.healthState])" -o tsv --only-show-errors)
+            echo "[$i] $revision: $status"
+            case "$status" in
+              *Failed*) echo "::error::Revision $revision failed. Check the Log stream."; exit 1 ;;
+              *Healthy*)
+                if curl -fsS --max-time 10 "https://$fqdn/health"; then
+                  echo; echo "Backend healthy on revision $revision"; exit 0
+                fi ;;
+            esac
             sleep 10
           done
-          echo "::error::Backend revision $latest did not become healthy. Check the Log stream (migration failure? invalid env var?)."
+          echo "::error::Revision $revision did not become healthy (last: $status). Check the Log stream (migration failure? DB stopped? invalid env var?)."
           exit 1
 
       # NEXT_PUBLIC_API_URL é embutida no build (static export), então vem do
@@ -100,6 +112,7 @@ jobs:
         run: |
           az containerapp update -g "$RESOURCE_GROUP" -n "$FRONTEND_APP" \
             --image "$ACR_NAME.azurecr.io/cashtrail-frontend:$IMAGE_TAG" \
+            --revision-suffix "gh${{ github.run_number }}-${{ github.run_attempt }}" \
             --only-show-errors -o none
           fqdn=$(az containerapp show -g "$RESOURCE_GROUP" -n "$FRONTEND_APP" --query properties.configuration.ingress.fqdn -o tsv)
           echo "Frontend: https://$fqdn" >> "$GITHUB_STEP_SUMMARY"

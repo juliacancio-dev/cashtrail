@@ -89,7 +89,11 @@ Autenticação no Azure via OIDC (federated credential), sem segredo de longa du
 
 ## Status
 
-MVP (Marcos 1-6 do roadmap, ver [`docs/planning/13-roadmap.md`](docs/planning/13-roadmap.md)) implementado e testado localmente ponta a ponta. Deploy em produção no Azure: backend e frontend do Marco 2 já validados ao vivo; Marcos 3-6 aguardando um próximo deploy em lote (link de demo será adicionado aqui quando isso acontecer).
+MVP completo (Marcos 1-6 do roadmap, ver [`docs/planning/13-roadmap.md`](docs/planning/13-roadmap.md)) e em produção no Azure Container Apps, com deploy via GitHub Actions.
+
+**Demo:** https://cashtrail-frontend.ashydune-a5fddf60.brazilsouth.azurecontainerapps.io
+
+> Para economizar custo, o banco de dados é desligado automaticamente toda noite (ver [`db-lifecycle.yml`](.github/workflows/db-lifecycle.yml)). Se a demo não responder, o banco provavelmente está desligado.
 
 ## Documentação do projeto
 

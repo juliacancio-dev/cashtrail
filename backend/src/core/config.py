@@ -35,8 +35,13 @@ class Settings(BaseSettings):
     # Base do link enviado por e-mail; produção sobrescreve via FRONTEND_URL (deploy.yml).
     frontend_url: str = "http://localhost:3000"
     # "console" só registra o e-mail no log (dev e enquanto o Azure Communication
-    # Services não estiver configurado).
+    # Services não estiver configurado); "acs" envia de verdade (produção).
     email_backend: str = "console"
+    # Só usados com EMAIL_BACKEND=acs. A connection string é segredo: no Container App
+    # entra como secret (secretref), nunca em texto puro (SEC-005).
+    acs_connection_string: str = ""
+    # Remetente do domínio do Communication Services, ex: DoNotReply@<id>.azurecomm.net
+    email_sender_address: str = ""
 
 
 settings = Settings()

@@ -92,9 +92,11 @@ Testes de integração usam Testcontainers (Postgres real via Docker), não mock
 
 - **CI** ([`ci.yml`](.github/workflows/ci.yml)): testes do backend + lint/build do frontend a cada push/PR.
 - **Deploy** ([`deploy.yml`](.github/workflows/deploy.yml)): disparado manualmente (Actions → Deploy → Run workflow). Roda o CI, garante o Postgres ligado, builda as imagens no ACR (`az acr build`, tag = SHA do commit), atualiza os dois Container Apps e espera a nova revisão do backend ficar saudável. As migrations do Alembic rodam na subida do container do backend.
-- **DB Lifecycle** ([`db-lifecycle.yml`](.github/workflows/db-lifecycle.yml)): desliga o Postgres toda noite para economizar custo; start manual.
+- **DB Lifecycle** ([`db-lifecycle.yml`](.github/workflows/db-lifecycle.yml)): desliga o Postgres toda noite (03:00 UTC) para economizar custo e liga às segundas às 06:00 UTC (03:00 em Brasília); também pode ser ligado/desligado manualmente.
 
 Autenticação no Azure via OIDC (federated credential), sem segredo de longa duração no GitHub.
+
+**Secrets do GitHub:** `AZURE_CLIENT_ID`, `AZURE_TENANT_ID`, `AZURE_SUBSCRIPTION_ID` (login). Opcionais, para o e-mail real da recuperação de senha via Azure Communication Services: `ACS_CONNECTION_STRING` e `EMAIL_SENDER_ADDRESS` — sem eles o backend usa `EMAIL_BACKEND=console` (o link só aparece no log).
 
 ## Status
 

@@ -68,9 +68,11 @@ jobs:
 
       - name: Deploy backend
         run: |
+          # FRONTEND_URL monta o link do e-mail de redefinição de senha (RF-013).
+          frontend_fqdn=$(az containerapp show -g "$RESOURCE_GROUP" -n "$FRONTEND_APP" --query properties.configuration.ingress.fqdn -o tsv --only-show-errors)
           az containerapp update -g "$RESOURCE_GROUP" -n "$BACKEND_APP" \
             --image "$ACR_NAME.azurecr.io/cashtrail-backend:$IMAGE_TAG" \
-            --set-env-vars ENABLE_SCHEDULER=true "APP_VERSION=$IMAGE_TAG" \
+            --set-env-vars ENABLE_SCHEDULER=true "APP_VERSION=$IMAGE_TAG" "FRONTEND_URL=https://$frontend_fqdn" \
             --only-show-errors -o none
 
       # Ambiente Express não aceita revision suffix nem preenche

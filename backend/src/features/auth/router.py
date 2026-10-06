@@ -1,6 +1,6 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Cookie, Depends, HTTPException, Request, Response, status
+from fastapi import APIRouter, BackgroundTasks, Cookie, Depends, HTTPException, Request, Response, status
 from sqlalchemy.orm import Session
 
 from src.core.config import settings
@@ -8,7 +8,15 @@ from src.core.database import get_db
 from src.core.dependencies import CurrentUser, RequireFrontendHeader
 from src.core.rate_limit import limiter
 from src.features.auth import service
-from src.features.auth.schemas import AccessTokenResponse, LoginRequest, RegisterRequest, UserRead
+from src.features.auth.schemas import (
+    AccessTokenResponse,
+    ForgotPasswordRequest,
+    LoginRequest,
+    MessageResponse,
+    RegisterRequest,
+    ResetPasswordRequest,
+    UserRead,
+)
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -75,6 +83,37 @@ def refresh(
 @router.post("/logout", status_code=status.HTTP_204_NO_CONTENT, dependencies=[RequireFrontendHeader])
 def logout(response: Response) -> None:
     response.delete_cookie(REFRESH_COOKIE_NAME, path=REFRESH_COOKIE_PATH)
+
+
+@router.post("/forgot-password", response_model=MessageResponse, status_code=status.HTTP_202_ACCEPTED)
+@limiter.limit("5/minute")
+def forgot_password(
+    request: Request,
+    payload: ForgotPasswordRequest,
+    background_tasks: BackgroundTasks,
+    db: Annotated[Session, Depends(get_db)],
+) -> MessageResponse:
+    """RF-013. Resposta idêntica exista ou não a conta (não revela e-mails cadastrados);
+    o envio vai para background para o tempo de resposta também não denunciar.
+    """
+    token = service.request_password_reset(db, payload.email)
+    if token is not None:
+        background_tasks.add_task(service.send_password_reset_email, payload.email, token)
+
+    return MessageResponse(
+        message="se o e-mail estiver cadastrado, você receberá um link para redefinir a senha"
+    )
+
+
+@router.post("/reset-password", status_code=status.HTTP_204_NO_CONTENT)
+@limiter.limit("5/minute")
+def reset_password(
+    request: Request, payload: ResetPasswordRequest, db: Annotated[Session, Depends(get_db)]
+) -> None:
+    try:
+        service.reset_password(db, payload.token, payload.new_password)
+    except service.InvalidResetTokenError:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, detail="link invalido ou expirado")
 
 
 @router.get("/me", response_model=UserRead)

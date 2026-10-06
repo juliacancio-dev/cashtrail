@@ -1,3 +1,5 @@
+import hashlib
+import secrets
 from datetime import datetime, timedelta, timezone
 from enum import StrEnum
 from uuid import UUID
@@ -54,7 +56,9 @@ class InvalidTokenError(Exception):
     pass
 
 
-def decode_token(token: str, expected_type: TokenType) -> UUID:
+def decode_token(token: str, expected_type: TokenType) -> tuple[UUID, datetime]:
+    """Retorna (user_id, issued_at) — issued_at é usado para invalidar sessões
+    abertas antes de uma redefinição de senha (RF-013)."""
     try:
         payload = jwt.decode(token, settings.jwt_secret_key, algorithms=[settings.jwt_algorithm])
     except jwt.PyJWTError as exc:
@@ -63,4 +67,16 @@ def decode_token(token: str, expected_type: TokenType) -> UUID:
     if payload.get("type") != expected_type.value:
         raise InvalidTokenError("tipo de token inesperado")
 
-    return UUID(payload["sub"])
+    return UUID(payload["sub"]), datetime.fromtimestamp(payload["iat"], tz=timezone.utc)
+
+
+def generate_opaque_token() -> tuple[str, str]:
+    """Token aleatório para links de uso único: (valor enviado ao usuário, hash persistido)."""
+    token = secrets.token_urlsafe(32)
+    return token, hash_opaque_token(token)
+
+
+def hash_opaque_token(token: str) -> str:
+    # SHA-256 sem salt é suficiente aqui: o token já tem 256 bits de entropia,
+    # não é uma senha escolhida por humano (argon2 seria desperdício).
+    return hashlib.sha256(token.encode()).hexdigest()

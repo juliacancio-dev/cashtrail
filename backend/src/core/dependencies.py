@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 from src.core.database import get_db
 from src.core.security import InvalidTokenError, TokenType, decode_token
 from src.features.auth import repository
+from src.features.auth import service as auth_service
 from src.features.auth.models import User
 
 _bearer_scheme = HTTPBearer(auto_error=False)
@@ -31,12 +32,12 @@ def get_current_user(
         raise unauthorized
 
     try:
-        user_id = decode_token(credentials.credentials, expected_type=TokenType.ACCESS)
+        user_id, issued_at = decode_token(credentials.credentials, expected_type=TokenType.ACCESS)
     except InvalidTokenError:
         raise unauthorized
 
     user = repository.get_by_id(db, user_id)
-    if user is None:
+    if user is None or auth_service.token_predates_password_change(user, issued_at):
         raise unauthorized
 
     return user

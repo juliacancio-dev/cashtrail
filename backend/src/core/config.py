@@ -30,5 +30,13 @@ class Settings(BaseSettings):
     # nome/estado de revisão de forma confiável).
     app_version: str = "dev"
 
+    # Marco 7 (RF-013): recuperação de senha.
+    password_reset_token_expire_minutes: int = 30
+    # Base do link enviado por e-mail; produção sobrescreve via FRONTEND_URL (deploy.yml).
+    frontend_url: str = "http://localhost:3000"
+    # "console" só registra o e-mail no log (dev e enquanto o Azure Communication
+    # Services não estiver configurado).
+    email_backend: str = "console"
+
 
 settings = Settings()

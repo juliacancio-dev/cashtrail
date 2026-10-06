@@ -19,11 +19,18 @@ Controle financeiro pessoal espalhado entre planilhas e memória: nenhuma visão
 | Metas de economia | Progresso = soma dos lançamentos vinculados; marcada como atingida automaticamente |
 | Lançamentos recorrentes | Job agendado gera o lançamento e avança a próxima ocorrência, sem ação manual |
 
-Importação de extrato (CSV/OFX) e recuperação de senha ficam para depois do MVP (`docs/planning/12-mvp.md`).
+**Pós-MVP (Marco 7):**
+
+| Funcionalidade | Regra de negócio principal |
+|---|---|
+| Recuperação de senha | Link por e-mail com token de uso único e expiração curta; redefinir encerra todas as sessões abertas |
+| Importação de extrato (CSV) | Pré-visualização antes de gravar; possíveis duplicatas (mesma conta/tipo/valor, data ±2 dias) vêm desmarcadas para o usuário decidir — nunca descartadas em silêncio |
+
+OFX ficou fora do escopo da primeira versão da importação (só CSV).
 
 ## Arquitetura
 
-**Vertical slices**: cada funcionalidade (`accounts`, `categories`, `transactions`, `dashboard`, `budgets`, `goals`, `recurring`) é uma fatia completa — schema, regra de negócio, persistência, rota e teste moram juntos em `backend/src/features/<nome>/`. `transactions` é o núcleo do domínio: as demais slices dependem dela (nunca o contrário), chamando só sua camada `service` pública — nunca o `repository`/model ORM de outra slice diretamente. Detalhes e diagrama de dependências em [`docs/planning/09-vertical-slices.md`](docs/planning/09-vertical-slices.md).
+**Vertical slices**: cada funcionalidade (`accounts`, `categories`, `transactions`, `dashboard`, `budgets`, `goals`, `recurring`, `statement_import`) é uma fatia completa — schema, regra de negócio, persistência, rota e teste moram juntos em `backend/src/features/<nome>/`. `transactions` é o núcleo do domínio: as demais slices dependem dela (nunca o contrário), chamando só sua camada `service` pública — nunca o `repository`/model ORM de outra slice diretamente. Detalhes e diagrama de dependências em [`docs/planning/09-vertical-slices.md`](docs/planning/09-vertical-slices.md).
 
 **Decisões de maior consequência** (ADRs completos em [`docs/planning/decisions/`](docs/planning/decisions/)):
 - Azure como provedor de nuvem (ADR-001), multiusuário desde o início mesmo sendo uso pessoal (ADR-002)
@@ -38,7 +45,9 @@ Importação de extrato (CSV/OFX) e recuperação de senha ficam para depois do 
 
 Threat model completo em [`docs/planning/11-security.md`](docs/planning/11-security.md). Controles em vigor:
 - Toda query filtra por `user_id` do token autenticado (RNF-001/SEC-002) — testado em cada slice (`test_user_cannot_access_another_users_*`)
-- Rate limiting no login (SEC-006, 5 tentativas/minuto)
+- Rate limiting no login e na recuperação de senha (SEC-006, 5 tentativas/minuto)
+- Recuperação de senha: só o hash do token é guardado, a resposta é idêntica exista ou não a conta (não revela e-mails cadastrados)
+- Upload de extrato (SEC-004): só `.csv`, até 2 MB e 5.000 linhas; erro de parsing vira mensagem por linha, nunca derruba a API
 - CSRF: `SameSite=Strict` no cookie de refresh + header customizado exigido nas rotas que dependem só do cookie (`/auth/refresh`, `/auth/logout`)
 - Segredos fora do código-fonte (Azure Key Vault / variáveis de ambiente)
 - SQL injection: SQLAlchemy ORM exclusivamente, sem SQL concatenado

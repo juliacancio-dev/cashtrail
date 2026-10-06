@@ -1,4 +1,5 @@
 import uuid
+from dataclasses import dataclass
 from datetime import date
 from decimal import Decimal
 
@@ -88,6 +89,66 @@ def create_transaction(
         source=source,
         recurring_transaction_id=recurring_transaction_id,
     )
+
+
+def list_by_account_period(
+    db: Session, user_id: uuid.UUID, account_id: uuid.UUID, start_date: date, end_date: date
+) -> list[Transaction]:
+    return repository.list_by_account_period(db, user_id, account_id, start_date, end_date)
+
+
+@dataclass(frozen=True)
+class TransactionDraft:
+    category_id: uuid.UUID
+    type: TransactionType
+    amount: Decimal
+    description: str | None
+    occurred_at: date
+
+
+def create_many(
+    db: Session,
+    user_id: uuid.UUID,
+    account_id: uuid.UUID,
+    drafts: list[TransactionDraft],
+    source: TransactionSource,
+    commit: bool = True,
+) -> list[Transaction]:
+    """Criação em lote, tudo-ou-nada (usada pela importação de extrato, RF-011).
+
+    Valida conta e todas as categorias ANTES de adicionar qualquer linha, então um
+    rascunho inválido não deixa nada pela metade. `commit=False` deixa o chamador
+    gravar um registro dele (ex: statement_imports) na mesma transação.
+    """
+    try:
+        account = accounts_service.get_account(db, user_id, account_id)
+    except accounts_service.AccountNotFoundError:
+        raise InvalidAccountError(account_id)
+
+    if account.is_archived:
+        raise ArchivedAccountError(account_id)
+
+    for category_id in {draft.category_id for draft in drafts}:
+        try:
+            categories_service.get_category(db, user_id, category_id)
+        except categories_service.CategoryNotFoundError:
+            raise InvalidCategoryError(category_id)
+
+    transactions = [
+        Transaction(
+            user_id=user_id,
+            account_id=account_id,
+            category_id=draft.category_id,
+            type=draft.type,
+            source=source,
+            amount=draft.amount,
+            description=draft.description,
+            occurred_at=draft.occurred_at,
+        )
+        for draft in drafts
+    ]
+    repository.add_many(db, transactions, commit=commit)
+    return transactions
 
 
 def sum_by_goal(db: Session, user_id: uuid.UUID, goal_id: uuid.UUID) -> Decimal:

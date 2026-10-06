@@ -18,6 +18,7 @@ from src.features.dashboard.router import router as dashboard_router
 from src.features.goals.router import router as goals_router
 from src.features.recurring import service as recurring_service
 from src.features.recurring.router import router as recurring_router
+from src.features.statement_import.router import router as statement_import_router
 from src.features.transactions.router import router as transactions_router
 
 
@@ -67,6 +68,7 @@ app.include_router(dashboard_router)
 app.include_router(goals_router)
 app.include_router(budgets_router)
 app.include_router(recurring_router)
+app.include_router(statement_import_router)
 
 
 @app.get("/health")

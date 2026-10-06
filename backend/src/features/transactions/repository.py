@@ -61,6 +61,29 @@ def create(
     return transaction
 
 
+def list_by_account_period(
+    db: Session, user_id: uuid.UUID, account_id: uuid.UUID, start_date: date, end_date: date
+) -> list[Transaction]:
+    return list(
+        db.scalars(
+            select(Transaction)
+            .where(
+                Transaction.user_id == user_id,
+                Transaction.account_id == account_id,
+                Transaction.occurred_at >= start_date,
+                Transaction.occurred_at <= end_date,
+            )
+            .order_by(Transaction.occurred_at, Transaction.created_at)
+        )
+    )
+
+
+def add_many(db: Session, transactions: list[Transaction], commit: bool) -> None:
+    db.add_all(transactions)
+    if commit:
+        db.commit()
+
+
 def sum_by_goal(db: Session, user_id: uuid.UUID, goal_id: uuid.UUID) -> Decimal:
     total = db.scalar(
         select(func.coalesce(func.sum(Transaction.amount), 0)).where(

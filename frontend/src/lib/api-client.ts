@@ -29,7 +29,10 @@ export async function refreshAccessToken(): Promise<boolean> {
 async function request(path: string, options: RequestInit = {}, allowRetry = true): Promise<Response> {
   const headers = new Headers(options.headers);
   if (accessToken) headers.set("Authorization", `Bearer ${accessToken}`);
-  if (options.body && !headers.has("Content-Type")) headers.set("Content-Type", "application/json");
+  // Upload (FormData): o browser precisa montar o Content-Type com o boundary sozinho.
+  if (options.body && !(options.body instanceof FormData) && !headers.has("Content-Type")) {
+    headers.set("Content-Type", "application/json");
+  }
   // CSRF defesa em profundidade (11-security.md) — exigido pelo backend nas rotas
   // que dependem só do cookie de refresh (auth/refresh, auth/logout).
   headers.set("X-Requested-With", "CashTrail");
@@ -53,6 +56,7 @@ export const apiClient = {
   get: (path: string) => request(path),
   post: (path: string, body?: unknown) =>
     request(path, { method: "POST", body: body !== undefined ? JSON.stringify(body) : undefined }),
+  postForm: (path: string, body: FormData) => request(path, { method: "POST", body }),
   patch: (path: string, body?: unknown) =>
     request(path, { method: "PATCH", body: body !== undefined ? JSON.stringify(body) : undefined }),
   delete: (path: string) => request(path, { method: "DELETE" }),

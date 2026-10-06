@@ -34,6 +34,7 @@
 ### StatementImport — importação de extrato (slice `statement_import`)
 - `id` (PK), `user_id` (FK), `account_id` (FK), `file_name`, `file_format` (`csv` | `ofx`), `status` (`processing` | `completed` | `failed`), `transactions_created` (int), `transactions_flagged` (int, possíveis duplicatas pendentes de revisão), `created_at`
 - Serve de registro de auditoria de cada importação — não é estritamente exigido pelas RF, mas é barato de manter e resolve a exigência implícita de "resumo da importação" do Fluxo 6 (`04-usecases.md`).
+- **Como foi implementado (Marco 7, só CSV):** colunas `file_name`, `file_sha256` (avisa quando o mesmo arquivo é reenviado), `rows_total`, `transactions_created`, `rows_skipped`. Sem `file_format`/`status`/`transactions_flagged`: não há OFX, e o fluxo é pré-visualizar → confirmar sem estado intermediário, então o registro só existe depois de confirmado (junto com os lançamentos, na mesma transação). `Transaction.import_fitid` não foi criado, pois depende do OFX.
 
 ## Diagrama entidade-relacionamento
 

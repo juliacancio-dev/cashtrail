@@ -1,3 +1,4 @@
+import logging
 from datetime import datetime, timedelta, timezone
 
 from sqlalchemy.orm import Session
@@ -17,6 +18,8 @@ from src.core.security import (
 )
 from src.features.auth import repository
 from src.features.auth.models import User
+
+logger = logging.getLogger(__name__)
 
 
 class EmailAlreadyRegisteredError(Exception):
@@ -91,16 +94,22 @@ def request_password_reset(db: Session, email_address: str) -> str | None:
 
 def send_password_reset_email(to: str, token: str) -> None:
     link = f"{settings.frontend_url}/reset-password?token={token}"
-    email.send_email(
-        to=to,
-        subject="CashTrail - redefinição de senha",
-        body=(
-            "Recebemos um pedido para redefinir a sua senha no CashTrail.\n\n"
-            f"Para criar uma nova senha, acesse: {link}\n\n"
-            f"O link expira em {settings.password_reset_token_expire_minutes} minutos e só pode "
-            "ser usado uma vez. Se você não pediu isso, ignore este e-mail."
-        ),
-    )
+    try:
+        email.send_email(
+            to=to,
+            subject="CashTrail - redefinição de senha",
+            body=(
+                "Recebemos um pedido para redefinir a sua senha no CashTrail.\n\n"
+                f"Para criar uma nova senha, acesse: {link}\n\n"
+                f"O link expira em {settings.password_reset_token_expire_minutes} minutos e só pode "
+                "ser usado uma vez. Se você não pediu isso, ignore este e-mail."
+            ),
+        )
+    except Exception:
+        # Roda em background depois da resposta 202: o usuário já recebeu a mensagem
+        # genérica (não pode saber se a conta existe), então a falha só vai pro log.
+        # Nunca logar o `link`/token aqui.
+        logger.exception("falha ao enviar e-mail de redefinicao de senha")
 
 
 def reset_password(db: Session, token: str, new_password: str) -> None:

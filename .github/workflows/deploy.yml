@@ -67,12 +67,32 @@ jobs:
             --file Dockerfile .
 
       - name: Deploy backend
+        env:
+          ACS_CONNECTION_STRING: ${{ secrets.ACS_CONNECTION_STRING }}
+          EMAIL_SENDER_ADDRESS: ${{ secrets.EMAIL_SENDER_ADDRESS }}
         run: |
           # FRONTEND_URL monta o link do e-mail de redefinição de senha (RF-013).
           frontend_fqdn=$(az containerapp show -g "$RESOURCE_GROUP" -n "$FRONTEND_APP" --query properties.configuration.ingress.fqdn -o tsv --only-show-errors)
+
+          # E-mail real (Azure Communication Services): só liga se o secret do GitHub existir.
+          # Sem ele o backend segue com EMAIL_BACKEND=console (link só no log), então o
+          # deploy não quebra antes de o recurso ser criado.
+          email_env=()
+          if [ -n "$ACS_CONNECTION_STRING" ]; then
+            if [ -z "$EMAIL_SENDER_ADDRESS" ]; then
+              echo "::error::ACS_CONNECTION_STRING definido, mas falta o secret EMAIL_SENDER_ADDRESS."
+              exit 1
+            fi
+            az containerapp secret set -g "$RESOURCE_GROUP" -n "$BACKEND_APP" \
+              --secrets "acs-connection-string=$ACS_CONNECTION_STRING" --only-show-errors -o none
+            email_env=(EMAIL_BACKEND=acs ACS_CONNECTION_STRING=secretref:acs-connection-string "EMAIL_SENDER_ADDRESS=$EMAIL_SENDER_ADDRESS")
+          else
+            echo "::warning::ACS_CONNECTION_STRING não configurado: e-mail de recuperação de senha só no log."
+          fi
+
           az containerapp update -g "$RESOURCE_GROUP" -n "$BACKEND_APP" \
             --image "$ACR_NAME.azurecr.io/cashtrail-backend:$IMAGE_TAG" \
-            --set-env-vars ENABLE_SCHEDULER=true "APP_VERSION=$IMAGE_TAG" "FRONTEND_URL=https://$frontend_fqdn" \
+            --set-env-vars ENABLE_SCHEDULER=true "APP_VERSION=$IMAGE_TAG" "FRONTEND_URL=https://$frontend_fqdn" "${email_env[@]}" \
             --only-show-errors -o none
 
       # Ambiente Express não aceita revision suffix nem preenche

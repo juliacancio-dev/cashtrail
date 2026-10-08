@@ -4,6 +4,9 @@ on:
   schedule:
     # 03:00 UTC (00:00 em Brasília) — todo dia, garante que não fica ligado à noite.
     - cron: "0 3 * * *"
+    # 06:00 UTC (03:00 em Brasília) — só às segundas, liga o banco. O texto do cron
+    # abaixo precisa ser idêntico ao usado em ACTION (compara com github.event.schedule).
+    - cron: "0 6 * * 1"
   workflow_dispatch:
     inputs:
       action:
@@ -35,7 +38,7 @@ jobs:
       # start/stop falham se o servidor já está no estado pedido, então checa antes.
       - name: Start or stop Postgres
         env:
-          ACTION: ${{ github.event_name == 'schedule' && 'stop' || inputs.action }}
+          ACTION: ${{ github.event_name == 'schedule' && (github.event.schedule == '0 6 * * 1' && 'start' || 'stop') || inputs.action }}
         run: |
           state=$(az postgres flexible-server show --resource-group $RESOURCE_GROUP --name $SERVER_NAME --query state -o tsv)
           echo "Action: $ACTION | current state: $state"

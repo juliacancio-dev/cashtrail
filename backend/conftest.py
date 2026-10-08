@@ -24,6 +24,7 @@ from src.features.accounts.models import Account  # noqa: F401
 from src.features.auth.models import User  # noqa: F401
 from src.features.budgets.models import Budget  # noqa: F401
 from src.features.categories.models import Category  # noqa: F401
+from src.features.commitments.models import Commitment, CommitmentSettlement  # noqa: F401
 from src.features.goals.models import Goal  # noqa: F401
 from src.features.recurring.models import RecurringTransaction  # noqa: F401
 from src.features.statement_import.models import StatementImport  # noqa: F401

@@ -8,6 +8,7 @@ const links = [
   { href: "/accounts", label: "Contas" },
   { href: "/categories", label: "Categorias" },
   { href: "/transactions", label: "Lançamentos" },
+  { href: "/commitments", label: "A pagar/receber" },
   { href: "/import", label: "Importar" },
   { href: "/budgets", label: "Orçamentos" },
   { href: "/goals", label: "Metas" },

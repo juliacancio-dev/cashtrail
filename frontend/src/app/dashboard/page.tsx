@@ -7,6 +7,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { AppNav } from "@/components/app-nav";
 import { useAuth } from "@/features/auth/auth-context";
+import { getCommitmentSummary } from "@/features/commitments/api";
+import type { CommitmentSummary } from "@/features/commitments/schemas";
+import { CommitmentsAlert } from "@/features/commitments/summary-cards";
 import { getDashboard } from "@/features/dashboard/api";
 import type { Dashboard } from "@/features/dashboard/schemas";
 import { SummaryCards } from "@/features/dashboard/summary-cards";
@@ -17,6 +20,7 @@ export default function DashboardPage() {
   const { user, isLoading, logout } = useAuth();
   const router = useRouter();
   const [dashboard, setDashboard] = useState<Dashboard | null>(null);
+  const [commitments, setCommitments] = useState<CommitmentSummary | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -30,6 +34,10 @@ export default function DashboardPage() {
     getDashboard()
       .then(setDashboard)
       .catch(() => setError("nao foi possivel carregar o dashboard"));
+    // O alerta de vencimentos é um extra: se falhar, o dashboard segue sem ele.
+    getCommitmentSummary()
+      .then(setCommitments)
+      .catch(() => setCommitments(null));
   }, [user]);
 
   if (isLoading || !user) {
@@ -59,6 +67,8 @@ export default function DashboardPage() {
       </div>
 
       {error && <p className="text-destructive text-sm">{error}</p>}
+
+      {commitments && <CommitmentsAlert summary={commitments} />}
 
       {!dashboard ? (
         <p className="text-muted-foreground text-sm">Carregando...</p>

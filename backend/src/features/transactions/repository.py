@@ -42,6 +42,7 @@ def create(
     goal_id: uuid.UUID | None = None,
     source: TransactionSource = TransactionSource.MANUAL,
     recurring_transaction_id: uuid.UUID | None = None,
+    commit: bool = True,
 ) -> Transaction:
     transaction = Transaction(
         user_id=user_id,
@@ -56,9 +57,21 @@ def create(
         occurred_at=occurred_at,
     )
     db.add(transaction)
-    db.commit()
-    db.refresh(transaction)
+    if commit:
+        db.commit()
+        db.refresh(transaction)
+    else:
+        # flush atribui o id sem encerrar a transação do chamador.
+        db.flush()
     return transaction
+
+
+def delete(db: Session, transaction: Transaction, commit: bool) -> None:
+    db.delete(transaction)
+    if commit:
+        db.commit()
+    else:
+        db.flush()
 
 
 def list_by_account_period(

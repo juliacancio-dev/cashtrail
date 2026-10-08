@@ -55,8 +55,12 @@ def create_transaction(
     goal_id: uuid.UUID | None = None,
     source: TransactionSource = TransactionSource.MANUAL,
     recurring_transaction_id: uuid.UUID | None = None,
+    commit: bool = True,
 ) -> Transaction:
     """RB-001: lançamento pertence a exatamente uma conta e uma categoria do próprio usuário.
+
+    `commit=False` deixa o chamador gravar outra coisa na mesma transação (a baixa de
+    um compromisso cria o lançamento e a baixa juntos, tudo-ou-nada).
 
     `goal_id`/`recurring_transaction_id` não são validados aqui de propósito:
     transactions não depende de goals nem de recurring (09-vertical-slices.md) —
@@ -88,7 +92,18 @@ def create_transaction(
         goal_id=goal_id,
         source=source,
         recurring_transaction_id=recurring_transaction_id,
+        commit=commit,
     )
+
+
+def delete_transaction(db: Session, user_id: uuid.UUID, transaction_id: uuid.UUID, commit: bool = True) -> None:
+    """Exclusão controlada, NÃO exposta na API de lançamentos (que segue sem DELETE).
+
+    Existe para uma slice desfazer um lançamento que ela mesma criou (ex: desfazer a
+    baixa de um compromisso). Quem chama garante que o lançamento é dele.
+    """
+    transaction = get_transaction(db, user_id, transaction_id)
+    repository.delete(db, transaction, commit=commit)
 
 
 def list_by_account_period(

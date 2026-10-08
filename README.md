@@ -24,6 +24,7 @@ Controle financeiro pessoal espalhado entre planilhas e memória: nenhuma visão
 | Funcionalidade | Regra de negócio principal |
 |---|---|
 | Recuperação de senha | Link por e-mail com token de uso único e expiração curta; redefinir encerra todas as sessões abertas |
+| Contas a pagar e a receber | Compromisso com vencimento; a baixa (total ou parcial) cria o lançamento realizado; parcelamento; "atrasado" é calculado, nunca marcado à mão |
 | Importação de extrato (CSV) | Pré-visualização antes de gravar; possíveis duplicatas (mesma conta/tipo/valor, data ±2 dias) vêm desmarcadas para o usuário decidir — nunca descartadas em silêncio |
 
 OFX ficou fora do escopo da primeira versão da importação (só CSV).

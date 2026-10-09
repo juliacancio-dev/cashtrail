@@ -67,7 +67,7 @@ export default function CardsPage() {
 
   const configured = new Set((cards ?? []).map((card) => card.account_id));
   const freeCardAccounts = accounts.filter((a) => a.type === "credit_card" && !a.is_archived && !configured.has(a.id));
-  const paymentAccounts = accounts.filter((a) => a.type !== "credit_card" && !a.is_archived);
+  const paymentAccounts = accounts.filter((a) => a.type !== "credit_card" && a.type !== "loan" && !a.is_archived);
 
   return (
     <main className="mx-auto flex w-full max-w-4xl flex-1 flex-col gap-6 p-6">

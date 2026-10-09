@@ -13,6 +13,12 @@ class AccountType(str, enum.Enum):
     CHECKING = "checking"
     SAVINGS = "savings"
     CREDIT_CARD = "credit_card"
+    LOAN = "loan"
+
+
+# Contas que NÃO são dinheiro em caixa: dívida de cartão e de empréstimo/financiamento (R-11.3).
+# Um único predicado, usado por saldos, fluxo de caixa e dashboard.
+NON_CASH_TYPES = (AccountType.CREDIT_CARD, AccountType.LOAN)
 
 
 class Account(Base):

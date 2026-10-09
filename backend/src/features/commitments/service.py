@@ -13,6 +13,7 @@ from src.features.commitments import repository
 from src.features.commitments.models import Commitment, CommitmentDirection, CommitmentSettlement
 from src.features.transactions import service as transactions_service
 from src.features.transactions.models import TransactionType
+from src.features.transfers import service as transfers_service
 
 SOON_DAYS = 7
 MAX_INSTALLMENTS = 120
@@ -39,6 +40,10 @@ class InvalidCategoryError(Exception):
 
 class ArchivedAccountError(Exception):
     """RB-010: conta arquivada não aceita novos lançamentos (reaproveita RB-003)."""
+
+
+class DebtManagedError(Exception):
+    """Parcela de dívida (Marco 11): pagar/editar/cancelar só pela slice debts, que separa principal de encargos."""
 
 
 class CommitmentLockedError(Exception):
@@ -149,11 +154,17 @@ def create_commitment(
     installments: int = 1,
     today: date | None = None,
     recurring_transaction_id: uuid.UUID | None = None,
+    debt_id: uuid.UUID | None = None,
+    installment_number: int | None = None,
+    installment_count: int | None = None,
+    commit: bool = True,
 ) -> list[CommitmentView]:
     """RF-014/RF-015. O `amount` é o TOTAL; com N > 1 vira N compromissos mensais.
 
     `recurring_transaction_id` só é passado pela slice recurring (RF-022); a posse da
     recorrência já foi garantida por quem chama, como acontece com `goal_id` em transactions.
+    `debt_id`/`installment_*` só são passados pela slice debts (Marco 11), que cria uma parcela
+    por vez e numera pelo cronograma da dívida.
     """
     if not 1 <= installments <= MAX_INSTALLMENTS:
         raise InvalidInstallmentsError(installments)
@@ -174,13 +185,14 @@ def create_commitment(
             notes=notes,
             recurring_transaction_id=recurring_transaction_id,
             installment_group_id=group_id,
-            installment_number=index + 1 if group_id else None,
-            installment_count=installments if group_id else None,
+            installment_number=index + 1 if group_id else installment_number,
+            installment_count=installments if group_id else installment_count,
+            debt_id=debt_id,
             is_canceled=False,
         )
         for index, part in enumerate(split_amount(amount, installments))
     ]
-    repository.add_all(db, rows)
+    repository.add_all(db, rows, commit=commit)
     return [_view(row, ZERO, today) for row in rows]
 
 
@@ -240,9 +252,12 @@ def update_commitment(
     commitment_id: uuid.UUID,
     changes: dict[str, Any],
     today: date | None = None,
+    via_debt: bool = False,
 ) -> CommitmentView:
     today = today or date.today()
     commitment = _get(db, user_id, commitment_id)
+    if commitment.debt_id is not None and not via_debt and ("amount" in changes or "due_date" in changes):
+        raise DebtManagedError(commitment_id)
     paid = repository.paid_amount(db, commitment.id)
     status = derive_status(commitment, paid, today)
 
@@ -261,17 +276,27 @@ def update_commitment(
 
 
 def cancel_commitment(
-    db: Session, user_id: uuid.UUID, commitment_id: uuid.UUID, today: date | None = None
+    db: Session,
+    user_id: uuid.UUID,
+    commitment_id: uuid.UUID,
+    today: date | None = None,
+    via_debt: bool = False,
+    commit: bool = True,
 ) -> CommitmentView:
     """RF-020. Cancela só o que ainda está em aberto; o que já foi pago fica no histórico."""
     today = today or date.today()
     commitment = _get(db, user_id, commitment_id)
+    if commitment.debt_id is not None and not via_debt:
+        raise DebtManagedError(commitment_id)
     paid = repository.paid_amount(db, commitment.id)
     if derive_status(commitment, paid, today) in ("paid", "canceled"):
         raise CommitmentLockedError(commitment_id)
 
     commitment.is_canceled = True
-    repository.save(db, commitment)
+    if commit:
+        repository.save(db, commitment)
+    else:
+        db.flush()
     return _view(commitment, paid, today)
 
 
@@ -283,14 +308,22 @@ def settle_commitment(
     paid_at: date | None,
     account_id: uuid.UUID | None,
     today: date | None = None,
+    transfer_amount: Decimal | None = None,
+    transfer_to_account_id: uuid.UUID | None = None,
 ) -> tuple[CommitmentView, CommitmentSettlement]:
     """RF-016/RF-017: cria o lançamento realizado e a baixa na MESMA transação.
+
+    `transfer_amount`/`transfer_to_account_id` só vêm da slice debts (Marco 11): parte da baixa
+    (o principal) vira transferência para a conta da dívida e só o restante (encargos) vira
+    despesa, então o DRE não conta o principal como gasto (RB-023).
 
     O lançamento nasce via transactions.service (nunca direto na tabela), que revalida
     posse de conta/categoria (RB-001) e conta arquivada (RB-010).
     """
     today = today or date.today()
     commitment = _get(db, user_id, commitment_id)
+    if commitment.debt_id is not None and transfer_to_account_id is None:
+        raise DebtManagedError(commitment_id)
     paid = repository.paid_amount(db, commitment.id)
     balance = commitment.amount - paid
 
@@ -313,29 +346,56 @@ def settle_commitment(
     if commitment.installment_number and commitment.installment_count:
         description = f"{description} ({commitment.installment_number}/{commitment.installment_count})"
 
-    try:
-        transaction = transactions_service.create_transaction(
-            db,
-            user_id,
-            account_id=target_account_id,
-            category_id=commitment.category_id,
-            type=TransactionType.EXPENSE if commitment.direction == CommitmentDirection.PAYABLE else TransactionType.INCOME,
-            amount=amount,
-            description=description[:255],
-            occurred_at=paid_at,
-            commit=False,
-        )
-    except transactions_service.InvalidAccountError:
-        raise InvalidAccountError(target_account_id)
-    except transactions_service.ArchivedAccountError:
-        raise ArchivedAccountError(target_account_id)
-    except transactions_service.InvalidCategoryError:
-        raise InvalidCategoryError(commitment.category_id)
+    split = transfer_amount or ZERO
+    if split < 0 or split > amount or (split > 0 and transfer_to_account_id is None):
+        raise InvalidAmountError(commitment_id)
+    expense_amount = amount - split
+
+    transaction = None
+    if expense_amount > 0:
+        try:
+            transaction = transactions_service.create_transaction(
+                db,
+                user_id,
+                account_id=target_account_id,
+                category_id=commitment.category_id,
+                type=TransactionType.EXPENSE if commitment.direction == CommitmentDirection.PAYABLE else TransactionType.INCOME,
+                amount=expense_amount,
+                description=description[:255],
+                occurred_at=paid_at,
+                commit=False,
+            )
+        except transactions_service.InvalidAccountError:
+            raise InvalidAccountError(target_account_id)
+        except transactions_service.ArchivedAccountError:
+            raise ArchivedAccountError(target_account_id)
+        except transactions_service.InvalidCategoryError:
+            raise InvalidCategoryError(commitment.category_id)
+
+    transfer = None
+    if split > 0:
+        try:
+            transfer = transfers_service.create_transfer(
+                db,
+                user_id,
+                from_account_id=target_account_id,
+                to_account_id=transfer_to_account_id,
+                amount=split,
+                occurred_at=paid_at,
+                description=description[:255],
+                commit=False,
+                today=today,
+            )
+        except (transfers_service.InvalidAccountError, transfers_service.SameAccountError):
+            raise InvalidAccountError(target_account_id)
+        except transfers_service.ArchivedAccountError:
+            raise ArchivedAccountError(target_account_id)
 
     settlement = CommitmentSettlement(
         user_id=user_id,
         commitment_id=commitment.id,
-        transaction_id=transaction.id,
+        transaction_id=transaction.id if transaction else None,
+        transfer_id=transfer.id if transfer else None,
         amount=amount,
         paid_at=paid_at,
     )
@@ -363,9 +423,12 @@ def undo_settlement(
     if settlement is None:
         raise SettlementNotFoundError(settlement_id)
 
-    transaction_id = settlement.transaction_id
+    transaction_id, transfer_id = settlement.transaction_id, settlement.transfer_id
     repository.delete_settlement(db, settlement)
-    transactions_service.delete_transaction(db, user_id, transaction_id, commit=False)
+    if transaction_id is not None:
+        transactions_service.delete_transaction(db, user_id, transaction_id, commit=False)
+    if transfer_id is not None:
+        transfers_service.delete_transfer(db, user_id, transfer_id, commit=False)
     db.commit()
 
     return _view(commitment, repository.paid_amount(db, commitment.id), today)

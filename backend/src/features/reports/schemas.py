@@ -5,7 +5,7 @@ from typing import Literal
 
 from pydantic import BaseModel
 
-AccountKind = Literal["checking", "savings", "credit_card"]
+AccountKind = Literal["checking", "savings", "credit_card", "loan"]
 
 
 class AccountBalanceRead(BaseModel):
@@ -21,6 +21,7 @@ class BalancesRead(BaseModel):
     accounts: list[AccountBalanceRead]
     cash_total: Decimal
     card_debt_total: Decimal
+    loan_debt_total: Decimal
 
 
 class DreCategoryRead(BaseModel):

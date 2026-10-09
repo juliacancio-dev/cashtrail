@@ -11,6 +11,9 @@ import { getCommitmentSummary } from "@/features/commitments/api";
 import type { CommitmentSummary } from "@/features/commitments/schemas";
 import { CommitmentsAlert } from "@/features/commitments/summary-cards";
 import { getCardsSummary } from "@/features/credit-cards/api";
+import { getDebtsSummary } from "@/features/debts/api";
+import type { DebtsSummary } from "@/features/debts/schemas";
+import { DebtsAlert } from "@/features/debts/summary-alert";
 import type { CardsSummary } from "@/features/credit-cards/schemas";
 import { CardsAlert } from "@/features/credit-cards/summary-alert";
 import { getDashboard } from "@/features/dashboard/api";
@@ -25,6 +28,7 @@ export default function DashboardPage() {
   const [dashboard, setDashboard] = useState<Dashboard | null>(null);
   const [commitments, setCommitments] = useState<CommitmentSummary | null>(null);
   const [cards, setCards] = useState<CardsSummary | null>(null);
+  const [debts, setDebts] = useState<DebtsSummary | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -45,6 +49,9 @@ export default function DashboardPage() {
     getCardsSummary()
       .then(setCards)
       .catch(() => setCards(null));
+    getDebtsSummary()
+      .then(setDebts)
+      .catch(() => setDebts(null));
   }, [user]);
 
   if (isLoading || !user) {
@@ -77,6 +84,7 @@ export default function DashboardPage() {
 
       {commitments && <CommitmentsAlert summary={commitments} />}
       {cards && <CardsAlert summary={cards} />}
+      {debts && <DebtsAlert summary={debts} />}
 
       {!dashboard ? (
         <p className="text-muted-foreground text-sm">Carregando...</p>

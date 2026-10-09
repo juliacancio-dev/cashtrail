@@ -20,7 +20,7 @@ from decimal import Decimal
 from sqlalchemy.orm import Session
 
 from src.features.accounts import service as accounts_service
-from src.features.accounts.models import AccountType
+from src.features.accounts.models import NON_CASH_TYPES, AccountType
 from src.features.categories import service as categories_service
 from src.features.commitments import service as commitments_service
 from src.features.commitments.models import CommitmentDirection
@@ -116,8 +116,9 @@ def month_key(day: date) -> str:
 def collect_items(db: Session, user_id: uuid.UUID, today: date, horizon_end: date) -> list[FlowItem]:
     accounts = accounts_service.list_accounts(db, user_id)
     account_names = {a.id: a.name for a in accounts}
-    cash_ids = {a.id for a in accounts if a.type != AccountType.CREDIT_CARD}
+    cash_ids = {a.id for a in accounts if a.type not in NON_CASH_TYPES}
     card_ids = {a.id for a in accounts if a.type == AccountType.CREDIT_CARD}
+    loan_ids = {a.id for a in accounts if a.type == AccountType.LOAN}
     category_names = {c.id: c.name for c in categories_service.list_categories(db, user_id)}
     items: list[FlowItem] = []
 
@@ -148,10 +149,12 @@ def collect_items(db: Session, user_id: uuid.UUID, today: date, horizon_end: dat
         if from_cash == to_cash:
             continue  # entre contas de caixa (ou entre cartões): movimento interno
         if from_cash:
-            description = tr.description or f"Pagamento de cartão: {account_names.get(tr.to_account_id, '?')}"
+            kind = "Pagamento de dívida" if tr.to_account_id in loan_ids else "Pagamento de cartão"
+            description = tr.description or f"{kind}: {account_names.get(tr.to_account_id, '?')}"
             items.append(FlowItem("realized", "out", tr.occurred_at, tr.amount, "transfers", description, ref_id=tr.id))
         else:
-            description = tr.description or f"Recebido do cartão: {account_names.get(tr.from_account_id, '?')}"
+            kind = "Recebido da dívida" if tr.from_account_id in loan_ids else "Recebido do cartão"
+            description = tr.description or f"{kind}: {account_names.get(tr.from_account_id, '?')}"
             items.append(FlowItem("realized", "in", tr.occurred_at, tr.amount, "transfers", description, ref_id=tr.id))
 
     # 3) Contas a pagar e a receber: previsto pelo bruto no vencimento (RB-024).
@@ -227,7 +230,7 @@ def collect_items(db: Session, user_id: uuid.UUID, today: date, horizon_end: dat
 
 def _opening_total(db: Session, user_id: uuid.UUID) -> Decimal:
     return sum(
-        (a.opening_balance for a in accounts_service.list_accounts(db, user_id) if a.type != AccountType.CREDIT_CARD),
+        (a.opening_balance for a in accounts_service.list_accounts(db, user_id) if a.type not in NON_CASH_TYPES),
         ZERO,
     )
 

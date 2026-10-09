@@ -6,11 +6,11 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { accountTypeOptions, type Account } from "@/features/accounts/schemas";
+import { accountTypeLabels, type Account } from "@/features/accounts/schemas";
 import { formatCurrency } from "@/lib/format";
 
 function typeLabel(type: Account["type"]): string {
-  return accountTypeOptions.find((option) => option.value === type)?.label ?? type;
+  return accountTypeLabels[type] ?? type;
 }
 
 function OpeningBalanceEditor({
@@ -87,7 +87,7 @@ export function AccountList({
     <div className="flex flex-col gap-3">
       {accounts.map((account) => {
         const balance = balances[account.id];
-        const isCard = account.type === "credit_card";
+        const isCard = account.type === "credit_card" || account.type === "loan";
         const opening = Number(account.opening_balance);
         const hasNoOpening = opening === 0 && balance !== undefined && Number(balance) !== 0;
 

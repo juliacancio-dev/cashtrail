@@ -41,6 +41,7 @@ def _read(view: service.CommitmentView) -> CommitmentRead:
         installment_group_id=c.installment_group_id,
         installment_number=c.installment_number,
         installment_count=c.installment_count,
+        debt_id=c.debt_id,
         is_canceled=c.is_canceled,
         created_at=c.created_at,
         paid_amount=view.paid_amount,
@@ -64,6 +65,8 @@ def _not_found(exc: Exception) -> HTTPException:
         return HTTPException(status.HTTP_404_NOT_FOUND, detail="conta nao encontrada")
     return HTTPException(status.HTTP_404_NOT_FOUND, detail="categoria nao encontrada")
 
+
+DEBT_MANAGED_MESSAGE = "parcela de divida: use a tela de dividas para pagar, editar ou cancelar"
 
 NOT_FOUND = (
     service.CommitmentNotFoundError,
@@ -140,6 +143,8 @@ def update_commitment(
         raise HTTPException(status.HTTP_409_CONFLICT, detail="compromisso pago ou cancelado nao pode ter valor ou vencimento alterados")
     except service.InvalidAmountError:
         raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, detail="o valor nao pode ser menor do que o ja pago")
+    except service.DebtManagedError:
+        raise HTTPException(status.HTTP_409_CONFLICT, detail=DEBT_MANAGED_MESSAGE)
 
     return _read(view)
 
@@ -154,6 +159,8 @@ def cancel_commitment(
         raise _not_found(exc)
     except service.CommitmentLockedError:
         raise HTTPException(status.HTTP_409_CONFLICT, detail="compromisso ja pago ou cancelado")
+    except service.DebtManagedError:
+        raise HTTPException(status.HTTP_409_CONFLICT, detail=DEBT_MANAGED_MESSAGE)
 
     return _read(view)
 
@@ -184,6 +191,8 @@ def settle_commitment(
         raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, detail="informe a conta da baixa")
     except service.FutureDateError:
         raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, detail="a data do pagamento nao pode estar no futuro")
+    except service.DebtManagedError:
+        raise HTTPException(status.HTTP_409_CONFLICT, detail=DEBT_MANAGED_MESSAGE)
 
     return _detail(view, settlements)
 

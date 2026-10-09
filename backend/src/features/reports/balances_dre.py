@@ -11,7 +11,7 @@ from decimal import Decimal
 from sqlalchemy.orm import Session
 
 from src.features.accounts import service as accounts_service
-from src.features.accounts.models import AccountType
+from src.features.accounts.models import NON_CASH_TYPES, AccountType
 from src.features.categories import service as categories_service
 from src.features.commitments import service as commitments_service
 from src.features.commitments.models import CommitmentDirection
@@ -42,8 +42,9 @@ class AccountBalance:
 @dataclass(frozen=True)
 class Balances:
     accounts: list[AccountBalance]
-    cash_total: Decimal  # soma das contas que NÃO são cartão (inclui arquivadas)
+    cash_total: Decimal  # soma das contas que NÃO são cartão nem dívida (inclui arquivadas)
     card_debt_total: Decimal
+    loan_debt_total: Decimal  # saldo devedor de empréstimos e financiamentos (Marco 11)
 
 
 def balances(db: Session, user_id: uuid.UUID, today: date | None = None) -> Balances:
@@ -73,9 +74,12 @@ def balances(db: Session, user_id: uuid.UUID, today: date | None = None) -> Bala
         )
         for account in accounts_service.list_accounts(db, user_id)
     ]
-    cash = sum((r.balance for r in rows if r.type != AccountType.CREDIT_CARD), ZERO)
+    cash = sum((r.balance for r in rows if r.type not in NON_CASH_TYPES), ZERO)
     debt = sum((-r.balance for r in rows if r.type == AccountType.CREDIT_CARD), ZERO)
-    return Balances(accounts=rows, cash_total=money(cash), card_debt_total=money(debt))
+    loans = sum((-r.balance for r in rows if r.type == AccountType.LOAN), ZERO)
+    return Balances(
+        accounts=rows, cash_total=money(cash), card_debt_total=money(debt), loan_debt_total=money(loans)
+    )
 
 
 # ---------- DRE ----------

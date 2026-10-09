@@ -1,4 +1,4 @@
-export type AccountKind = "checking" | "savings" | "credit_card";
+export type AccountKind = "checking" | "savings" | "credit_card" | "loan";
 
 export type AccountBalance = {
   account_id: string;
@@ -13,6 +13,7 @@ export type Balances = {
   accounts: AccountBalance[];
   cash_total: string;
   card_debt_total: string;
+  loan_debt_total: string;
 };
 
 export type DreCategory = { category_id: string | null; name: string; amount: string };

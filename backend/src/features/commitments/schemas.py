@@ -55,7 +55,8 @@ class SettlementRead(BaseModel):
 
     id: uuid.UUID
     commitment_id: uuid.UUID
-    transaction_id: uuid.UUID
+    transaction_id: uuid.UUID | None
+    transfer_id: uuid.UUID | None
     amount: Decimal
     paid_at: date
     created_at: datetime
@@ -75,6 +76,7 @@ class CommitmentRead(BaseModel):
     installment_group_id: uuid.UUID | None
     installment_number: int | None
     installment_count: int | None
+    debt_id: uuid.UUID | None
     is_canceled: bool
     created_at: datetime
     paid_amount: Decimal

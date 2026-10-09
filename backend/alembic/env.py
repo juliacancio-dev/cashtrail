@@ -13,6 +13,7 @@ from src.features.budgets.models import Budget  # noqa: F401
 from src.features.categories.models import Category  # noqa: F401
 from src.features.commitments.models import Commitment, CommitmentSettlement  # noqa: F401
 from src.features.credit_cards.models import CardInvoicePayment, CardPurchase, CreditCard  # noqa: F401
+from src.features.debts.models import Debt, DebtAmortization, DebtInstallment  # noqa: F401
 from src.features.goals.models import Goal  # noqa: F401
 from src.features.recurring.models import RecurringTransaction  # noqa: F401
 from src.features.statement_import.models import StatementImport  # noqa: F401

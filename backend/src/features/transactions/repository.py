@@ -91,6 +91,27 @@ def list_by_account_period(
     )
 
 
+def list_by_account(db: Session, user_id: uuid.UUID, account_id: uuid.UUID) -> list[Transaction]:
+    return list(
+        db.scalars(
+            select(Transaction)
+            .where(Transaction.user_id == user_id, Transaction.account_id == account_id)
+            .order_by(Transaction.occurred_at, Transaction.created_at)
+        )
+    )
+
+
+def totals_by_account(db: Session, user_id: uuid.UUID, account_id: uuid.UUID) -> tuple[Decimal, Decimal]:
+    """(receitas, despesas) de uma conta, de todo o histórico."""
+    rows = db.execute(
+        select(Transaction.type, func.coalesce(func.sum(Transaction.amount), 0))
+        .where(Transaction.user_id == user_id, Transaction.account_id == account_id)
+        .group_by(Transaction.type)
+    )
+    totals = {kind: Decimal(total) for kind, total in rows}
+    return totals.get(TransactionType.INCOME, Decimal("0")), totals.get(TransactionType.EXPENSE, Decimal("0"))
+
+
 def add_many(db: Session, transactions: list[Transaction], commit: bool) -> None:
     db.add_all(transactions)
     if commit:

@@ -1,4 +1,5 @@
 import { apiClient } from "@/lib/api-client";
+import { apiFail as fail } from "@/lib/api-errors";
 import {
   NO_ACCOUNT,
   type Commitment,
@@ -9,19 +10,6 @@ import {
   type CommitmentSummary,
   type SettleFormValues,
 } from "@/features/commitments/schemas";
-
-/** O backend devolve `detail` em texto nas regras de negócio (ex: baixa acima do saldo). */
-async function fail(response: Response, fallback: string): Promise<never> {
-  if (response.status === 429) throw new Error("muitas tentativas, aguarde um minuto");
-  let detail: string | null = null;
-  try {
-    const body = (await response.json()) as { detail?: unknown };
-    if (typeof body.detail === "string") detail = body.detail;
-  } catch {
-    // corpo não-JSON: usa a mensagem padrão
-  }
-  throw new Error(detail ?? fallback);
-}
 
 export async function listCommitments(filters: CommitmentFilters): Promise<CommitmentList> {
   const params = new URLSearchParams();

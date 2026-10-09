@@ -174,6 +174,15 @@ A faixa é larga porque as **regras de cada banco** (fechamento, horário de cor
 
 ---
 
-**STATUS:** Ainda não pronto.
+**STATUS:** Aprovado pela Julia em 2026-10-09, todas as recomendações: decisão 1 = (a) transferência como conceito próprio; 2 = (a) fatura calculada, em Cartões; 3 = compra até o dia de fechamento, inclusive, entra na fatura que fecha, com fatura movível por compra; 4 = N despesas, uma por fatura; 5 = despesa na data da compra; 6 = (a) saldo parcial fica na mesma fatura; 7 = limite só avisa; 8 = tela funcional agora.
 
-**PENDÊNCIAS:** decisões **1, 2, 3 e 6** (as de escolha), a pergunta da decisão 3 (banco e datas do seu cartão) e um "ok" nas **4, 5, 7 e 8**.
+**Implementado em 2026-10-09 (etapas 1 a 7).** Slices `transfers` e `credit_cards` (+ `card_purchases` e `card_invoice_payments`), migrations `f6c9e4a13d58` e `a7d2f5b84e69`, 67 testes novos (234 no total). Verificado no navegador de verdade (roteiro automático, 15 checagens): configurar cartão, compra em 3x, fatura paga vira transferência e o dashboard não muda, mover compra, desfazer pagamento, transferência pela tela e alerta no dashboard.
+
+**Decisões tomadas ao codar:**
+- Mudar o dia de fechamento mantém cada fatura no **mesmo mês** (compras movidas e pagamentos acompanham o novo dia), em vez de ficarem órfãos.
+- A API devolve `previous_closing_date`/`next_closing_date` de cada fatura, para a tela mover uma compra sem refazer a matemática de datas.
+- A dívida do cartão (limite usado) inclui transferências para dentro **e para fora** da conta do cartão; uma transferência manual para o cartão, fora do fluxo de pagamento de fatura, reduz a dívida mas não pertence a nenhuma fatura.
+- `split_amount`/`add_months` existem também em `credit_cards/cycle.py` (duplicados de `commitments`) de propósito: uma slice não pode depender da outra só por causa de uma função de 5 linhas.
+- Na criação de compra a tela não oferece escolher a fatura; ela usa a regra da data e a pessoa move depois (a API aceita `invoice_closing_date`).
+
+**PENDÊNCIA não bloqueante:** banco, dia de fechamento e dia de vencimento do cartão real da Julia, para validar a regra do ciclo com uma fatura de verdade. A implementação começa sem isso (a regra é configurável por cartão e a fatura de cada compra pode ser movida).

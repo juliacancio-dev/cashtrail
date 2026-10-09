@@ -9,6 +9,8 @@ const links = [
   { href: "/categories", label: "Categorias" },
   { href: "/transactions", label: "Lançamentos" },
   { href: "/commitments", label: "A pagar/receber" },
+  { href: "/cards", label: "Cartões" },
+  { href: "/transfers", label: "Transferências" },
   { href: "/import", label: "Importar" },
   { href: "/budgets", label: "Orçamentos" },
   { href: "/goals", label: "Metas" },
@@ -19,7 +21,7 @@ export function AppNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="flex gap-4 text-sm">
+    <nav className="flex flex-wrap gap-x-4 gap-y-1 text-sm">
       {links.map((link) => (
         <Link
           key={link.href}

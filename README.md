@@ -25,13 +25,15 @@ Controle financeiro pessoal espalhado entre planilhas e memória: nenhuma visão
 |---|---|
 | Recuperação de senha | Link por e-mail com token de uso único e expiração curta; redefinir encerra todas as sessões abertas |
 | Contas a pagar e a receber | Compromisso com vencimento; a baixa (total ou parcial) cria o lançamento realizado; parcelamento; "atrasado" é calculado, nunca marcado à mão |
+| Transferências entre contas | Mover dinheiro entre duas contas **não** é receita nem despesa: fica fora do dashboard, dos orçamentos e das metas |
+| Cartões de crédito e faturas | Compra conta como despesa na data da compra (parcelada vira uma despesa por fatura); a fatura é calculada por ciclo de fechamento; pagar a fatura é uma transferência para o cartão, então o gasto nunca é contado duas vezes |
 | Importação de extrato (CSV) | Pré-visualização antes de gravar; possíveis duplicatas (mesma conta/tipo/valor, data ±2 dias) vêm desmarcadas para o usuário decidir — nunca descartadas em silêncio |
 
 OFX ficou fora do escopo da primeira versão da importação (só CSV).
 
 ## Arquitetura
 
-**Vertical slices**: cada funcionalidade (`accounts`, `categories`, `transactions`, `dashboard`, `budgets`, `goals`, `recurring`, `statement_import`) é uma fatia completa — schema, regra de negócio, persistência, rota e teste moram juntos em `backend/src/features/<nome>/`. `transactions` é o núcleo do domínio: as demais slices dependem dela (nunca o contrário), chamando só sua camada `service` pública — nunca o `repository`/model ORM de outra slice diretamente. Detalhes e diagrama de dependências em [`docs/planning/09-vertical-slices.md`](docs/planning/09-vertical-slices.md).
+**Vertical slices**: cada funcionalidade (`accounts`, `categories`, `transactions`, `dashboard`, `budgets`, `goals`, `recurring`, `statement_import`, `commitments`, `transfers`, `credit_cards`) é uma fatia completa — schema, regra de negócio, persistência, rota e teste moram juntos em `backend/src/features/<nome>/`. `transactions` é o núcleo do domínio: as demais slices dependem dela (nunca o contrário), chamando só sua camada `service` pública — nunca o `repository`/model ORM de outra slice diretamente. Detalhes e diagrama de dependências em [`docs/planning/09-vertical-slices.md`](docs/planning/09-vertical-slices.md).
 
 **Decisões de maior consequência** (ADRs completos em [`docs/planning/decisions/`](docs/planning/decisions/)):
 - Azure como provedor de nuvem (ADR-001), multiusuário desde o início mesmo sendo uso pessoal (ADR-002)

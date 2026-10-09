@@ -112,6 +112,15 @@ def list_by_account_period(
     return repository.list_by_account_period(db, user_id, account_id, start_date, end_date)
 
 
+def list_by_account(db: Session, user_id: uuid.UUID, account_id: uuid.UUID) -> list[Transaction]:
+    return repository.list_by_account(db, user_id, account_id)
+
+
+def totals_by_account(db: Session, user_id: uuid.UUID, account_id: uuid.UUID) -> tuple[Decimal, Decimal]:
+    """(receitas, despesas) de uma conta, de todo o histórico."""
+    return repository.totals_by_account(db, user_id, account_id)
+
+
 @dataclass(frozen=True)
 class TransactionDraft:
     category_id: uuid.UUID

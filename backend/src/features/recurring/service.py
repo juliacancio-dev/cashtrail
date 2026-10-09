@@ -1,5 +1,6 @@
 import calendar
 import uuid
+from dataclasses import dataclass
 from datetime import date, timedelta
 from decimal import Decimal
 
@@ -213,3 +214,50 @@ def generate_due_commitments(db: Session, as_of: date | None = None) -> int:
             repository.advance_next_occurrence(db, recurring, _advance(due_date, recurring.frequency))
 
     return generated
+
+@dataclass(frozen=True)
+class Occurrence:
+    """Ocorrência FUTURA de uma recorrência, calculada pela regra (ainda não gerada)."""
+
+    recurring_id: uuid.UUID
+    occurs_on: date
+    type: TransactionType
+    amount: Decimal
+    description: str | None
+    category_id: uuid.UUID
+    account_id: uuid.UUID
+    generate_as_commitment: bool
+
+
+# Trava por recorrência: uma regra semanal projetada por anos não pode gerar milhares de itens.
+MAX_PROJECTED_OCCURRENCES = 120
+
+
+def list_future_occurrences(db: Session, user_id: uuid.UUID, until: date) -> list[Occurrence]:
+    """Expande as regras ativas em ocorrências até `until` (Marco 10, decisão 4).
+
+    Começa em `next_occurrence_date`, que é a primeira ocorrência AINDA NÃO gerada, então
+    nada aqui duplica um lançamento ou compromisso que já existe.
+    """
+    occurrences: list[Occurrence] = []
+    for recurring in repository.list_by_user(db, user_id):
+        if not recurring.is_active:
+            continue
+        current = recurring.next_occurrence_date
+        for _ in range(MAX_PROJECTED_OCCURRENCES):
+            if current > until:
+                break
+            occurrences.append(
+                Occurrence(
+                    recurring_id=recurring.id,
+                    occurs_on=current,
+                    type=recurring.type,
+                    amount=recurring.amount,
+                    description=recurring.description,
+                    category_id=recurring.category_id,
+                    account_id=recurring.account_id,
+                    generate_as_commitment=recurring.generate_as_commitment,
+                )
+            )
+            current = _advance(current, recurring.frequency)
+    return occurrences

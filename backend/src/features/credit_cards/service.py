@@ -137,8 +137,10 @@ def _debt(db: Session, user_id: uuid.UUID, card: CreditCard) -> Decimal:
     income, expense = transactions_service.totals_by_account(db, user_id, card.account_id)
     incoming = transfers_service.sum_into_account(db, user_id, card.account_id)
     outgoing = transfers_service.sum_out_of_account(db, user_id, card.account_id)
+    # Saldo inicial negativo de um cartão = dívida que já existia antes de usar o app.
+    opening = accounts_service.get_account(db, user_id, card.account_id).opening_balance
     # quantize: sem lançamentos as somas vêm como Decimal("0") e a API devolveria "0", não "0.00".
-    return (expense - income - incoming + outgoing).quantize(Decimal("0.01"))
+    return (expense - income - incoming + outgoing - opening).quantize(Decimal("0.01"))
 
 
 def _view(db: Session, user_id: uuid.UUID, card: CreditCard) -> CardView:
@@ -491,3 +493,14 @@ def summary(db: Session, user_id: uuid.UUID, today: date | None = None, days: in
                 result["due_soon_count"] += 1
                 result["due_soon_amount"] += invoice.balance
     return result
+
+def due_date_for_purchase(
+    db: Session, user_id: uuid.UUID, account_id: uuid.UUID, purchase_date: date
+) -> date | None:
+    """Vencimento da fatura em que uma compra feita na conta `account_id` cairia.
+    None se a conta não tem cartão configurado. Usado na projeção do fluxo de caixa."""
+    card = repository.get_card_by_account(db, account_id, user_id)
+    if card is None:
+        return None
+    closing = cycle.invoice_closing_for(purchase_date, card.closing_day)
+    return cycle.due_date_for(closing, card.due_day)

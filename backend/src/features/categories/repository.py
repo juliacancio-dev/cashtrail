@@ -17,8 +17,8 @@ def get_by_id_and_user(db: Session, category_id: uuid.UUID, user_id: uuid.UUID) 
     )
 
 
-def create(db: Session, user_id: uuid.UUID, name: str) -> Category:
-    category = Category(user_id=user_id, name=name)
+def create(db: Session, user_id: uuid.UUID, name: str, dre_group: str | None = None) -> Category:
+    category = Category(user_id=user_id, name=name, dre_group=dre_group)
     db.add(category)
     db.commit()
     db.refresh(category)
@@ -27,6 +27,15 @@ def create(db: Session, user_id: uuid.UUID, name: str) -> Category:
 
 def rename(db: Session, category: Category, name: str) -> Category:
     category.name = name
+    db.commit()
+    db.refresh(category)
+    return category
+
+
+def update(db: Session, category: Category, changes: dict) -> Category:
+    for field in ("name", "dre_group"):
+        if field in changes:
+            setattr(category, field, changes[field])
     db.commit()
     db.refresh(category)
     return category

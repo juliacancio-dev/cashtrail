@@ -24,7 +24,7 @@ export function AccountForm({ onCreate }: { onCreate: (values: CreateAccountForm
     formState: { errors, isSubmitting },
   } = useForm<CreateAccountFormValues>({
     resolver: zodResolver(createAccountSchema),
-    defaultValues: { name: "", type: "checking" },
+    defaultValues: { name: "", type: "checking", opening_balance: "" },
   });
 
   async function onSubmit(values: CreateAccountFormValues) {
@@ -60,6 +60,21 @@ export function AccountForm({ onCreate }: { onCreate: (values: CreateAccountForm
             </Select>
           )}
         />
+      </div>
+
+      <div className="flex flex-col gap-2">
+        <Label htmlFor="opening_balance">Saldo inicial</Label>
+        <Input
+          id="opening_balance"
+          type="number"
+          step="0.01"
+          placeholder="0,00"
+          className="w-36"
+          {...register("opening_balance")}
+        />
+        {errors.opening_balance && (
+          <p className="text-sm text-destructive">{errors.opening_balance.message}</p>
+        )}
       </div>
 
       <Button type="submit" disabled={isSubmitting}>

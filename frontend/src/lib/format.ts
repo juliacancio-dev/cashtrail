@@ -10,6 +10,34 @@ export function formatDate(iso: string): string {
   return `${day}/${month}/${year}`;
 }
 
+const MONTHS = ["jan", "fev", "mar", "abr", "mai", "jun", "jul", "ago", "set", "out", "nov", "dez"];
+
+/** "2026-08" -> "ago/2026". */
+export function monthLabel(month: string): string {
+  const [year, number] = month.split("-");
+  return `${MONTHS[Number(number) - 1]}/${year}`;
+}
+
+function pad(value: number): string {
+  return String(value).padStart(2, "0");
+}
+
+export function currentMonthIso(offset = 0): string {
+  const now = new Date();
+  const shifted = new Date(now.getFullYear(), now.getMonth() + offset, 1);
+  return `${shifted.getFullYear()}-${pad(shifted.getMonth() + 1)}`;
+}
+
+export function firstDayOfCurrentMonthIso(): string {
+  return `${currentMonthIso()}-01`;
+}
+
+export function lastDayOfCurrentMonthIso(): string {
+  const now = new Date();
+  const last = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+  return `${last.getFullYear()}-${pad(last.getMonth() + 1)}-${pad(last.getDate())}`;
+}
+
 export function todayIso(): string {
   const now = new Date();
   const month = String(now.getMonth() + 1).padStart(2, "0");

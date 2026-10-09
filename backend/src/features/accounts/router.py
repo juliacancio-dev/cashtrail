@@ -24,7 +24,9 @@ def list_accounts(
 def create_account(
     payload: AccountCreate, current_user: CurrentUser, db: Annotated[Session, Depends(get_db)]
 ) -> AccountRead:
-    account = service.create_account(db, current_user.id, payload.name, payload.type)
+    account = service.create_account(
+        db, current_user.id, payload.name, payload.type, payload.opening_balance
+    )
     return AccountRead.model_validate(account)
 
 
@@ -48,11 +50,9 @@ def update_account(
     db: Annotated[Session, Depends(get_db)],
 ) -> AccountRead:
     try:
-        account = (
-            service.rename_account(db, current_user.id, account_id, payload.name)
-            if payload.name is not None
-            else service.get_account(db, current_user.id, account_id)
-        )
+        # `null` explícito não limpa nada nestes campos: ignora e mantém o valor atual.
+        changes = {k: v for k, v in payload.model_dump(exclude_unset=True).items() if v is not None}
+        account = service.update_account(db, current_user.id, account_id, changes)
     except service.AccountNotFoundError:
         raise HTTPException(status.HTTP_404_NOT_FOUND, detail="conta nao encontrada")
 

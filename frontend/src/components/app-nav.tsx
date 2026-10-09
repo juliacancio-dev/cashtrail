@@ -11,6 +11,8 @@ const links = [
   { href: "/commitments", label: "A pagar/receber" },
   { href: "/cards", label: "Cartões" },
   { href: "/transfers", label: "Transferências" },
+  { href: "/dre", label: "DRE" },
+  { href: "/cash-flow", label: "Fluxo de caixa" },
   { href: "/import", label: "Importar" },
   { href: "/budgets", label: "Orçamentos" },
   { href: "/goals", label: "Metas" },

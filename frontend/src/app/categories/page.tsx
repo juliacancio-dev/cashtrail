@@ -8,7 +8,7 @@ import { AppNav } from "@/components/app-nav";
 import { useAuth } from "@/features/auth/auth-context";
 import { CategoryForm } from "@/features/categories/category-form";
 import { CategoryList } from "@/features/categories/category-list";
-import { archiveCategory, createCategory, listCategories } from "@/features/categories/api";
+import { archiveCategory, createCategory, listCategories, updateCategoryGroup } from "@/features/categories/api";
 import type { Category, CreateCategoryFormValues } from "@/features/categories/schemas";
 
 export default function CategoriesPage() {
@@ -35,10 +35,20 @@ export default function CategoriesPage() {
   async function handleCreate(values: CreateCategoryFormValues) {
     setError(null);
     try {
-      const category = await createCategory(values.name);
+      const category = await createCategory(values.name, values.dre_group);
       setCategories((current) => [...current, category]);
     } catch {
       setError("nao foi possivel criar a categoria");
+    }
+  }
+
+  async function handleChangeGroup(id: string, group: string) {
+    setError(null);
+    try {
+      const updated = await updateCategoryGroup(id, group);
+      setCategories((current) => current.map((c) => (c.id === id ? updated : c)));
+    } catch {
+      setError("nao foi possivel salvar o grupo da categoria");
     }
   }
 
@@ -81,7 +91,7 @@ export default function CategoriesPage() {
       {isLoadingCategories ? (
         <p className="text-muted-foreground text-sm">Carregando categorias...</p>
       ) : (
-        <CategoryList categories={categories} onArchive={handleArchive} />
+        <CategoryList categories={categories} onArchive={handleArchive} onChangeGroup={handleChangeGroup} />
       )}
     </main>
   );

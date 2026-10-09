@@ -1,4 +1,6 @@
 import uuid
+from decimal import Decimal
+from typing import Any
 
 from sqlalchemy.orm import Session
 
@@ -14,8 +16,10 @@ def list_accounts(db: Session, user_id: uuid.UUID) -> list[Account]:
     return repository.list_by_user(db, user_id)
 
 
-def create_account(db: Session, user_id: uuid.UUID, name: str, type: AccountType) -> Account:
-    return repository.create(db, user_id=user_id, name=name, type=type)
+def create_account(
+    db: Session, user_id: uuid.UUID, name: str, type: AccountType, opening_balance: Decimal = Decimal("0")
+) -> Account:
+    return repository.create(db, user_id=user_id, name=name, type=type, opening_balance=opening_balance)
 
 
 def get_account(db: Session, user_id: uuid.UUID, account_id: uuid.UUID) -> Account:
@@ -29,6 +33,11 @@ def get_account(db: Session, user_id: uuid.UUID, account_id: uuid.UUID) -> Accou
 def rename_account(db: Session, user_id: uuid.UUID, account_id: uuid.UUID, name: str) -> Account:
     account = get_account(db, user_id, account_id)
     return repository.rename(db, account, name)
+
+
+def update_account(db: Session, user_id: uuid.UUID, account_id: uuid.UUID, changes: dict[str, Any]) -> Account:
+    account = get_account(db, user_id, account_id)
+    return repository.update(db, account, changes)
 
 
 def archive_account(db: Session, user_id: uuid.UUID, account_id: uuid.UUID) -> Account:

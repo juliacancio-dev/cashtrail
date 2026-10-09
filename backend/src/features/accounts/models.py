@@ -1,8 +1,9 @@
 import enum
 import uuid
 from datetime import datetime
+from decimal import Decimal
 
-from sqlalchemy import Boolean, DateTime, Enum, ForeignKey, String, Uuid, func
+from sqlalchemy import Boolean, DateTime, Enum, ForeignKey, Numeric, String, Uuid, func, text
 from sqlalchemy.orm import Mapped, mapped_column
 
 from src.core.database import Base
@@ -23,5 +24,9 @@ class Account(Base):
     )
     name: Mapped[str] = mapped_column(String(120), nullable=False)
     type: Mapped[AccountType] = mapped_column(Enum(AccountType, name="account_type"), nullable=False)
+    # Saldo da conta no início do uso do app (RF-031). Num cartão, valor negativo = dívida inicial.
+    opening_balance: Mapped[Decimal] = mapped_column(
+        Numeric(12, 2), default=Decimal("0"), server_default=text("0"), nullable=False
+    )
     is_archived: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())

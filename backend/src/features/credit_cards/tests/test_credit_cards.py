@@ -101,6 +101,19 @@ def test_card_shows_debt_available_and_over_limit(client):
     assert (over["debt"], over["available"], over["over_limit"]) == ("1100.00", "-100.00", True)
 
 
+def test_card_debt_includes_the_opening_balance(client):
+    """Saldo inicial negativo no cartão = dívida que já existia antes de usar o app."""
+    headers, _, card_account, category, card_id = _setup(client, "cc3b@example.com", limit="1000.00")
+    client.patch(f"/accounts/{card_account}", json={"opening_balance": "-400.00"}, headers=headers)
+
+    before = client.get(f"/cards/{card_id}", headers=headers).json()
+    _buy(client, headers, card_id, category, amount="100.00")
+    after = client.get(f"/cards/{card_id}", headers=headers).json()
+
+    assert (before["debt"], before["available"]) == ("400.00", "600.00")
+    assert (after["debt"], after["available"]) == ("500.00", "500.00")
+
+
 def test_card_without_limit_has_no_available(client):
     headers, _, _, _, card_id = _setup(client, "cc4@example.com", limit=None)
 

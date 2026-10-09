@@ -24,7 +24,7 @@ def list_categories(
 def create_category(
     payload: CategoryCreate, current_user: CurrentUser, db: Annotated[Session, Depends(get_db)]
 ) -> CategoryRead:
-    category = service.create_category(db, current_user.id, payload.name)
+    category = service.create_category(db, current_user.id, payload.name, payload.dre_group)
     return CategoryRead.model_validate(category)
 
 
@@ -48,11 +48,10 @@ def update_category(
     db: Annotated[Session, Depends(get_db)],
 ) -> CategoryRead:
     try:
-        category = (
-            service.rename_category(db, current_user.id, category_id, payload.name)
-            if payload.name is not None
-            else service.get_category(db, current_user.id, category_id)
-        )
+        changes = payload.model_dump(exclude_unset=True)
+        if changes.get("name") is None:
+            changes.pop("name", None)  # `name: null` não renomeia; `dre_group: null` remove o grupo
+        category = service.update_category(db, current_user.id, category_id, changes)
     except service.CategoryNotFoundError:
         raise HTTPException(status.HTTP_404_NOT_FOUND, detail="categoria nao encontrada")
 

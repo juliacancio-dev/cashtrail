@@ -1,4 +1,6 @@
 import uuid
+from decimal import Decimal
+from typing import Any
 
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -17,8 +19,10 @@ def get_by_id_and_user(db: Session, account_id: uuid.UUID, user_id: uuid.UUID) -
     )
 
 
-def create(db: Session, user_id: uuid.UUID, name: str, type: AccountType) -> Account:
-    account = Account(user_id=user_id, name=name, type=type)
+def create(
+    db: Session, user_id: uuid.UUID, name: str, type: AccountType, opening_balance: Decimal = Decimal("0")
+) -> Account:
+    account = Account(user_id=user_id, name=name, type=type, opening_balance=opening_balance)
     db.add(account)
     db.commit()
     db.refresh(account)
@@ -27,6 +31,15 @@ def create(db: Session, user_id: uuid.UUID, name: str, type: AccountType) -> Acc
 
 def rename(db: Session, account: Account, name: str) -> Account:
     account.name = name
+    db.commit()
+    db.refresh(account)
+    return account
+
+
+def update(db: Session, account: Account, changes: dict[str, Any]) -> Account:
+    for field in ("name", "opening_balance"):
+        if field in changes:
+            setattr(account, field, changes[field])
     db.commit()
     db.refresh(account)
     return account

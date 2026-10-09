@@ -37,6 +37,7 @@ def _read(view: service.CommitmentView) -> CommitmentRead:
         category_id=c.category_id,
         account_id=c.account_id,
         notes=c.notes,
+        recurring_transaction_id=c.recurring_transaction_id,
         installment_group_id=c.installment_group_id,
         installment_number=c.installment_number,
         installment_count=c.installment_count,

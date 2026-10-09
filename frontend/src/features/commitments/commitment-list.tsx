@@ -100,6 +100,7 @@ function CommitmentRow({
               {payable ? "A pagar" : "A receber"} · vence em {formatDate(commitment.due_date)} · {categoryName}
               {commitment.counterparty && ` · ${commitment.counterparty}`}
               {accountName && ` · ${accountName}`}
+              {commitment.recurring_transaction_id && " · recorrente"}
             </p>
             {commitment.notes && <p className="text-muted-foreground text-sm">{commitment.notes}</p>}
           </div>

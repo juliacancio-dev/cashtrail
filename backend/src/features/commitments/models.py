@@ -41,6 +41,11 @@ class Commitment(Base):
         Uuid, ForeignKey("accounts.id", ondelete="RESTRICT"), index=True, nullable=True
     )
     notes: Mapped[str | None] = mapped_column(String(1000), nullable=True)
+    # Preenchido só quando o compromisso foi gerado por uma recorrência (Marco 8, etapa 6).
+    # Mesmo padrão de transactions.recurring_transaction_id: FK sem importar a slice recurring.
+    recurring_transaction_id: Mapped[uuid.UUID | None] = mapped_column(
+        Uuid, ForeignKey("recurring_transactions.id", ondelete="SET NULL"), index=True, nullable=True
+    )
     # Parcelas são compromissos independentes ligados por um grupo (decisão 2).
     installment_group_id: Mapped[uuid.UUID | None] = mapped_column(Uuid, index=True, nullable=True)
     installment_number: Mapped[int | None] = mapped_column(SmallInteger, nullable=True)

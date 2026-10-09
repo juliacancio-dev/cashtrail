@@ -7,10 +7,20 @@ from sqlalchemy.orm import Session
 
 from src.features.accounts import service as accounts_service
 from src.features.categories import service as categories_service
+from src.features.commitments import service as commitments_service
+from src.features.commitments.models import CommitmentDirection
 from src.features.recurring import repository
 from src.features.recurring.models import RecurringFrequency, RecurringTransaction
 from src.features.transactions import service as transactions_service
 from src.features.transactions.models import TransactionSource, TransactionType
+
+
+# Recorrência no modo "conta a pagar/receber": cria o compromisso com esta antecedência,
+# para ele aparecer na lista (e no alerta de vencimentos) antes de vencer.
+COMMITMENT_LOOKAHEAD_DAYS = 31
+# Trava de segurança por execução: uma recorrência semanal criada com data muito antiga
+# não pode gerar centenas de compromissos de uma vez.
+MAX_COMMITMENTS_PER_RUN = 12
 
 
 class RecurringNotFoundError(Exception):
@@ -63,6 +73,7 @@ def create_recurring(
     description: str | None,
     frequency: RecurringFrequency,
     next_occurrence_date: date,
+    generate_as_commitment: bool = False,
 ) -> RecurringTransaction:
     """Mesma validação de posse/estado de conta que transactions.create_transaction (RB-001)."""
     try:
@@ -88,6 +99,7 @@ def create_recurring(
         description=description,
         frequency=frequency,
         next_occurrence_date=next_occurrence_date,
+        generate_as_commitment=generate_as_commitment,
     )
 
 
@@ -144,5 +156,60 @@ def generate_due_transactions(db: Session, as_of: date | None = None) -> int:
 
         repository.advance_next_occurrence(db, recurring, _advance(recurring.next_occurrence_date, recurring.frequency))
         generated += 1
+
+    return generated
+
+
+def generate_due_commitments(db: Session, as_of: date | None = None) -> int:
+    """Job agendado (RF-022): recorrências no modo "conta a pagar/receber" criam o
+    compromisso de cada ocorrência até COMMITMENT_LOOKAHEAD_DAYS à frente.
+
+    Idempotente: se o compromisso daquela ocorrência já existe (job que caiu entre criar
+    e avançar a data), não duplica, só avança. Passa por commitments.service, nunca
+    insere direto na tabela (09-vertical-slices.md).
+    """
+    as_of = as_of or date.today()
+    horizon = as_of + timedelta(days=COMMITMENT_LOOKAHEAD_DAYS)
+
+    generated = 0
+    for recurring in repository.list_due(db, horizon, as_commitment=True):
+        for _ in range(MAX_COMMITMENTS_PER_RUN):
+            due_date = recurring.next_occurrence_date
+            if due_date > horizon:
+                break
+
+            if not commitments_service.has_commitment_for_recurrence(db, recurring.user_id, recurring.id, due_date):
+                try:
+                    description = recurring.description or categories_service.get_category(
+                        db, recurring.user_id, recurring.category_id
+                    ).name
+                    commitments_service.create_commitment(
+                        db,
+                        recurring.user_id,
+                        direction=(
+                            CommitmentDirection.PAYABLE
+                            if recurring.type == TransactionType.EXPENSE
+                            else CommitmentDirection.RECEIVABLE
+                        ),
+                        description=description,
+                        counterparty=None,
+                        amount=recurring.amount,
+                        due_date=due_date,
+                        category_id=recurring.category_id,
+                        account_id=recurring.account_id,
+                        notes=None,
+                        recurring_transaction_id=recurring.id,
+                    )
+                except (
+                    categories_service.CategoryNotFoundError,
+                    commitments_service.InvalidAccountError,
+                    commitments_service.InvalidCategoryError,
+                    commitments_service.ArchivedAccountError,
+                ):
+                    # conta/categoria ficou inválida: não avança, tenta de novo na próxima execução.
+                    break
+                generated += 1
+
+            repository.advance_next_occurrence(db, recurring, _advance(due_date, recurring.frequency))
 
     return generated

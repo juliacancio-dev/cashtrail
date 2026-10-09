@@ -148,8 +148,13 @@ def create_commitment(
     notes: str | None,
     installments: int = 1,
     today: date | None = None,
+    recurring_transaction_id: uuid.UUID | None = None,
 ) -> list[CommitmentView]:
-    """RF-014/RF-015. O `amount` é o TOTAL; com N > 1 vira N compromissos mensais."""
+    """RF-014/RF-015. O `amount` é o TOTAL; com N > 1 vira N compromissos mensais.
+
+    `recurring_transaction_id` só é passado pela slice recurring (RF-022); a posse da
+    recorrência já foi garantida por quem chama, como acontece com `goal_id` em transactions.
+    """
     if not 1 <= installments <= MAX_INSTALLMENTS:
         raise InvalidInstallmentsError(installments)
     _validate_refs(db, user_id, category_id, account_id)
@@ -167,6 +172,7 @@ def create_commitment(
             category_id=category_id,
             account_id=account_id,
             notes=notes,
+            recurring_transaction_id=recurring_transaction_id,
             installment_group_id=group_id,
             installment_number=index + 1 if group_id else None,
             installment_count=installments if group_id else None,
@@ -176,6 +182,13 @@ def create_commitment(
     ]
     repository.add_all(db, rows)
     return [_view(row, ZERO, today) for row in rows]
+
+
+def has_commitment_for_recurrence(
+    db: Session, user_id: uuid.UUID, recurring_id: uuid.UUID, due_date: date
+) -> bool:
+    """Idempotência do job de recorrência: já existe o compromisso desta ocorrência?"""
+    return repository.exists_for_recurrence(db, user_id, recurring_id, due_date)
 
 
 def list_commitments(

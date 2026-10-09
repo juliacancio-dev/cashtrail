@@ -57,6 +57,7 @@ export type Commitment = {
   category_id: string;
   account_id: string | null;
   notes: string | null;
+  recurring_transaction_id: string | null;
   installment_group_id: string | null;
   installment_number: number | null;
   installment_count: number | null;

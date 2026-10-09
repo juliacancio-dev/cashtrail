@@ -28,6 +28,7 @@ def _run_recurring_job() -> None:
     db = SessionLocal()
     try:
         recurring_service.generate_due_transactions(db)
+        recurring_service.generate_due_commitments(db)
     finally:
         db.close()
 

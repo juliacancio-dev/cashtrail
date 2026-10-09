@@ -35,6 +35,7 @@ def create_recurring(
             description=payload.description,
             frequency=payload.frequency,
             next_occurrence_date=payload.next_occurrence_date,
+            generate_as_commitment=payload.generate_as_commitment,
         )
     except service.InvalidAccountError:
         raise HTTPException(status.HTTP_404_NOT_FOUND, detail="conta nao encontrada")

@@ -48,6 +48,7 @@ export function RecurringForm({
       description: "",
       frequency: "monthly",
       next_occurrence_date: new Date().toISOString().slice(0, 10),
+      generate_as_commitment: false,
     },
   });
 
@@ -179,6 +180,17 @@ export function RecurringForm({
       <div className="flex flex-col gap-2">
         <Label htmlFor="description">Descrição</Label>
         <Input id="description" placeholder="Opcional" {...register("description")} />
+      </div>
+
+      <div className="flex w-full flex-col gap-1">
+        <label className="flex items-center gap-2 text-sm">
+          <input type="checkbox" {...register("generate_as_commitment")} />
+          Gerar como conta a pagar/receber
+        </label>
+        <p className="text-muted-foreground text-xs">
+          Desmarcado, o lançamento já nasce realizado na data. Marcado, a conta aparece em A pagar/receber
+          até 31 dias antes do vencimento, para você dar baixa quando pagar.
+        </p>
       </div>
 
       <Button type="submit" disabled={isSubmitting}>

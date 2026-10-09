@@ -55,6 +55,19 @@ def get_by_id_and_user(db: Session, commitment_id: uuid.UUID, user_id: uuid.UUID
     return db.scalar(select(Commitment).where(Commitment.id == commitment_id, Commitment.user_id == user_id))
 
 
+def exists_for_recurrence(db: Session, user_id: uuid.UUID, recurring_id: uuid.UUID, due_date: date) -> bool:
+    count = db.scalar(
+        select(func.count())
+        .select_from(Commitment)
+        .where(
+            Commitment.user_id == user_id,
+            Commitment.recurring_transaction_id == recurring_id,
+            Commitment.due_date == due_date,
+        )
+    )
+    return bool(count)
+
+
 def paid_amount(db: Session, commitment_id: uuid.UUID) -> Decimal:
     total = db.scalar(
         select(func.coalesce(func.sum(CommitmentSettlement.amount), 0)).where(

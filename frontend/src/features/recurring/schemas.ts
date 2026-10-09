@@ -16,6 +16,7 @@ export const createRecurringSchema = z.object({
   description: z.string().optional(),
   frequency: z.enum(["weekly", "monthly"]),
   next_occurrence_date: z.string().min(1, "informe a proxima data"),
+  generate_as_commitment: z.boolean(),
 });
 
 export type CreateRecurringFormValues = z.infer<typeof createRecurringSchema>;
@@ -30,5 +31,6 @@ export type Recurring = {
   frequency: "weekly" | "monthly";
   next_occurrence_date: string;
   is_active: boolean;
+  generate_as_commitment: boolean;
   created_at: string;
 };

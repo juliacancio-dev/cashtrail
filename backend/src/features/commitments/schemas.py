@@ -71,6 +71,7 @@ class CommitmentRead(BaseModel):
     category_id: uuid.UUID
     account_id: uuid.UUID | None
     notes: str | None
+    recurring_transaction_id: uuid.UUID | None
     installment_group_id: uuid.UUID | None
     installment_number: int | None
     installment_count: int | None

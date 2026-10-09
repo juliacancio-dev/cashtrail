@@ -16,6 +16,8 @@ class RecurringCreate(BaseModel):
     description: str | None = Field(default=None, max_length=255)
     frequency: RecurringFrequency
     next_occurrence_date: date
+    # Padrão False preserva o comportamento do Marco 5 (gera o lançamento já realizado).
+    generate_as_commitment: bool = False
 
 
 class RecurringUpdate(BaseModel):
@@ -36,4 +38,5 @@ class RecurringRead(BaseModel):
     frequency: RecurringFrequency
     next_occurrence_date: date
     is_active: bool
+    generate_as_commitment: bool
     created_at: datetime

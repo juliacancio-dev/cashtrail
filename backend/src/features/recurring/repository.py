@@ -30,14 +30,17 @@ def get_by_id_and_user(
     )
 
 
-def list_due(db: Session, as_of: date) -> list[RecurringTransaction]:
+def list_due(db: Session, as_of: date, as_commitment: bool = False) -> list[RecurringTransaction]:
     """Consulta de sistema (job agendado), atravessa todos os usuários de propósito —
     não é uma rota autenticada, não se aplica RNF-001 aqui.
+
+    `as_commitment` separa os dois modos: cada job só enxerga as recorrências do seu modo.
     """
     return list(
         db.scalars(
             select(RecurringTransaction).where(
                 RecurringTransaction.is_active.is_(True),
+                RecurringTransaction.generate_as_commitment.is_(as_commitment),
                 RecurringTransaction.next_occurrence_date <= as_of,
             )
         )
@@ -54,6 +57,7 @@ def create(
     description: str | None,
     frequency: RecurringFrequency,
     next_occurrence_date: date,
+    generate_as_commitment: bool = False,
 ) -> RecurringTransaction:
     recurring = RecurringTransaction(
         user_id=user_id,
@@ -64,6 +68,7 @@ def create(
         description=description,
         frequency=frequency,
         next_occurrence_date=next_occurrence_date,
+        generate_as_commitment=generate_as_commitment,
     )
     db.add(recurring)
     db.commit()

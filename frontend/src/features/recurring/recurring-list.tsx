@@ -48,6 +48,7 @@ export function RecurringList({
                 {accountName(item.account_id)} · {categoryName(item.category_id)} ·{" "}
                 {frequencyLabel(item.frequency)} · {formatCurrency(item.amount)} · próxima em{" "}
                 {item.next_occurrence_date}
+                {item.generate_as_commitment && " · gera conta a pagar/receber"}
               </p>
             </div>
             {item.is_active && (

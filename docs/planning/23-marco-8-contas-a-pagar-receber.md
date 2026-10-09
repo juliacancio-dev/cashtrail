@@ -174,6 +174,8 @@ Uma branch e um commit por etapa significativa.
 
 **STATUS:** Aprovado pela Julia em 2026-10-08, todas as recomendações: decisão 1 = (b) baixa parcial; 2 = (a) parcelas independentes com id de grupo; 3 = (c) opção por recorrência, como última etapa; 4 = (b) sem enum novo; 5 = (a) categoria obrigatória; 6 = (a) favorecido em texto livre; 7 = (b) tela funcional agora, visual depois; 8 = (b) desfazer baixa limitado a lançamentos criados por baixa.
 
+**Implementação concluída em 2026-10-08, etapas 1 a 6.** A etapa 6 (RF-022, decisão 3c) ficou assim: recorrência ganha `generate_as_commitment` (padrão `false`, comportamento do Marco 5 intacto); no modo novo o job cria a conta a pagar/receber **31 dias antes** do vencimento, é idempotente (não duplica se o job cair entre criar e avançar a data), limita 12 por execução e tenta de novo se a conta/categoria ficou inválida. O compromisso gerado guarda `recurring_transaction_id` e aparece como "recorrente".
+
 **Notas de implementação decididas ao codar:**
 - "Hoje" usa a data do servidor (UTC). Entre 21h e 24h em Brasília, um compromisso que vence "hoje" já aparece como atrasado. Aceito por ora; corrigir com fuso `America/Sao_Paulo` exige o pacote `tzdata` na imagem.
 - Data de pagamento no futuro é rejeitada (evita lançamento realizado "fantasma").

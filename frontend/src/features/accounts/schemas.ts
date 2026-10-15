@@ -4,6 +4,7 @@ export const accountTypeOptions = [
   { value: "checking", label: "Conta corrente" },
   { value: "savings", label: "Poupança" },
   { value: "credit_card", label: "Cartão de crédito" },
+  { value: "investment", label: "Investimento (corretora/banco)" },
 ] as const;
 
 /** Rótulo de qualquer tipo, inclusive `loan` (criada pela tela de Dívidas, nunca pelo formulário de conta). */
@@ -12,11 +13,12 @@ export const accountTypeLabels: Record<string, string> = {
   savings: "Poupança",
   credit_card: "Cartão de crédito",
   loan: "Dívida (empréstimo/financiamento)",
+  investment: "Investimento (corretora/banco)",
 };
 
 export const createAccountSchema = z.object({
   name: z.string().min(1, "informe um nome"),
-  type: z.enum(["checking", "savings", "credit_card"]),
+  type: z.enum(["checking", "savings", "credit_card", "investment"]),
   // Opcional; pode ser negativo (conta no vermelho, ou dívida inicial do cartão).
   opening_balance: z
     .string()
@@ -29,7 +31,7 @@ export type CreateAccountFormValues = z.infer<typeof createAccountSchema>;
 export type Account = {
   id: string;
   name: string;
-  type: "checking" | "savings" | "credit_card" | "loan";
+  type: "checking" | "savings" | "credit_card" | "loan" | "investment";
   opening_balance: string;
   is_archived: boolean;
   created_at: string;

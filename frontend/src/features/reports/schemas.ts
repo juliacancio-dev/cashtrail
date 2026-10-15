@@ -1,4 +1,4 @@
-export type AccountKind = "checking" | "savings" | "credit_card" | "loan";
+export type AccountKind = "checking" | "savings" | "credit_card" | "loan" | "investment";
 
 export type AccountBalance = {
   account_id: string;
@@ -106,6 +106,18 @@ export type NetWorthAsset = {
   equity: string;
 };
 
+export type NetWorthInvestment = {
+  asset_id: string;
+  name: string;
+  asset_class: string;
+  market_value: string;
+  cost: string;
+  unrealized: string;
+  price_date: string | null;
+  has_quote: boolean;
+  is_stale_quote: boolean;
+};
+
 export type NetWorthDebt = {
   account_id: string;
   name: string;
@@ -118,10 +130,12 @@ export type NetWorth = {
   as_of: string;
   cash: NetWorthAccount[];
   assets: NetWorthAsset[];
+  investments: NetWorthInvestment[];
   cards: NetWorthAccount[];
   debts: NetWorthDebt[];
   cash_total: string;
   assets_total: string;
+  investments_total: string;
   total_assets: string;
   cards_total: string;
   debts_total: string;

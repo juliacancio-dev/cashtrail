@@ -179,6 +179,27 @@ export default function NetWorthPage() {
                       .join(" · ")}
                   />
                 ))}
+                <p className="text-muted-foreground mt-2 text-xs font-medium">Investimentos (valor de mercado)</p>
+                {worth.investments.length === 0 && (
+                  <p className="text-muted-foreground text-sm">
+                    Nenhum investimento.{" "}
+                    <Link href="/investments" className="underline">
+                      Cadastrar
+                    </Link>
+                  </p>
+                )}
+                {worth.investments.map((item) => (
+                  <Row
+                    key={item.asset_id}
+                    label={item.name}
+                    value={item.market_value}
+                    hint={
+                      item.has_quote
+                        ? `custo ${formatCurrency(item.cost)} · resultado ${formatCurrency(item.unrealized)}`
+                        : "sem cotação: valor pelo custo"
+                    }
+                  />
+                ))}
                 <Row label="Total dos ativos" value={worth.total_assets} strong />
               </CardContent>
             </Card>

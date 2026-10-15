@@ -119,6 +119,7 @@ def collect_items(db: Session, user_id: uuid.UUID, today: date, horizon_end: dat
     cash_ids = {a.id for a in accounts if a.type not in NON_CASH_TYPES}
     card_ids = {a.id for a in accounts if a.type == AccountType.CREDIT_CARD}
     loan_ids = {a.id for a in accounts if a.type == AccountType.LOAN}
+    investment_ids = {a.id for a in accounts if a.type == AccountType.INVESTMENT}
     category_names = {c.id: c.name for c in categories_service.list_categories(db, user_id)}
     items: list[FlowItem] = []
 
@@ -149,11 +150,23 @@ def collect_items(db: Session, user_id: uuid.UUID, today: date, horizon_end: dat
         if from_cash == to_cash:
             continue  # entre contas de caixa (ou entre cartões): movimento interno
         if from_cash:
-            kind = "Pagamento de dívida" if tr.to_account_id in loan_ids else "Pagamento de cartão"
+            kind = (
+                "Aporte em investimento"
+                if tr.to_account_id in investment_ids
+                else "Pagamento de dívida"
+                if tr.to_account_id in loan_ids
+                else "Pagamento de cartão"
+            )
             description = tr.description or f"{kind}: {account_names.get(tr.to_account_id, '?')}"
             items.append(FlowItem("realized", "out", tr.occurred_at, tr.amount, "transfers", description, ref_id=tr.id))
         else:
-            kind = "Recebido da dívida" if tr.from_account_id in loan_ids else "Recebido do cartão"
+            kind = (
+                "Resgate de investimento"
+                if tr.from_account_id in investment_ids
+                else "Recebido da dívida"
+                if tr.from_account_id in loan_ids
+                else "Recebido do cartão"
+            )
             description = tr.description or f"{kind}: {account_names.get(tr.from_account_id, '?')}"
             items.append(FlowItem("realized", "in", tr.occurred_at, tr.amount, "transfers", description, ref_id=tr.id))
 

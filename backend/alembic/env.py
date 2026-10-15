@@ -15,6 +15,12 @@ from src.features.commitments.models import Commitment, CommitmentSettlement  # 
 from src.features.assets.models import Asset, AssetValuation  # noqa: F401
 from src.features.credit_cards.models import CardInvoicePayment, CardPurchase, CreditCard  # noqa: F401
 from src.features.debts.models import Debt, DebtAmortization, DebtInstallment  # noqa: F401
+from src.features.investments.models import (  # noqa: F401
+    InvestmentAsset,
+    InvestmentOperation,
+    InvestmentQuote,
+    QuoteRequestLog,
+)
 from src.features.goals.models import Goal  # noqa: F401
 from src.features.recurring.models import RecurringTransaction  # noqa: F401
 from src.features.statement_import.models import StatementImport  # noqa: F401

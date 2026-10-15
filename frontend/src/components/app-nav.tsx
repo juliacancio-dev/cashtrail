@@ -13,6 +13,7 @@ const links = [
   { href: "/transfers", label: "Transferências" },
   { href: "/debts", label: "Dívidas" },
   { href: "/assets", label: "Bens" },
+  { href: "/investments", label: "Investimentos" },
   { href: "/net-worth", label: "Patrimônio" },
   { href: "/dre", label: "DRE" },
   { href: "/cash-flow", label: "Fluxo de caixa" },

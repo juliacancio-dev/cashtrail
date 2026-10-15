@@ -5,7 +5,7 @@ from typing import Literal
 
 from pydantic import BaseModel
 
-AccountKind = Literal["checking", "savings", "credit_card", "loan"]
+AccountKind = Literal["checking", "savings", "credit_card", "loan", "investment"]
 
 
 class AccountBalanceRead(BaseModel):
@@ -112,6 +112,18 @@ class NetWorthAssetRead(BaseModel):
     equity: Decimal
 
 
+class NetWorthInvestmentRead(BaseModel):
+    asset_id: uuid.UUID
+    name: str
+    asset_class: str
+    market_value: Decimal
+    cost: Decimal
+    unrealized: Decimal
+    price_date: date | None
+    has_quote: bool
+    is_stale_quote: bool
+
+
 class NetWorthDebtRead(BaseModel):
     account_id: uuid.UUID
     name: str
@@ -124,10 +136,12 @@ class NetWorthRead(BaseModel):
     as_of: date
     cash: list[NetWorthAccountRead]
     assets: list[NetWorthAssetRead]
+    investments: list[NetWorthInvestmentRead]
     cards: list[NetWorthAccountRead]
     debts: list[NetWorthDebtRead]
     cash_total: Decimal
     assets_total: Decimal
+    investments_total: Decimal
     total_assets: Decimal
     cards_total: Decimal
     debts_total: Decimal

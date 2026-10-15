@@ -18,6 +18,9 @@ from src.features.commitments.router import router as commitments_router
 from src.features.credit_cards.router import router as credit_cards_router
 from src.features.assets.router import router as assets_router
 from src.features.debts.router import router as debts_router
+from src.features.investments import service as investments_service
+from src.features.investments.providers import BrapiProvider
+from src.features.investments.router import router as investments_router
 from src.features.dashboard.router import router as dashboard_router
 from src.features.goals.router import router as goals_router
 from src.features.recurring import service as recurring_service
@@ -38,6 +41,17 @@ def _run_recurring_job() -> None:
         db.close()
 
 
+def _run_quotes_job() -> None:
+    """Marco 13 (decisão 3): atualiza as cotações da carteira de todos; o teto mensal protege o limite da fonte."""
+    db = SessionLocal()
+    try:
+        investments_service.refresh_all_users(db, BrapiProvider(), monthly_cap=settings.quotes_monthly_cap)
+    except Exception:  # noqa: BLE001 - a fonte externa nunca derruba a API nem o agendador
+        db.rollback()
+    finally:
+        db.close()
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     scheduler = BackgroundScheduler()
@@ -47,6 +61,7 @@ async def lifespan(app: FastAPI):
         # recorrências vencidas esperando o próximo acesso à API por muito tempo.
         _run_recurring_job()
         scheduler.add_job(_run_recurring_job, "interval", days=1, id="generate_recurring_transactions")
+        scheduler.add_job(_run_quotes_job, "interval", days=1, id="refresh_investment_quotes")
         scheduler.start()
     yield
     if settings.enable_scheduler:
@@ -81,6 +96,7 @@ app.include_router(transfers_router)
 app.include_router(credit_cards_router)
 app.include_router(debts_router)
 app.include_router(assets_router)
+app.include_router(investments_router)
 app.include_router(reports_router)
 
 

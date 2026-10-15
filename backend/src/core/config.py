@@ -44,4 +44,11 @@ class Settings(BaseSettings):
     email_sender_address: str = ""
 
 
+    # Marco 13 (decisão 2): cotações de renda variável. O token é segredo (SEC-005): só no backend,
+    # em variável de ambiente; vazio = a brapi atende só ativos de teste (PETR4, VALE3, MGLU3, ITUB4).
+    brapi_base_url: str = "https://brapi.dev"
+    brapi_token: str = ""
+    # Teto mensal de requisições à fonte (o plano grátis permite 15.000); margem de segurança.
+    quotes_monthly_cap: int = 10000
+
 settings = Settings()

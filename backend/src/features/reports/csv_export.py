@@ -104,6 +104,8 @@ def net_worth_csv(worth: NetWorth) -> str:
         rows.append(["Ativo: caixa e contas", safe_text(item.name), number(item.amount)])
     for asset in worth.assets:
         rows.append(["Ativo: bens", safe_text(asset.name), number(asset.value)])
+    for item in worth.investments:
+        rows.append(["Ativo: investimentos", safe_text(item.name), number(item.market_value)])
     rows.append(["Total dos ativos", "", number(worth.total_assets)])
     for card in worth.cards:
         rows.append(["Passivo: cartões", safe_text(card.name), number(card.amount)])

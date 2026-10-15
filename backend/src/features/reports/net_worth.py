@@ -14,6 +14,7 @@ from sqlalchemy.orm import Session
 from src.features.accounts.models import AccountType
 from src.features.assets import service as assets_service
 from src.features.debts import service as debts_service
+from src.features.investments import service as investments_service
 from src.features.reports import balances_dre
 from src.features.reports.cash_flow import add_months, last_of_month
 
@@ -46,6 +47,19 @@ class AssetItem:
 
 
 @dataclass
+class InvestmentItem:
+    asset_id: uuid.UUID
+    name: str
+    asset_class: str
+    market_value: Decimal
+    cost: Decimal
+    unrealized: Decimal
+    price_date: date | None
+    has_quote: bool
+    is_stale_quote: bool
+
+
+@dataclass
 class DebtItem:
     account_id: uuid.UUID
     name: str
@@ -59,10 +73,12 @@ class NetWorth:
     as_of: date
     cash: list[AccountItem]
     assets: list[AssetItem]
+    investments: list[InvestmentItem]
     cards: list[AccountItem]
     debts: list[DebtItem]
     cash_total: Decimal
     assets_total: Decimal
+    investments_total: Decimal
     total_assets: Decimal
     cards_total: Decimal
     debts_total: Decimal
@@ -136,16 +152,36 @@ def net_worth(db: Session, user_id: uuid.UUID, as_of: date | None = None, today:
             )
         )
 
+    # RB-032: investimentos entram pelo valor de mercado; o saldo da conta `investment` (custo) fica de fora.
+    investments = [
+        InvestmentItem(
+            asset_id=v.asset.id,
+            name=v.asset.name,
+            asset_class=v.asset.asset_class,
+            market_value=v.market_value,
+            cost=v.cost,
+            unrealized=v.unrealized,
+            price_date=v.price_date,
+            has_quote=v.has_quote,
+            is_stale_quote=v.is_stale_quote,
+        )
+        for v in investments_service.portfolio(db, user_id, as_of, include_empty=False)
+    ]
+    investments_total = sum((i.market_value for i in investments), ZERO)
     cash_total = sum((i.amount for i in cash), ZERO)
     assets_total = sum((i.value for i in assets), ZERO)
     cards_total = sum((i.amount for i in cards), ZERO)
     debts_total = sum((i.amount for i in debts), ZERO)
-    total_assets = cash_total + assets_total
+    total_assets = cash_total + assets_total + investments_total
     total_liabilities = cards_total + debts_total
 
     warnings: list[str] = []
     if any(i.is_stale for i in assets):
         warnings.append("Há bens com avaliação de mais de 12 meses; atualize para o patrimônio não ficar defasado.")
+    if any(i.has_quote is False for i in investments):
+        warnings.append("Há investimentos sem cotação: aparecem pelo custo até você atualizar ou informar o valor.")
+    if any(i.is_stale_quote for i in investments):
+        warnings.append("Há investimentos com cotação de mais de 3 dias úteis; atualize para o patrimônio não ficar defasado.")
     if any(by_account[a.account_id].balance < 0 for a in cash):
         warnings.append("Há conta de caixa com saldo negativo: confira o saldo inicial em Contas.")
 
@@ -153,10 +189,12 @@ def net_worth(db: Session, user_id: uuid.UUID, as_of: date | None = None, today:
         as_of=as_of,
         cash=cash,
         assets=assets,
+        investments=investments,
         cards=cards,
         debts=debts,
         cash_total=money(cash_total),
         assets_total=money(assets_total),
+        investments_total=money(investments_total),
         total_assets=money(total_assets),
         cards_total=money(cards_total),
         debts_total=money(debts_total),

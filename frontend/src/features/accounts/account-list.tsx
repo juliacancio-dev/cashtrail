@@ -105,7 +105,9 @@ export function AccountList({
                 <div className="text-right">
                   {balance !== undefined && (
                     <>
-                      <p className="text-muted-foreground text-xs">{isCard ? "Dívida atual" : "Saldo atual"}</p>
+                      <p className="text-muted-foreground text-xs">
+                        {isCard ? "Dívida atual" : account.type === "investment" ? "Custo da carteira" : "Saldo atual"}
+                      </p>
                       <p className={`font-medium ${Number(balance) < 0 && !isCard ? "text-destructive" : ""}`}>
                         {formatCurrency(isCard ? Math.abs(Number(balance)) : balance)}
                       </p>

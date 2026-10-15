@@ -7,12 +7,14 @@ from sqlalchemy.orm import Session
 
 from src.core.database import get_db
 from src.core.dependencies import CurrentUser
-from src.features.reports import balances_dre, cash_flow, csv_export
+from src.features.reports import balances_dre, cash_flow, csv_export, net_worth
 from src.features.reports.schemas import (
     BalancesRead,
     CashFlowRead,
     DreRead,
     FlowItemRead,
+    NetWorthPointRead,
+    NetWorthRead,
 )
 
 router = APIRouter(prefix="/reports", tags=["reports"])
@@ -127,3 +129,39 @@ def get_cash_flow_items(
         )
         for i in items
     ]
+
+
+def _as_of(value: date | None) -> date:
+    today = date.today()
+    as_of = value or today
+    if as_of > today:
+        raise HTTPException(status.HTTP_422_UNPROCESSABLE_CONTENT, detail="a data nao pode estar no futuro")
+    return as_of
+
+
+@router.get("/net-worth", response_model=NetWorthRead)
+def get_net_worth(
+    current_user: CurrentUser,
+    db: Annotated[Session, Depends(get_db)],
+    as_of: date | None = Query(default=None, description="padrao: hoje"),
+) -> NetWorthRead:
+    return NetWorthRead(**asdict(net_worth.net_worth(db, current_user.id, _as_of(as_of))))
+
+
+@router.get("/net-worth/history", response_model=list[NetWorthPointRead])
+def get_net_worth_history(
+    current_user: CurrentUser,
+    db: Annotated[Session, Depends(get_db)],
+    months: int = Query(default=12, ge=1, le=net_worth.MAX_MONTHS),
+) -> list[NetWorthPointRead]:
+    return [NetWorthPointRead(**asdict(p)) for p in net_worth.history(db, current_user.id, months)]
+
+
+@router.get("/net-worth.csv")
+def get_net_worth_csv(
+    current_user: CurrentUser,
+    db: Annotated[Session, Depends(get_db)],
+    as_of: date | None = Query(default=None),
+) -> Response:
+    result = net_worth.net_worth(db, current_user.id, _as_of(as_of))
+    return _csv_response(csv_export.net_worth_csv(result), f"patrimonio-{result.as_of:%Y%m%d}.csv")

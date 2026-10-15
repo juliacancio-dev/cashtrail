@@ -92,3 +92,55 @@ class FlowItemRead(BaseModel):
     description: str
     category_id: uuid.UUID | None
     category_name: str | None
+
+
+class NetWorthAccountRead(BaseModel):
+    account_id: uuid.UUID
+    name: str
+    amount: Decimal
+    is_archived: bool
+
+
+class NetWorthAssetRead(BaseModel):
+    asset_id: uuid.UUID
+    name: str
+    kind: str
+    value: Decimal
+    valued_at: date | None
+    is_stale: bool
+    debt_outstanding: Decimal | None
+    equity: Decimal
+
+
+class NetWorthDebtRead(BaseModel):
+    account_id: uuid.UUID
+    name: str
+    amount: Decimal
+    short_term: Decimal | None
+    long_term: Decimal | None
+
+
+class NetWorthRead(BaseModel):
+    as_of: date
+    cash: list[NetWorthAccountRead]
+    assets: list[NetWorthAssetRead]
+    cards: list[NetWorthAccountRead]
+    debts: list[NetWorthDebtRead]
+    cash_total: Decimal
+    assets_total: Decimal
+    total_assets: Decimal
+    cards_total: Decimal
+    debts_total: Decimal
+    debts_short_term: Decimal | None
+    debts_long_term: Decimal | None
+    total_liabilities: Decimal
+    net_worth: Decimal
+    warnings: list[str]
+
+
+class NetWorthPointRead(BaseModel):
+    month: str
+    as_of: date
+    total_assets: Decimal
+    total_liabilities: Decimal
+    net_worth: Decimal

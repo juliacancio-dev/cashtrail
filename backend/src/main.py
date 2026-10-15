@@ -16,6 +16,7 @@ from src.features.budgets.router import router as budgets_router
 from src.features.categories.router import router as categories_router
 from src.features.commitments.router import router as commitments_router
 from src.features.credit_cards.router import router as credit_cards_router
+from src.features.assets.router import router as assets_router
 from src.features.debts.router import router as debts_router
 from src.features.dashboard.router import router as dashboard_router
 from src.features.goals.router import router as goals_router
@@ -79,6 +80,7 @@ app.include_router(commitments_router)
 app.include_router(transfers_router)
 app.include_router(credit_cards_router)
 app.include_router(debts_router)
+app.include_router(assets_router)
 app.include_router(reports_router)
 
 

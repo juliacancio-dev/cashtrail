@@ -15,6 +15,7 @@ from decimal import Decimal
 
 from src.features.reports.balances_dre import Dre
 from src.features.reports.cash_flow import CashFlow
+from src.features.reports.net_worth import NetWorth
 
 FORMULA_PREFIXES = ("=", "+", "-", "@", "\t", "\r")
 BOM = "﻿"
@@ -91,4 +92,23 @@ def cash_flow_csv(flow: CashFlow) -> str:
                 number(month.closing_realized),
             ]
         )
+    return _write(rows)
+
+
+def net_worth_csv(worth: NetWorth) -> str:
+    rows: list[list[str]] = [
+        [safe_text(f"Balanço patrimonial em {worth.as_of:%d/%m/%Y}")],
+        ["Seção", "Item", "Valor"],
+    ]
+    for item in worth.cash:
+        rows.append(["Ativo: caixa e contas", safe_text(item.name), number(item.amount)])
+    for asset in worth.assets:
+        rows.append(["Ativo: bens", safe_text(asset.name), number(asset.value)])
+    rows.append(["Total dos ativos", "", number(worth.total_assets)])
+    for card in worth.cards:
+        rows.append(["Passivo: cartões", safe_text(card.name), number(card.amount)])
+    for debt in worth.debts:
+        rows.append(["Passivo: dívidas", safe_text(debt.name), number(debt.amount)])
+    rows.append(["Total dos passivos", "", number(worth.total_liabilities)])
+    rows.append(["Patrimônio líquido", "", number(worth.net_worth)])
     return _write(rows)

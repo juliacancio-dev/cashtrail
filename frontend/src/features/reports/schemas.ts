@@ -92,3 +92,50 @@ export const sourceLabels: Record<string, string> = {
   card_invoices: "Faturas de cartão",
   recurring: "Recorrências",
 };
+
+export type NetWorthAccount = { account_id: string; name: string; amount: string; is_archived: boolean };
+
+export type NetWorthAsset = {
+  asset_id: string;
+  name: string;
+  kind: string;
+  value: string;
+  valued_at: string | null;
+  is_stale: boolean;
+  debt_outstanding: string | null;
+  equity: string;
+};
+
+export type NetWorthDebt = {
+  account_id: string;
+  name: string;
+  amount: string;
+  short_term: string | null;
+  long_term: string | null;
+};
+
+export type NetWorth = {
+  as_of: string;
+  cash: NetWorthAccount[];
+  assets: NetWorthAsset[];
+  cards: NetWorthAccount[];
+  debts: NetWorthDebt[];
+  cash_total: string;
+  assets_total: string;
+  total_assets: string;
+  cards_total: string;
+  debts_total: string;
+  debts_short_term: string | null;
+  debts_long_term: string | null;
+  total_liabilities: string;
+  net_worth: string;
+  warnings: string[];
+};
+
+export type NetWorthPoint = {
+  month: string;
+  as_of: string;
+  total_assets: string;
+  total_liabilities: string;
+  net_worth: string;
+};

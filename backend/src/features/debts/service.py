@@ -623,3 +623,39 @@ def amortize(
     )
     db.commit()
     return get_debt(db, user_id, debt.id, today)
+
+
+# ---------- leitura para outras slices (assets, reports) ----------
+
+def debt_exists(db: Session, user_id: uuid.UUID, debt_id: uuid.UUID) -> bool:
+    return repository.get_debt(db, debt_id, user_id) is not None
+
+
+def debt_account_ids(db: Session, user_id: uuid.UUID) -> dict[uuid.UUID, uuid.UUID]:
+    """debt_id -> id da conta `loan` (o saldo devedor é o negativo do saldo dessa conta)."""
+    return {debt.id: debt.account_id for debt in repository.list_debts(db, user_id)}
+
+
+def short_term_principal(
+    db: Session, user_id: uuid.UUID, today: date | None = None, months: int = 12
+) -> dict[uuid.UUID, Decimal]:
+    """Principal das parcelas em aberto que vencem em até `months` meses, por conta da dívida (RF-044).
+
+    Limitado ao saldo devedor: o curto prazo nunca passa do total da dívida.
+    """
+    today = today or date.today()
+    horizon = commitments_service.add_months(today, months)
+    result: dict[uuid.UUID, Decimal] = {}
+    for debt in repository.list_debts(db, user_id):
+        account = accounts_service.get_account(db, user_id, debt.account_id)
+        outstanding = _outstanding(db, user_id, debt, account)
+        due = sum(
+            (
+                view.installment.principal_part
+                for view in _installment_views(db, user_id, debt, today)
+                if view.status in ("open", "due_today", "overdue") and view.commitment.due_date <= horizon
+            ),
+            ZERO,
+        )
+        result[debt.account_id] = min(due, outstanding)
+    return result

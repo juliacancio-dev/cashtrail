@@ -7,6 +7,8 @@ import type {
   FlowColumn,
   FlowDirection,
   FlowItem,
+  NetWorth,
+  NetWorthPoint,
 } from "@/features/reports/schemas";
 
 export async function getBalances(): Promise<Balances> {
@@ -64,4 +66,20 @@ export function dreCsvPath(startDate: string, endDate: string, includeForecast: 
 
 export function cashFlowCsvPath(startMonth: string, months: number): string {
   return `/reports/cash-flow.csv?start_month=${startMonth}&months=${months}`;
+}
+
+export async function getNetWorth(asOf?: string): Promise<NetWorth> {
+  const response = await apiClient.get(`/reports/net-worth${asOf ? `?as_of=${asOf}` : ""}`);
+  if (!response.ok) return apiFail(response, "erro ao carregar o balanço");
+  return response.json() as Promise<NetWorth>;
+}
+
+export async function getNetWorthHistory(months: number): Promise<NetWorthPoint[]> {
+  const response = await apiClient.get(`/reports/net-worth/history?months=${months}`);
+  if (!response.ok) return apiFail(response, "erro ao carregar a evolução do patrimônio");
+  return response.json() as Promise<NetWorthPoint[]>;
+}
+
+export function netWorthCsvPath(asOf?: string): string {
+  return `/reports/net-worth.csv${asOf ? `?as_of=${asOf}` : ""}`;
 }

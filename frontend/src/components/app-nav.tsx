@@ -12,6 +12,8 @@ const links = [
   { href: "/cards", label: "Cartões" },
   { href: "/transfers", label: "Transferências" },
   { href: "/debts", label: "Dívidas" },
+  { href: "/assets", label: "Bens" },
+  { href: "/net-worth", label: "Patrimônio" },
   { href: "/dre", label: "DRE" },
   { href: "/cash-flow", label: "Fluxo de caixa" },
   { href: "/import", label: "Importar" },

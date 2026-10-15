@@ -30,6 +30,7 @@ Controle financeiro pessoal espalhado entre planilhas e memória: nenhuma visão
 | Saldo inicial e saldo atual por conta | Cada conta tem saldo inicial; o saldo atual é inicial + movimentações (cartão: dívida inclui o saldo inicial negativo) |
 | DRE | Resultado do período por competência, agrupado por grupos de DRE configurados nas categorias, com % da receita líquida, comparação com o período anterior, opção de incluir previsto e exportação CSV |
 | Dívidas e financiamentos | Empréstimo vira conta de dívida: receber o dinheiro e amortizar o principal **não** são receita nem despesa, só os juros e encargos entram no DRE; cronograma Price/SAC/sem juros com parcela editável, pagamento extra (reduz prazo ou parcela) e quitação; parcelas aparecem em contas a pagar, dashboard e fluxo de caixa |
+| Patrimônio e bens | Balanço pessoal (ativos − passivos): caixa e contas + bens com avaliações por data − cartões − dívidas, com curto e longo prazo, patrimônio líquido por bem financiado, evolução de 12 meses calculada do histórico e exportação CSV |
 | Fluxo de caixa | Meses em colunas (previsto × realizado × projetado) por caixa, com recorrências expandidas, drill-down até os lançamentos, gráfico e exportação CSV |
 | Importação de extrato (CSV) | Pré-visualização antes de gravar; possíveis duplicatas (mesma conta/tipo/valor, data ±2 dias) vêm desmarcadas para o usuário decidir — nunca descartadas em silêncio |
 
@@ -37,7 +38,7 @@ OFX ficou fora do escopo da primeira versão da importação (só CSV).
 
 ## Arquitetura
 
-**Vertical slices**: cada funcionalidade (`accounts`, `categories`, `transactions`, `dashboard`, `budgets`, `goals`, `recurring`, `statement_import`, `commitments`, `transfers`, `credit_cards`, `debts`, `reports`) é uma fatia completa — schema, regra de negócio, persistência, rota e teste moram juntos em `backend/src/features/<nome>/`. `transactions` é o núcleo do domínio: as demais slices dependem dela (nunca o contrário), chamando só sua camada `service` pública — nunca o `repository`/model ORM de outra slice diretamente. Detalhes e diagrama de dependências em [`docs/planning/09-vertical-slices.md`](docs/planning/09-vertical-slices.md).
+**Vertical slices**: cada funcionalidade (`accounts`, `categories`, `transactions`, `dashboard`, `budgets`, `goals`, `recurring`, `statement_import`, `commitments`, `transfers`, `credit_cards`, `debts`, `assets`, `reports`) é uma fatia completa — schema, regra de negócio, persistência, rota e teste moram juntos em `backend/src/features/<nome>/`. `transactions` é o núcleo do domínio: as demais slices dependem dela (nunca o contrário), chamando só sua camada `service` pública — nunca o `repository`/model ORM de outra slice diretamente. Detalhes e diagrama de dependências em [`docs/planning/09-vertical-slices.md`](docs/planning/09-vertical-slices.md).
 
 **Decisões de maior consequência** (ADRs completos em [`docs/planning/decisions/`](docs/planning/decisions/)):
 - Azure como provedor de nuvem (ADR-001), multiusuário desde o início mesmo sendo uso pessoal (ADR-002)

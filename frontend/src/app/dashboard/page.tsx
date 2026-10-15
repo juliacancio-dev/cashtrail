@@ -14,6 +14,9 @@ import { getCardsSummary } from "@/features/credit-cards/api";
 import { getDebtsSummary } from "@/features/debts/api";
 import type { DebtsSummary } from "@/features/debts/schemas";
 import { DebtsAlert } from "@/features/debts/summary-alert";
+import { getNetWorthHistory } from "@/features/reports/api";
+import { NetWorthCard } from "@/features/reports/net-worth-card";
+import type { NetWorthPoint } from "@/features/reports/schemas";
 import type { CardsSummary } from "@/features/credit-cards/schemas";
 import { CardsAlert } from "@/features/credit-cards/summary-alert";
 import { getDashboard } from "@/features/dashboard/api";
@@ -29,6 +32,7 @@ export default function DashboardPage() {
   const [commitments, setCommitments] = useState<CommitmentSummary | null>(null);
   const [cards, setCards] = useState<CardsSummary | null>(null);
   const [debts, setDebts] = useState<DebtsSummary | null>(null);
+  const [netWorth, setNetWorth] = useState<NetWorthPoint[]>([]);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -52,6 +56,9 @@ export default function DashboardPage() {
     getDebtsSummary()
       .then(setDebts)
       .catch(() => setDebts(null));
+    getNetWorthHistory(2)
+      .then(setNetWorth)
+      .catch(() => setNetWorth([]));
   }, [user]);
 
   if (isLoading || !user) {
@@ -82,6 +89,7 @@ export default function DashboardPage() {
 
       {error && <p className="text-destructive text-sm">{error}</p>}
 
+      <NetWorthCard points={netWorth} />
       {commitments && <CommitmentsAlert summary={commitments} />}
       {cards && <CardsAlert summary={cards} />}
       {debts && <DebtsAlert summary={debts} />}

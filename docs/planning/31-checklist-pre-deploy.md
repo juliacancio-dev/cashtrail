@@ -27,6 +27,17 @@ Legenda: **FATO** (verificado no código ou nos arquivos) · **INFERÊNCIA** · 
 | D4 | **Visual**: publicar com a interface funcional atual ou esperar o redesign | O menu já tem ~20 itens e quebra em duas linhas; a pesquisa visual (doc 21) segue sem decisão e sem as capturas de ERPs | Publicar agora é possível; o redesign não bloqueia nada técnico |
 | D5 | **Dados de produção**: o MVP em produção tem dados reais dela? | Define o quanto o backup e o rollback pesam | Tratar como dados reais e fazer backup antes (item B1) |
 
+### Decisões tomadas pela Julia (2026-10-15)
+
+| # | Decisão |
+|---|---|
+| D1 | **Banco ligado todo dia, das 06:00 às 23:00 (Brasília)**: `db-lifecycle.yml` agora liga às `09:00 UTC` e desliga às `02:00 UTC`, todos os dias (~17h/dia). Fora dessa janela, ligar à mão pelo workflow |
+| D2 | **Criar o ACS na mesma sessão**, partindo do zero (nenhum recurso de e-mail existe) |
+| D3 | **Deploy sem token da brapi**, com valor manual; termos e token ficam para depois |
+| D4 | **Publicar agora com a interface atual**; o redesign vira o próximo marco |
+| D5 | O que está em produção são **dados de teste/demo**: backup continua recomendado, o ensaio das migrações em banco temporário pode ser dispensado |
+| Sessão | **Agora**, guiada passo a passo |
+
 ## 3. Bloqueadores técnicos (fazer antes de rodar o Deploy)
 
 | ID | Item | Estado | Como fechar |

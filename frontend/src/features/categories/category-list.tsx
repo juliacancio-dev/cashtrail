@@ -9,16 +9,24 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { NO_GROUP, dreGroupOptions, type Category } from "@/features/categories/schemas";
+import {
+  NO_GROUP,
+  NO_IR_KIND,
+  dreGroupOptions,
+  irKindOptions,
+  type Category,
+} from "@/features/categories/schemas";
 
 export function CategoryList({
   categories,
   onArchive,
   onChangeGroup,
+  onChangeIrKind,
 }: {
   categories: Category[];
   onArchive: (id: string) => Promise<void>;
   onChangeGroup: (id: string, group: string) => Promise<void>;
+  onChangeIrKind: (id: string, irKind: string) => Promise<void>;
 }) {
   if (categories.length === 0) {
     return <p className="text-muted-foreground text-sm">Nenhuma categoria cadastrada ainda.</p>;
@@ -48,6 +56,25 @@ export function CategoryList({
                   </SelectTrigger>
                   <SelectContent>
                     {dreGroupOptions.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-muted-foreground text-xs">No IR</span>
+                <Select
+                  value={category.ir_kind ?? NO_IR_KIND}
+                  onValueChange={(value) => value && onChangeIrKind(category.id, value)}
+                  items={[...irKindOptions]}
+                >
+                  <SelectTrigger className="w-52" aria-label={`Marca fiscal de ${category.name}`}>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {irKindOptions.map((option) => (
                       <SelectItem key={option.value} value={option.value}>
                         {option.label}
                       </SelectItem>

@@ -586,3 +586,42 @@ def benchmark(
 
     difference = portfolio_pct - cdi_pct if portfolio_pct is not None and cdi_pct is not None else None
     return Benchmark(since, invested, portfolio_pct, cdi_pct, difference, note)
+
+
+# ---------- leitura para a apuração de imposto (Marco 14) ----------
+
+@dataclass(frozen=True)
+class SaleRecord:
+    asset_id: uuid.UUID
+    name: str
+    asset_class: str
+    occurred_at: date
+    gross: Decimal  # quantidade × preço unitário, sem taxas
+    gain: Decimal  # ganho líquido já calculado pelo custo médio, com as taxas da venda
+    same_day_buy: bool  # compra do mesmo ativo no mesmo dia: indício de day trade
+
+
+def list_sales(db: Session, user_id: uuid.UUID, end: date | None = None) -> list[SaleRecord]:
+    assets = {a.id: a for a in repository.list_assets(db, user_id)}
+    operations = repository.list_operations(db, user_id)
+    buy_days = {(op.asset_id, op.occurred_at) for op in operations if op.kind == "buy"}
+    records: list[SaleRecord] = []
+    for op in operations:
+        if op.kind != "sell" or (end is not None and op.occurred_at > end):
+            continue
+        asset = assets.get(op.asset_id)
+        if asset is None:
+            continue
+        records.append(
+            SaleRecord(
+                asset_id=asset.id,
+                name=asset.name,
+                asset_class=asset.asset_class,
+                occurred_at=op.occurred_at,
+                gross=_money(op.quantity * op.unit_price),
+                gain=op.gain if op.gain is not None else ZERO,
+                same_day_buy=(op.asset_id, op.occurred_at) in buy_days,
+            )
+        )
+    return records
+

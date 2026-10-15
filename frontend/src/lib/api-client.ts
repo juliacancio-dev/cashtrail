@@ -57,6 +57,8 @@ export const apiClient = {
   post: (path: string, body?: unknown) =>
     request(path, { method: "POST", body: body !== undefined ? JSON.stringify(body) : undefined }),
   postForm: (path: string, body: FormData) => request(path, { method: "POST", body }),
+  put: (path: string, body?: unknown) =>
+    request(path, { method: "PUT", body: body !== undefined ? JSON.stringify(body) : undefined }),
   patch: (path: string, body?: unknown) =>
     request(path, { method: "PATCH", body: body !== undefined ? JSON.stringify(body) : undefined }),
   delete: (path: string) => request(path, { method: "DELETE" }),

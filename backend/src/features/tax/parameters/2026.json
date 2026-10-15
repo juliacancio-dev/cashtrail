@@ -1,0 +1,58 @@
+{
+  "year": 2026,
+  "label": "Ano-calendário 2026 (declaração entregue em 2027)",
+  "consulted_at": "2026-10-15",
+  "sources": [
+    {
+      "topic": "Tabela progressiva anual, deduções por dependente e educação, limite do desconto simplificado, redutor da Lei 15.270/2025",
+      "url": "https://www.gov.br/receitafederal/pt-br/assuntos/meu-imposto-de-renda/tabelas/2026",
+      "kind": "oficial"
+    },
+    {
+      "topic": "Renda variável em ações: alíquota, isenção de vendas até R$ 20.000 no mês, DARF 6015, prazo e IRRF 0,005% sobre a venda",
+      "url": "https://www.gov.br/receitafederal/pt-br/assuntos/meu-imposto-de-renda/pagamento/renda-variavel/bolsa-de-valores-1/calculo-e-pagamento-do-imposto",
+      "kind": "oficial"
+    },
+    {
+      "topic": "Saúde sem limite e PGBL até 12%",
+      "url": "https://www.gov.br/receitafederal/pt-br/assuntos/meu-imposto-de-renda/preenchimento/manual-mir/pagamentos-ou-doacoes/despesas-dedutiveis",
+      "kind": "oficial"
+    }
+  ],
+  "annual_table": [
+    {"up_to": "29145.60", "rate": "0", "deduction": "0"},
+    {"up_to": "33919.80", "rate": "0.075", "deduction": "2185.92"},
+    {"up_to": "45012.60", "rate": "0.15", "deduction": "4729.91"},
+    {"up_to": "55976.16", "rate": "0.225", "deduction": "8105.85"},
+    {"up_to": null, "rate": "0.275", "deduction": "10904.66"}
+  ],
+  "dependent_deduction": "2275.08",
+  "education_limit_per_person": "3561.50",
+  "simplified_limit": "17640.00",
+  "simplified_rate": "0.20",
+  "pension_limit_rate": "0.12",
+  "reducer": {
+    "full_up_to": "60000.00",
+    "full_amount": "2694.15",
+    "phase_out_up_to": "88200.00",
+    "phase_constant": "8429.73",
+    "phase_factor": "0.095575",
+    "base": "gross_taxable_income"
+  },
+  "variable_income": {
+    "stock_exempt_monthly_sales": "20000.00",
+    "stock_rate": "0.15",
+    "fii_rate": "0.20",
+    "irrf_rate": "0.00005",
+    "darf_code": "6015",
+    "darf_minimum": "10.00"
+  },
+  "unverified": [
+    "simplified_rate: a Receita publica o limite (R$ 17.640,00); os 20% vêm do que conheço da lei e não foram lidos na fonte oficial",
+    "reducer.base: a página oficial diz 'rendimentos tributáveis'; assumi o total dos rendimentos tributáveis antes das deduções (como no redutor mensal)",
+    "fii_rate e compensação de prejuízo por modalidade: fonte secundária",
+    "irrf_rate: o valor 0,005% aparece só num exemplo da Receita (sobre a venda); a aplicação a FII não foi verificada",
+    "darf_minimum: R$ 10,00 é a regra que conheço; não confirmei no texto oficial",
+    "VR/VT, PLR, 13º e renda fixa: vêm do informe de rendimentos digitado; o sistema não recalcula o imposto retido nesses casos"
+  ]
+}

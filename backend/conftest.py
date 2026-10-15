@@ -37,6 +37,7 @@ from src.features.investments.models import (  # noqa: F401
 from src.features.goals.models import Goal  # noqa: F401
 from src.features.recurring.models import RecurringTransaction  # noqa: F401
 from src.features.statement_import.models import StatementImport  # noqa: F401
+from src.features.tax.models import TaxIncomeStatement, TaxYearSettings  # noqa: F401
 from src.features.transactions.models import Transaction  # noqa: F401
 from src.features.transfers.models import Transfer  # noqa: F401
 

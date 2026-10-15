@@ -33,7 +33,7 @@ def rename(db: Session, category: Category, name: str) -> Category:
 
 
 def update(db: Session, category: Category, changes: dict) -> Category:
-    for field in ("name", "dre_group"):
+    for field in ("name", "dre_group", "ir_kind"):
         if field in changes:
             setattr(category, field, changes[field])
     db.commit()

@@ -8,7 +8,13 @@ import { AppNav } from "@/components/app-nav";
 import { useAuth } from "@/features/auth/auth-context";
 import { CategoryForm } from "@/features/categories/category-form";
 import { CategoryList } from "@/features/categories/category-list";
-import { archiveCategory, createCategory, listCategories, updateCategoryGroup } from "@/features/categories/api";
+import {
+  archiveCategory,
+  createCategory,
+  listCategories,
+  updateCategoryGroup,
+  updateCategoryIrKind,
+} from "@/features/categories/api";
 import type { Category, CreateCategoryFormValues } from "@/features/categories/schemas";
 
 export default function CategoriesPage() {
@@ -52,6 +58,16 @@ export default function CategoriesPage() {
     }
   }
 
+  async function handleChangeIrKind(id: string, irKind: string) {
+    setError(null);
+    try {
+      const updated = await updateCategoryIrKind(id, irKind);
+      setCategories((current) => current.map((c) => (c.id === id ? updated : c)));
+    } catch {
+      setError("nao foi possivel salvar a marca fiscal da categoria");
+    }
+  }
+
   async function handleArchive(id: string) {
     setError(null);
     try {
@@ -91,7 +107,12 @@ export default function CategoriesPage() {
       {isLoadingCategories ? (
         <p className="text-muted-foreground text-sm">Carregando categorias...</p>
       ) : (
-        <CategoryList categories={categories} onArchive={handleArchive} onChangeGroup={handleChangeGroup} />
+        <CategoryList
+          categories={categories}
+          onArchive={handleArchive}
+          onChangeGroup={handleChangeGroup}
+          onChangeIrKind={handleChangeIrKind}
+        />
       )}
     </main>
   );

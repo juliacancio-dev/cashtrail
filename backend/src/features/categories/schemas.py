@@ -9,16 +9,20 @@ DreGroup = Literal[
     "revenue", "deduction", "variable_expense", "fixed_expense", "financial_expense", "financial_revenue"
 ]
 
+IrKind = Literal["deduction_health", "deduction_education", "deduction_pension"]
+
 
 class CategoryCreate(BaseModel):
     name: str = Field(min_length=1, max_length=120)
     dre_group: DreGroup | None = None
+    ir_kind: IrKind | None = None
 
 
 class CategoryUpdate(BaseModel):
     name: str | None = Field(default=None, min_length=1, max_length=120)
     # Enviar `null` explicitamente remove o grupo (volta para "Sem grupo").
     dre_group: DreGroup | None = None
+    ir_kind: IrKind | None = None
 
 
 class CategoryRead(BaseModel):
@@ -27,5 +31,6 @@ class CategoryRead(BaseModel):
     id: uuid.UUID
     name: str
     dre_group: DreGroup | None
+    ir_kind: IrKind | None
     is_archived: bool
     created_at: datetime

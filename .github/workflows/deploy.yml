@@ -70,6 +70,7 @@ jobs:
         env:
           ACS_CONNECTION_STRING: ${{ secrets.ACS_CONNECTION_STRING }}
           EMAIL_SENDER_ADDRESS: ${{ secrets.EMAIL_SENDER_ADDRESS }}
+          BRAPI_TOKEN: ${{ secrets.BRAPI_TOKEN }}
         run: |
           # FRONTEND_URL monta o link do e-mail de redefinição de senha (RF-013).
           frontend_fqdn=$(az containerapp show -g "$RESOURCE_GROUP" -n "$FRONTEND_APP" --query properties.configuration.ingress.fqdn -o tsv --only-show-errors)
@@ -90,9 +91,20 @@ jobs:
             echo "::warning::ACS_CONNECTION_STRING não configurado: e-mail de recuperação de senha só no log."
           fi
 
+          # Cotações da carteira (Marco 13): o token da brapi só entra se o secret do GitHub existir.
+          # Sem ele a brapi atende só ativos de teste e o valor manual continua funcionando.
+          quotes_env=()
+          if [ -n "$BRAPI_TOKEN" ]; then
+            az containerapp secret set -g "$RESOURCE_GROUP" -n "$BACKEND_APP" \
+              --secrets "brapi-token=$BRAPI_TOKEN" --only-show-errors -o none
+            quotes_env=(BRAPI_TOKEN=secretref:brapi-token)
+          else
+            echo "::warning::BRAPI_TOKEN não configurado: cotação automática só para ativos de teste da brapi."
+          fi
+
           az containerapp update -g "$RESOURCE_GROUP" -n "$BACKEND_APP" \
             --image "$ACR_NAME.azurecr.io/cashtrail-backend:$IMAGE_TAG" \
-            --set-env-vars ENABLE_SCHEDULER=true "APP_VERSION=$IMAGE_TAG" "FRONTEND_URL=https://$frontend_fqdn" "${email_env[@]}" \
+            --set-env-vars ENABLE_SCHEDULER=true "APP_VERSION=$IMAGE_TAG" "FRONTEND_URL=https://$frontend_fqdn" "${email_env[@]}" "${quotes_env[@]}" \
             --only-show-errors -o none
 
       # Ambiente Express não aceita revision suffix nem preenche

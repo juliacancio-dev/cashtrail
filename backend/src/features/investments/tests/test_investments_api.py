@@ -359,3 +359,21 @@ def test_cannot_register_assets_in_a_non_investment_account(client, providers):
     )
 
     assert response.status_code == 404
+
+
+def test_scheduled_refresh_skips_fresh_quotes_but_the_button_does_not(client, providers, db_session):
+    from src.features.investments import service as investments_service
+
+    quotes, _ = providers
+    w = world(client, "i18@example.com")
+    a = asset(w)
+    buy(w, a["id"], "10", "20")
+    w.post("/investments/refresh")  # primeira cotação do dia (botão)
+    calls_after_button = len(quotes.calls)
+
+    scheduled = investments_service.refresh_all_users(db_session, quotes)
+    forced = w.post("/investments/refresh")
+
+    assert scheduled == 0  # cotação com minutos de vida: o job não repete a requisição
+    assert len(quotes.calls) == calls_after_button + 1  # só o botão consultou de novo
+    assert forced["updated"] == ["PETR4"]

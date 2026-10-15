@@ -502,6 +502,7 @@ def refresh_quotes(
     today: date | None = None,
     monthly_cap: int = 10000,
     now: datetime | None = None,
+    skip_fresh_hours: int | None = None,
 ) -> RefreshResult:
     """RF-055: uma requisição por ativo com cotação automática; para no teto mensal; falha de um
     ativo não impede os outros nem apaga a última cotação conhecida (RF-054)."""
@@ -515,6 +516,16 @@ def refresh_quotes(
     for asset in repository.list_assets(db, user_id):
         if asset.is_archived or asset.quote_source != "brapi" or not asset.symbol:
             continue
+        if skip_fresh_hours is not None:
+            # Job de subida/diário: o app acorda várias vezes por dia; não repete a requisição de uma cotação recente.
+            existing = repository.get_quote_on(db, asset.id, today, user_id)
+            if (
+                existing is not None
+                and existing.source == "brapi"
+                and existing.fetched_at is not None
+                and now - existing.fetched_at < timedelta(hours=skip_fresh_hours)
+            ):
+                continue
         if used >= monthly_cap:
             skipped.append(asset.symbol)
             continue
@@ -540,12 +551,16 @@ def refresh_quotes(
 
 
 def refresh_all_users(
-    db: Session, provider: QuoteProvider, today: date | None = None, monthly_cap: int = 10000
+    db: Session,
+    provider: QuoteProvider,
+    today: date | None = None,
+    monthly_cap: int = 10000,
+    skip_fresh_hours: int | None = 4,
 ) -> int:
     """Job diário: atualiza a carteira de todos os usuários que têm ativo com cotação automática."""
     total = 0
     for user_id in repository.users_with_auto_assets(db):
-        total += len(refresh_quotes(db, user_id, provider, today, monthly_cap).updated)
+        total += len(refresh_quotes(db, user_id, provider, today, monthly_cap, skip_fresh_hours=skip_fresh_hours).updated)
     return total
 
 

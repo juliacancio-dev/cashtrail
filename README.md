@@ -108,7 +108,7 @@ Testes de integração usam Testcontainers (Postgres real via Docker), não mock
 
 Autenticação no Azure via OIDC (federated credential), sem segredo de longa duração no GitHub.
 
-**Secrets do GitHub:** `AZURE_CLIENT_ID`, `AZURE_TENANT_ID`, `AZURE_SUBSCRIPTION_ID` (login). Opcionais, para o e-mail real da recuperação de senha via Azure Communication Services: `ACS_CONNECTION_STRING` e `EMAIL_SENDER_ADDRESS` — sem eles o backend usa `EMAIL_BACKEND=console` (o link só aparece no log).
+**Secrets do GitHub:** `AZURE_CLIENT_ID`, `AZURE_TENANT_ID`, `AZURE_SUBSCRIPTION_ID` (login). Opcionais, para o e-mail real da recuperação de senha via Azure Communication Services: `ACS_CONNECTION_STRING` e `EMAIL_SENDER_ADDRESS` — sem eles o backend usa `EMAIL_BACKEND=console` (o link só aparece no log). Também opcional: `BRAPI_TOKEN` (cotações automáticas de ações, FIIs e ETFs; sem ele a brapi atende só ativos de teste). Checklist completo antes do deploy: [`docs/planning/31-checklist-pre-deploy.md`](docs/planning/31-checklist-pre-deploy.md).
 
 ## Status
 

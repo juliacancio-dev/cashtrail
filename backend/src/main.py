@@ -63,6 +63,10 @@ async def lifespan(app: FastAPI):
         # (05-integrations.md), então esperar 24h pelo primeiro `interval` deixaria
         # recorrências vencidas esperando o próximo acesso à API por muito tempo.
         _run_recurring_job()
+        # Cotações também na subida: com escala a zero o intervalo de 24h quase nunca chega a rodar.
+        # Cotação de menos de 4h é pulada, então acordar várias vezes no dia não gasta o limite da fonte.
+        # Em segundo plano (thread do agendador): uma fonte lenta não pode atrasar a subida nem o /health.
+        scheduler.add_job(_run_quotes_job, id="refresh_investment_quotes_on_start")
         scheduler.add_job(_run_recurring_job, "interval", days=1, id="generate_recurring_transactions")
         scheduler.add_job(_run_quotes_job, "interval", days=1, id="refresh_investment_quotes")
         scheduler.start()

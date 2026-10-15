@@ -18,6 +18,7 @@ from src.features.commitments.router import router as commitments_router
 from src.features.credit_cards.router import router as credit_cards_router
 from src.features.assets.router import router as assets_router
 from src.features.debts.router import router as debts_router
+from src.features.insurance.router import router as insurance_router
 from src.features.investments import service as investments_service
 from src.features.investments.providers import BrapiProvider
 from src.features.investments.router import router as investments_router
@@ -26,6 +27,7 @@ from src.features.goals.router import router as goals_router
 from src.features.recurring import service as recurring_service
 from src.features.recurring.router import router as recurring_router
 from src.features.reports.router import router as reports_router
+from src.features.retirement.router import router as retirement_router
 from src.features.statement_import.router import router as statement_import_router
 from src.features.transactions.router import router as transactions_router
 from src.features.tax.router import router as tax_router
@@ -99,6 +101,8 @@ app.include_router(debts_router)
 app.include_router(assets_router)
 app.include_router(investments_router)
 app.include_router(tax_router)
+app.include_router(insurance_router)
+app.include_router(retirement_router)
 app.include_router(reports_router)
 
 

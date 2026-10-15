@@ -16,6 +16,8 @@ const links = [
   { href: "/investments", label: "Investimentos" },
   { href: "/net-worth", label: "Patrimônio" },
   { href: "/tax", label: "Imposto de renda" },
+  { href: "/insurance", label: "Seguros" },
+  { href: "/retirement", label: "Independência" },
   { href: "/dre", label: "DRE" },
   { href: "/cash-flow", label: "Fluxo de caixa" },
   { href: "/import", label: "Importar" },

@@ -28,6 +28,8 @@ from src.features.commitments.models import Commitment, CommitmentSettlement  # 
 from src.features.assets.models import Asset, AssetValuation  # noqa: F401
 from src.features.credit_cards.models import CardInvoicePayment, CardPurchase, CreditCard  # noqa: F401
 from src.features.debts.models import Debt, DebtAmortization, DebtInstallment  # noqa: F401
+from src.features.insurance.models import InsurancePolicy  # noqa: F401
+from src.features.retirement.models import RetirementPlan  # noqa: F401
 from src.features.investments.models import (  # noqa: F401
     InvestmentAsset,
     InvestmentOperation,

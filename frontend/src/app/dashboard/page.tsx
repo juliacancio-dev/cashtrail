@@ -14,6 +14,9 @@ import { getCardsSummary } from "@/features/credit-cards/api";
 import { getDebtsSummary } from "@/features/debts/api";
 import type { DebtsSummary } from "@/features/debts/schemas";
 import { DebtsAlert } from "@/features/debts/summary-alert";
+import { getInsuranceSummary } from "@/features/insurance/api";
+import type { InsuranceSummary } from "@/features/insurance/schemas";
+import { InsuranceAlert } from "@/features/insurance/summary-alert";
 import { getNetWorthHistory } from "@/features/reports/api";
 import { NetWorthCard } from "@/features/reports/net-worth-card";
 import type { NetWorthPoint } from "@/features/reports/schemas";
@@ -32,6 +35,7 @@ export default function DashboardPage() {
   const [commitments, setCommitments] = useState<CommitmentSummary | null>(null);
   const [cards, setCards] = useState<CardsSummary | null>(null);
   const [debts, setDebts] = useState<DebtsSummary | null>(null);
+  const [insurance, setInsurance] = useState<InsuranceSummary | null>(null);
   const [netWorth, setNetWorth] = useState<NetWorthPoint[]>([]);
   const [error, setError] = useState<string | null>(null);
 
@@ -56,6 +60,9 @@ export default function DashboardPage() {
     getDebtsSummary()
       .then(setDebts)
       .catch(() => setDebts(null));
+    getInsuranceSummary()
+      .then(setInsurance)
+      .catch(() => setInsurance(null));
     getNetWorthHistory(2)
       .then(setNetWorth)
       .catch(() => setNetWorth([]));
@@ -93,6 +100,7 @@ export default function DashboardPage() {
       {commitments && <CommitmentsAlert summary={commitments} />}
       {cards && <CardsAlert summary={cards} />}
       {debts && <DebtsAlert summary={debts} />}
+      {insurance && <InsuranceAlert summary={insurance} />}
 
       {!dashboard ? (
         <p className="text-muted-foreground text-sm">Carregando...</p>

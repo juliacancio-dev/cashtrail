@@ -20,6 +20,7 @@ from src.core.config import settings
 TIMEOUT_SECONDS = 8
 BCB_WINDOW_DAYS = 365 * 9  # a API limita a 10 anos por consulta
 CDI_DAILY_SERIES = 12
+IPCA_MONTHLY_SERIES = 433
 
 
 class QuoteError(Exception):
@@ -39,6 +40,10 @@ class QuoteProvider(Protocol):
 class IndexProvider(Protocol):
     def cdi_daily(self, start: date, end: date) -> list[tuple[date, Decimal]]:
         """Taxa do CDI por dia, em PERCENTUAL ao dia (0.050788 = 0,050788% a.d.)."""
+        ...
+
+    def ipca_monthly(self, start: date, end: date) -> list[tuple[date, Decimal]]:
+        """IPCA mensal, em PERCENTUAL ao mês (0.82 = 0,82% a.m.)."""
         ...
 
 
@@ -78,6 +83,12 @@ class BcbProvider:
     """API de dados abertos do Banco Central (SGS): pública, sem autenticação."""
 
     def cdi_daily(self, start: date, end: date) -> list[tuple[date, Decimal]]:
+        return self._series(CDI_DAILY_SERIES, start, end)
+
+    def ipca_monthly(self, start: date, end: date) -> list[tuple[date, Decimal]]:
+        return self._series(IPCA_MONTHLY_SERIES, start, end)
+
+    def _series(self, code: int, start: date, end: date) -> list[tuple[date, Decimal]]:
         result: list[tuple[date, Decimal]] = []
         cursor = start
         while cursor <= end:
@@ -85,7 +96,7 @@ class BcbProvider:
             query = urllib.parse.urlencode(
                 {"formato": "json", "dataInicial": cursor.strftime("%d/%m/%Y"), "dataFinal": window_end.strftime("%d/%m/%Y")}
             )
-            url = f"https://api.bcb.gov.br/dados/serie/bcdata.sgs.{CDI_DAILY_SERIES}/dados?{query}"
+            url = f"https://api.bcb.gov.br/dados/serie/bcdata.sgs.{code}/dados?{query}"
             try:
                 rows = _get_json(url)
                 for row in rows:

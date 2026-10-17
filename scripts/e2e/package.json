@@ -1,0 +1,10 @@
+{
+  "name": "cashtrail-e2e",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Roteiros de verificacao no navegador (Playwright), usados nos marcos 8 a 15. Nao fazem parte do CI.",
+  "type": "commonjs",
+  "dependencies": {
+    "playwright": "^1.64.0"
+  }
+}

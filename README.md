@@ -161,6 +161,14 @@ A documentação de discovery e engenharia é versionada junto ao código, em [`
 - [Roadmap](docs/planning/13-roadmap.md) — marcos, escopo e evolução
 - [ADRs](docs/planning/decisions/) — decisões arquiteturais e suas justificativas
 
+## Contribuindo
+
+Relatos de bug, sugestões e pull requests são bem-vindos. O fluxo, os padrões de código, os testes exigidos e os termos das contribuições estão no [guia de contribuição](CONTRIBUTING.md).
+
+## Licença
+
+Copyright (c) 2026 Julia Cancio. **Todos os direitos reservados.** O código está público para consulta e avaliação; o uso, a cópia ou a redistribuição exigem autorização prévia. Veja o arquivo [LICENSE](LICENSE).
+
 ---
 
 **CashTrail** — um projeto de engenharia de software orientado a domínio, segurança, consistência financeira e evolução incremental.

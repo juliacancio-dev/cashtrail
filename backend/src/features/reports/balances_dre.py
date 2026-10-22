@@ -1,8 +1,3 @@
-"""Saldos por conta e DRE (RF-031, RF-033).
-
-Slice de leitura: consome só os `service` públicos das outras slices, como o dashboard.
-"""
-
 import uuid
 from dataclasses import dataclass, field
 from datetime import date, timedelta
@@ -15,6 +10,7 @@ from src.features.accounts.models import NON_CASH_TYPES, AccountType
 from src.features.categories import service as categories_service
 from src.features.commitments import service as commitments_service
 from src.features.commitments.models import CommitmentDirection
+from src.features.reports.cash_flow import add_months, last_of_month
 from src.features.transactions import service as transactions_service
 from src.features.transactions.models import TransactionType
 from src.features.transfers import service as transfers_service
@@ -36,15 +32,14 @@ class AccountBalance:
     type: AccountType
     is_archived: bool
     opening_balance: Decimal
-    balance: Decimal  # positivo = dinheiro; num cartão, negativo = dívida
-
+    balance: Decimal 
 
 @dataclass(frozen=True)
 class Balances:
     accounts: list[AccountBalance]
-    cash_total: Decimal  # soma das contas que NÃO são cartão nem dívida (inclui arquivadas)
+    cash_total: Decimal  
     card_debt_total: Decimal
-    loan_debt_total: Decimal  # saldo devedor de empréstimos e financiamentos (Marco 11)
+    loan_debt_total: Decimal  
 
 
 def balances(db: Session, user_id: uuid.UUID, today: date | None = None) -> Balances:
@@ -125,8 +120,7 @@ class Dre:
     lines: list[DreLine]
     net_result: Decimal
     previous_net_result: Decimal
-    ungrouped_count: int  # categorias com movimento e sem grupo, para avisar (RB-028)
-
+    ungrouped_count: int 
 
 @dataclass
 class _Totals:
@@ -158,19 +152,16 @@ def _collect(
             totals.by_category[key] = totals.by_category.get(key, ZERO) + amount
             return
 
-        # RB-029: lançamento no sentido oposto ao do grupo abate o total do grupo.
         same_direction = (kind == TransactionType.INCOME) == (group in REVENUE_SIDE)
         signed = amount if same_direction else -amount
         totals.groups[group] += signed
         key = (group, category_id)
         totals.by_category[key] = totals.by_category.get(key, ZERO) + signed
 
-    # Competência: data do lançamento; transferências nunca aparecem aqui (RB-014/RB-022).
     for transaction in transactions_service.list_transactions(db, user_id, start, end):
         add(transaction.category_id, transaction.type, transaction.amount)
 
     if include_forecast:
-        # "Incluir previsto": contas a pagar/receber ainda em aberto, pelo vencimento (saldo restante).
         views, _ = commitments_service.list_commitments(db, user_id, status="pending", due_from=start, due_to=end)
         for view in views:
             kind = (
@@ -199,6 +190,16 @@ def _results(t: _Totals) -> dict[str, Decimal]:
     }
 
 
+def previous_period(start_date: date, end_date: date) -> tuple[date, date]:
+    if start_date.day == 1 and end_date == last_of_month(end_date.replace(day=1)):
+        months = (end_date.year - start_date.year) * 12 + end_date.month - start_date.month + 1
+        previous_start = add_months(start_date, -months)
+        return previous_start, start_date - timedelta(days=1)
+    length = (end_date - start_date).days + 1
+    previous_end = start_date - timedelta(days=1)
+    return previous_end - timedelta(days=length - 1), previous_end
+
+
 def dre(
     db: Session,
     user_id: uuid.UUID,
@@ -206,14 +207,11 @@ def dre(
     end_date: date,
     include_forecast: bool = False,
 ) -> Dre:
-    """RF-033: DRE do período, por competência, comparado com o período imediatamente anterior."""
     categories = categories_service.list_categories(db, user_id)
     names = {c.id: c.name for c in categories}
     groups = {c.id: c.dre_group for c in categories}
 
-    length = (end_date - start_date).days + 1
-    previous_end = start_date - timedelta(days=1)
-    previous_start = previous_end - timedelta(days=length - 1)
+    previous_start, previous_end = previous_period(start_date, end_date)
 
     current = _collect(db, user_id, start_date, end_date, include_forecast, groups)
     previous = _collect(db, user_id, previous_start, previous_end, include_forecast, groups)

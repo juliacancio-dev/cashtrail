@@ -59,7 +59,7 @@ Legenda: **FATO** (fonte ou código verificado) · **INFERÊNCIA** · **HIPÓTES
 | (+) **Receitas financeiras** | rendimento de aplicações |
 | (=) **Resultado do mês** | sobra ou falta |
 
-Cada linha mostra o valor, o **% da receita líquida** e a **variação contra o período anterior**.
+Cada linha mostra o valor, o **% da receita líquida** e a **variação contra o período anterior**. Período anterior (corrigido em 2026-10-22): se o período são **meses inteiros**, o mesmo número de meses inteiros logo antes (outubro → setembro; out–dez → jul–set); senão, o mesmo número de dias terminando na véspera. Antes era sempre o mesmo número de dias, e outubro era comparado com 31/08 a 30/09.
 
 **FATO — como o Bling resolve:** a categoria financeira tem um **"grupo do DRE"** ([ajuda do Bling](https://ajuda.bling.com.br/hc/pt-br/articles/360036734714-Como-incluir-uma-conta-a-pagar), seção de cadastros). Sem esse agrupamento, o DRE não fecha.
 

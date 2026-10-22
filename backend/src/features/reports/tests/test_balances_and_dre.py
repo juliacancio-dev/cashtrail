@@ -3,6 +3,8 @@
 from datetime import date
 from decimal import Decimal
 
+import pytest
+
 from src.features.reports import balances_dre
 
 from .conftest_helpers import D, TODAY, make_world
@@ -160,9 +162,41 @@ def test_dre_compares_with_the_previous_period(client, db_session):
 
     revenue = _line(result, "revenue")
     assert (revenue.amount, revenue.previous_amount) == (D("5000.00"), D("4000.00"))
-    # o período anterior tem o mesmo tamanho (agosto = 31 dias) e termina na véspera: 01/07 a 31/07
+    # mês inteiro compara com o mês anterior inteiro: 01/07 a 31/07
     assert (result.previous_start_date, result.previous_end_date) == (date(2026, 7, 1), date(2026, 7, 31))
     assert result.previous_net_result == D("4000.00")
+
+
+def test_dre_of_a_31_day_month_compares_with_the_whole_previous_month(client, db_session):
+    # outubro (31 dias) contra setembro (30): antes comparava com 31/08 a 30/09 e contava o 31/08
+    w = make_world(client, "rd7b@example.com")
+    w.tx(w.checking, w.salary, "income", "700.00", "2026-08-31")
+    w.tx(w.checking, w.salary, "income", "4000.00", "2026-09-05")
+    w.tx(w.checking, w.salary, "income", "5000.00", "2026-10-05")
+
+    result = balances_dre.dre(db_session, w.user_id, date(2026, 10, 1), date(2026, 10, 31))
+
+    assert (result.previous_start_date, result.previous_end_date) == (date(2026, 9, 1), date(2026, 9, 30))
+    assert _line(result, "revenue").previous_amount == D("4000.00")
+
+
+@pytest.mark.parametrize(
+    ("start", "end", "expected"),
+    [
+        # meses inteiros: mesmo número de meses inteiros, mesmo com tamanhos diferentes
+        (date(2026, 10, 1), date(2026, 10, 31), (date(2026, 9, 1), date(2026, 9, 30))),
+        (date(2026, 3, 1), date(2026, 3, 31), (date(2026, 2, 1), date(2026, 2, 28))),
+        (date(2026, 1, 1), date(2026, 1, 31), (date(2025, 12, 1), date(2025, 12, 31))),
+        (date(2026, 10, 1), date(2026, 12, 31), (date(2026, 7, 1), date(2026, 9, 30))),
+        (date(2026, 1, 1), date(2026, 12, 31), (date(2025, 1, 1), date(2025, 12, 31))),
+        # outro período: mesmo número de dias, terminando na véspera
+        (date(2026, 10, 10), date(2026, 10, 19), (date(2026, 9, 30), date(2026, 10, 9))),
+        (date(2026, 10, 1), date(2026, 10, 15), (date(2026, 9, 16), date(2026, 9, 30))),
+        (date(2026, 10, 1), date(2026, 10, 1), (date(2026, 9, 30), date(2026, 9, 30))),
+    ],
+)
+def test_previous_period(start, end, expected):
+    assert balances_dre.previous_period(start, end) == expected
 
 
 def test_include_forecast_adds_open_commitments_by_due_date(client, db_session):

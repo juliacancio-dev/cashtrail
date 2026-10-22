@@ -1,123 +1,166 @@
 # CashTrail
 
-Plataforma de gestão financeira pessoal — projeto pessoal com uso real, construído com discovery, arquitetura e decisões documentadas do zero.
+**Personal Finance Management Platform**
 
-## O problema
+Uma plataforma de gestão financeira pessoal desenvolvida com foco em organização financeira, integridade dos dados, segurança e decisões de arquitetura bem fundamentadas.
 
-Controle financeiro pessoal espalhado entre planilhas e memória: nenhuma visão estruturada de pra onde o dinheiro vai, se o orçamento do mês estourou, ou se uma meta de economia está indo bem. O discovery completo (dores, pesquisa de mercado, requisitos) está em [`docs/planning/`](docs/planning/).
+O CashTrail nasceu de um processo de discovery que abrangeu o problema, a pesquisa de soluções existentes, os requisitos funcionais e não funcionais, a arquitetura, os registros de decisões técnicas (ADRs) e o planejamento de implementação.
 
-## Funcionalidades do MVP
+**[Acessar demonstração](https://cashtrail-frontend.ashydune-a5fddf60.brazilsouth.azurecontainerapps.io)** · **[Explorar a documentação](docs/planning/00-project-brief.md)**
 
-| Funcionalidade | Regra de negócio principal |
+> O banco de dados fica ligado das 06h às 23h (horário de Brasília). Fora dessa janela, a demonstração não responde.
+
+---
+
+## Sobre o projeto
+
+Controlar as finanças pessoais envolve mais do que registrar receitas e despesas. É necessário entender para onde o dinheiro está indo, acompanhar compromissos futuros, estabelecer metas e avaliar a evolução do patrimônio.
+
+O CashTrail centraliza essas informações em uma aplicação que conecta movimentações financeiras, orçamento, planejamento e relatórios, preservando a consistência dos dados e evitando que a mesma movimentação seja contabilizada mais de uma vez.
+
+O projeto também funciona como um estudo prático de engenharia de software: da investigação inicial à publicação em nuvem, com decisões arquiteturais documentadas, testes automatizados e pipeline de CI/CD.
+
+## Estrutura do repositório
+
+| Diretório | Conteúdo | Guia |
+|---|---|---|
+| [`backend/`](backend/) | API em FastAPI, organizada em vertical slices, com migrações Alembic e testes contra PostgreSQL real | [README do backend](backend/README.md) |
+| [`frontend/`](frontend/) | Aplicação Next.js exportada como site estático e servida por nginx | [README do frontend](frontend/README.md) |
+| [`docs/planning/`](docs/planning/) | Discovery, requisitos, arquitetura, ADRs, roadmap e planejamento de cada marco | [Project brief](docs/planning/00-project-brief.md) |
+| [`scripts/e2e/`](scripts/e2e/) | Roteiros Playwright usados para verificar cada tela num navegador real | [README dos roteiros](scripts/e2e/README.md) |
+| [`.github/workflows/`](.github/workflows/) | CI, deploy e ciclo de vida do banco | [CI/CD](#cicd-e-infraestrutura) |
+
+## Funcionalidades
+
+### Núcleo (MVP — Marcos 1 a 6)
+
+| Módulo | Funcionalidades |
 |---|---|
-| Autenticação (registro/login) | JWT com access token em memória + refresh token em cookie `httpOnly` |
-| Contas | Conta arquivada não aceita novos lançamentos, mas mantém histórico |
-| Categorias | Categoria com lançamentos associados não pode ser excluída, só arquivada |
-| Lançamentos | Pertence a exatamente uma conta e uma categoria do próprio usuário; `amount` sempre positivo, direção vem do `type` |
-| Dashboard | Resumo, gasto por categoria e evolução de saldo — soma bate com conferência manual |
-| Orçamento | Um orçamento por categoria/mês; alerta in-app quando ultrapassado |
-| Metas de economia | Progresso = soma dos lançamentos vinculados; marcada como atingida automaticamente |
-| Lançamentos recorrentes | Job agendado gera o lançamento e avança a próxima ocorrência, sem ação manual |
+| Autenticação | Cadastro, login, access token JWT e renovação de sessão por cookie seguro |
+| Contas | Organização de contas financeiras, arquivamento e preservação do histórico |
+| Categorias | Classificação de receitas e despesas, com proteção de categorias associadas a lançamentos |
+| Lançamentos | Registro de movimentações vinculadas às contas e categorias do usuário |
+| Dashboard | Resumo financeiro, despesas por categoria e evolução do saldo |
+| Orçamentos | Limites mensais por categoria e alertas quando ultrapassados |
+| Metas de economia | Acompanhamento do progresso a partir dos lançamentos vinculados |
+| Recorrências | Geração agendada de lançamentos recorrentes |
 
-**Pós-MVP (Marco 7):**
+### Expansão (Marcos 7 a 15)
 
-| Funcionalidade | Regra de negócio principal |
+| Área | Funcionalidades |
 |---|---|
-| Recuperação de senha | Link por e-mail com token de uso único e expiração curta; redefinir encerra todas as sessões abertas |
-| Contas a pagar e a receber | Compromisso com vencimento; a baixa (total ou parcial) cria o lançamento realizado; parcelamento; "atrasado" é calculado, nunca marcado à mão |
-| Transferências entre contas | Mover dinheiro entre duas contas **não** é receita nem despesa: fica fora do dashboard, dos orçamentos e das metas |
-| Cartões de crédito e faturas | Compra conta como despesa na data da compra (parcelada vira uma despesa por fatura); a fatura é calculada por ciclo de fechamento; pagar a fatura é uma transferência para o cartão, então o gasto nunca é contado duas vezes |
-| Saldo inicial e saldo atual por conta | Cada conta tem saldo inicial; o saldo atual é inicial + movimentações (cartão: dívida inclui o saldo inicial negativo) |
-| DRE | Resultado do período por competência, agrupado por grupos de DRE configurados nas categorias, com % da receita líquida, comparação com o período anterior, opção de incluir previsto e exportação CSV |
-| Dívidas e financiamentos | Empréstimo vira conta de dívida: receber o dinheiro e amortizar o principal **não** são receita nem despesa, só os juros e encargos entram no DRE; cronograma Price/SAC/sem juros com parcela editável, pagamento extra (reduz prazo ou parcela) e quitação; parcelas aparecem em contas a pagar, dashboard e fluxo de caixa |
-| Patrimônio e bens | Balanço pessoal (ativos − passivos): caixa e contas + bens com avaliações por data − cartões − dívidas, com curto e longo prazo, patrimônio líquido por bem financiado, evolução de 12 meses calculada do histórico e exportação CSV |
-| Investimentos | Carteira com ações, FIIs, ETFs, renda fixa e fundos: compra é transferência (não é despesa), ganho na venda e proventos entram uma vez como receita financeira, valorização não entra no DRE; custo médio, resultado não realizado, retorno total e comparativo com o CDI; cotação automática (brapi) com cache e teto mensal, ou valor manual; o patrimônio usa o valor de mercado |
-| Imposto de renda (IRPF) | Apoio à declaração do ano-calendário: informes de rendimentos digitados, despesas de saúde/educação/previdência marcadas por categoria, estimativa completa × simplificada com a tabela oficial e o redutor da Lei 15.270/2025, apuração mensal de ações e FIIs (isenção de R$ 20 mil, compensação de prejuízo, DARF 6015) e bens/direitos/dívidas em 31/12 pelo custo. **Estimativa: não substitui o programa da Receita nem um contador**; cada valor traz fonte e o que não foi verificado |
-| Seguros | Apólices (vida, saúde, auto, residencial, viagem) com prêmio mensal (recorrência) ou anual (conta a pagar) que entra uma vez só no fluxo de caixa, renovação com alerta em 30 dias e lista de bens sem seguro; só metadados, sem número de apólice nem documentos |
-| Independência financeira | Simulador em valores reais: patrimônio-alvo, progresso com o valor de mercado dos investimentos, tempo e aporte necessários e grade de cenários (taxa de retirada × retorno real); premissas editáveis e INSS não calculado |
-| Fluxo de caixa | Meses em colunas (previsto × realizado × projetado) por caixa, com recorrências expandidas, drill-down até os lançamentos, gráfico e exportação CSV |
-| Importação de extrato (CSV) | Pré-visualização antes de gravar; possíveis duplicatas (mesma conta/tipo/valor, data ±2 dias) vêm desmarcadas para o usuário decidir — nunca descartadas em silêncio |
+| Acesso | Recuperação de senha por e-mail com token de uso único |
+| Importação de dados | Extratos CSV com pré-visualização e identificação de possíveis duplicatas, que nunca são descartadas em silêncio |
+| Planejamento financeiro | Contas a pagar e receber, parcelamentos, transferências entre contas e fluxo de caixa previsto × realizado |
+| Cartões e dívidas | Cartões de crédito, faturas por ciclo de fechamento, empréstimos e financiamentos (Price, SAC) com amortização |
+| Relatórios | DRE pessoal por competência, comparativo de períodos e exportação CSV |
+| Patrimônio | Bens com avaliações, balanço pessoal (ativos − passivos) e evolução patrimonial |
+| Investimentos | Carteira de ativos, custo médio, rentabilidade, proventos, comparativo com o CDI e cotações automáticas |
+| Tributação | Apoio à declaração do IRPF, com estimativa completa × simplificada e apuração de renda variável — cada valor indica sua fonte e não substitui o programa da Receita |
+| Proteção e longo prazo | Seguros com alerta de renovação e simulador de independência financeira |
 
-OFX ficou fora do escopo da primeira versão da importação (só CSV).
+Uma regra atravessa todas as áreas: **cada movimentação conta uma única vez**. Transferências, pagamento de fatura, compra de investimento e amortização de principal não são receita nem despesa; só o fato econômico (a compra no cartão, os juros, o provento) entra nos relatórios.
+
+A importação de extratos cobre CSV; OFX está fora do escopo da primeira versão. Os marcos e o detalhamento de cada um estão no [roadmap](docs/planning/13-roadmap.md).
 
 ## Arquitetura
 
-**Vertical slices**: cada funcionalidade (`accounts`, `categories`, `transactions`, `dashboard`, `budgets`, `goals`, `recurring`, `statement_import`, `commitments`, `transfers`, `credit_cards`, `debts`, `assets`, `investments`, `tax`, `insurance`, `retirement`, `reports`) é uma fatia completa — schema, regra de negócio, persistência, rota e teste moram juntos em `backend/src/features/<nome>/`. `transactions` é o núcleo do domínio: as demais slices dependem dela (nunca o contrário), chamando só sua camada `service` pública — nunca o `repository`/model ORM de outra slice diretamente. Detalhes e diagrama de dependências em [`docs/planning/09-vertical-slices.md`](docs/planning/09-vertical-slices.md).
+### Vertical slices
 
-**Decisões de maior consequência** (ADRs completos em [`docs/planning/decisions/`](docs/planning/decisions/)):
-- Azure como provedor de nuvem (ADR-001), multiusuário desde o início mesmo sendo uso pessoal (ADR-002)
-- SQLAlchemy puro em vez de SQLModel (ADR-003), auth implementada na mão em vez de biblioteca pronta (ADR-004)
-- JWT com refresh em cookie `httpOnly` + access token só em memória, nunca em `localStorage` (ADR-006) — elimina roubo de token via XSS
-- APScheduler (não Celery+Redis) para o job de lançamentos recorrentes (ADR-005) — um único job periódico não justifica infraestrutura de fila dedicada
-- Vertical slices com `transactions` como núcleo desacoplado (ADR-007)
+O backend é organizado por funcionalidades de negócio, em vez de concentrar a aplicação em camadas técnicas compartilhadas. Cada módulo reúne schema, regras de negócio, persistência, rotas e testes em `backend/src/features/<nome>/`.
 
-**Infra**: Azure Container Apps para backend e frontend (o frontend usa static export do Next.js, servido por nginx no mesmo tipo de recurso — Static Web Apps foi abandonado por bloqueio de política de região na subscription Azure for Students), PostgreSQL Flexible Server, Azure Container Registry.
+O módulo `transactions` funciona como núcleo do domínio financeiro. Os demais módulos dependem dele (nunca o contrário) e acessam suas operações apenas pela camada pública de serviços, nunca consultando diretamente o repositório de outra funcionalidade. Essa organização reduz o acoplamento e permite evoluir e testar cada funcionalidade isoladamente.
 
-## Segurança
+O frontend espelha a mesma divisão em `frontend/src/features/<nome>/`.
 
-Threat model completo em [`docs/planning/11-security.md`](docs/planning/11-security.md). Controles em vigor:
-- Toda query filtra por `user_id` do token autenticado (RNF-001/SEC-002) — testado em cada slice (`test_user_cannot_access_another_users_*`)
-- Rate limiting no login e na recuperação de senha (SEC-006, 5 tentativas/minuto)
-- Recuperação de senha: só o hash do token é guardado, a resposta é idêntica exista ou não a conta (não revela e-mails cadastrados)
-- Upload de extrato (SEC-004): só `.csv`, até 2 MB e 5.000 linhas; erro de parsing vira mensagem por linha, nunca derruba a API
-- CSRF: `SameSite=Strict` no cookie de refresh + header customizado exigido nas rotas que dependem só do cookie (`/auth/refresh`, `/auth/logout`)
-- Segredos fora do código-fonte (Azure Key Vault / variáveis de ambiente)
-- SQL injection: SQLAlchemy ORM exclusivamente, sem SQL concatenado
+**Detalhes:** [anatomia de uma slice](backend/README.md#anatomia-de-uma-slice) · [arquitetura por vertical slices](docs/planning/09-vertical-slices.md)
 
-## Stack
+### Decisões arquiteturais
 
-- **Backend**: Python + FastAPI + SQLAlchemy 2.0 + PostgreSQL + Alembic + APScheduler
-- **Frontend**: Next.js (App Router, static export) + shadcn/ui + Tailwind CSS + Recharts
-- **Infra**: Azure (Container Apps, PostgreSQL Flexible Server, Container Registry)
-- **CI/CD**: GitHub Actions (testes de backend/frontend a cada push; start/stop agendado do banco)
+As decisões de maior impacto foram registradas em ADRs, com justificativas e alternativas consideradas.
 
-## Como rodar localmente
+| ADR | Decisão |
+|---|---|
+| [001](docs/planning/decisions/ADR-001-cloud-provider-azure.md) | Azure como provedor de nuvem |
+| [002](docs/planning/decisions/ADR-002-multi-user-from-start.md) | Aplicação multiusuário desde o início, mesmo sendo de uso pessoal |
+| [003](docs/planning/decisions/ADR-003-sqlalchemy-over-sqlmodel.md) | SQLAlchemy 2.0 em vez de SQLModel |
+| [004](docs/planning/decisions/ADR-004-custom-auth-implementation.md) | Autenticação implementada no projeto em vez de biblioteca pronta |
+| [005](docs/planning/decisions/ADR-005-apscheduler-over-celery.md) | APScheduler em vez de Celery + Redis para os jobs agendados |
+| [006](docs/planning/decisions/ADR-006-jwt-httponly-cookie.md) | Access token só em memória e refresh token em cookie `httpOnly`, nunca em `localStorage` |
+| [007](docs/planning/decisions/ADR-007-vertical-slices-transactions-kernel.md) | Vertical slices com `transactions` como núcleo desacoplado |
+
+## Segurança e integridade dos dados
+
+Segurança e consistência financeira são requisitos de arquitetura, não funcionalidades opcionais.
+
+- **Isolamento entre usuários:** toda consulta filtra pelo `user_id` do token autenticado, e cada slice tem testes que provam que um usuário não acessa os dados de outro.
+- **Proteção contra abuso:** rate limiting no login e na recuperação de senha.
+- **Sessões:** cookie de refresh `httpOnly` com `SameSite=Strict` e header obrigatório nas rotas que dependem só do cookie.
+- **Recuperação de senha:** apenas o hash do token é armazenado, e a resposta não revela se uma conta existe.
+- **Importação de arquivos:** só CSV, até 2 MB e 5.000 linhas; erros de parsing viram mensagens por linha.
+- **Acesso ao banco:** SQLAlchemy ORM exclusivamente, sem SQL montado por concatenação.
+- **Gestão de segredos:** variáveis de ambiente e Azure Key Vault, sem credenciais no código-fonte.
+
+**Detalhes:** [threat model e requisitos de segurança](docs/planning/11-security.md)
+
+## Stack tecnológica
+
+| Camada | Tecnologias |
+|---|---|
+| Backend | Python 3.12, FastAPI, SQLAlchemy 2.0, Alembic, APScheduler |
+| Banco de dados | PostgreSQL 16 (Azure Database for PostgreSQL Flexible Server) |
+| Frontend | Next.js (App Router, static export), React, shadcn/ui, Tailwind CSS, Recharts |
+| Testes | pytest e Testcontainers no backend; roteiros Playwright para as telas |
+| Containers e nuvem | Docker, Azure Container Apps e Azure Container Registry |
+| CI/CD | GitHub Actions com login no Azure via OIDC |
+
+## Início rápido
+
+Pré-requisitos: Docker, Node.js 22 e, para os testes, Python 3.12.
 
 ```bash
-docker compose up -d
-```
+docker compose up -d          # PostgreSQL (localhost:5544) e API (localhost:8001)
 
-- Backend: http://localhost:8001/health
-- Postgres: `localhost:5544` (usuário/senha/db: `cashtrail`)
-
-> Nota: as portas padrão (5432, 8000) foram remapeadas porque já havia um PostgreSQL nativo do Windows e uma reserva de porta do sistema usando-as nesta máquina. Ajuste `docker-compose.yml`/`.env` se seu ambiente for diferente.
-
-Frontend (fora do Docker Compose por enquanto):
-
-```bash
 cd frontend
+cp .env.local.example .env.local
 npm install
-npm run dev
+npm run dev                   # http://localhost:3000
 ```
 
-## Testes
+As migrações rodam automaticamente na subida da API. Configuração, testes e execução fora do Docker estão nos guias do [backend](backend/README.md) e do [frontend](frontend/README.md).
 
-```bash
-cd backend
-pip install -r requirements-dev.txt
-pytest
-```
+## CI/CD e infraestrutura
 
-Testes de integração usam Testcontainers (Postgres real via Docker), não mocks — cobrem os fluxos críticos: autenticação, isolamento por usuário em toda slice, RB-001 a RB-004, rate limiting e CSRF.
+Backend e frontend rodam em Azure Container Apps, com imagens no Azure Container Registry e banco em PostgreSQL Flexible Server. O frontend é um site estático servido por nginx no mesmo tipo de recurso que a API.
 
-## CI/CD
+| Workflow | Responsabilidade |
+|---|---|
+| [`ci.yml`](.github/workflows/ci.yml) | Testes do backend e lint/build do frontend a cada push ou pull request |
+| [`deploy.yml`](.github/workflows/deploy.yml) | Disparo manual: roda o CI, liga o banco, publica as imagens (tag = SHA do commit), atualiza os Container Apps e aguarda a nova revisão do backend responder no `/health` |
+| [`db-lifecycle.yml`](.github/workflows/db-lifecycle.yml) | Liga o banco às 06h e desliga às 23h (horário de Brasília), todos os dias; também aceita acionamento manual |
 
-- **CI** ([`ci.yml`](.github/workflows/ci.yml)): testes do backend + lint/build do frontend a cada push/PR.
-- **Deploy** ([`deploy.yml`](.github/workflows/deploy.yml)): disparado manualmente (Actions → Deploy → Run workflow). Roda o CI, garante o Postgres ligado, builda as imagens no ACR (`az acr build`, tag = SHA do commit), atualiza os dois Container Apps e espera a nova revisão do backend ficar saudável. As migrations do Alembic rodam na subida do container do backend.
-- **DB Lifecycle** ([`db-lifecycle.yml`](.github/workflows/db-lifecycle.yml)): desliga o Postgres toda noite (03:00 UTC) para economizar custo e liga às segundas às 06:00 UTC (03:00 em Brasília); também pode ser ligado/desligado manualmente.
+O login no Azure usa OIDC com credenciais federadas, sem segredo de longa duração no GitHub. Os secrets do repositório são:
 
-Autenticação no Azure via OIDC (federated credential), sem segredo de longa duração no GitHub.
+| Secret | Uso |
+|---|---|
+| `AZURE_CLIENT_ID`, `AZURE_TENANT_ID`, `AZURE_SUBSCRIPTION_ID` | Login no Azure (obrigatórios) |
+| `ACS_CONNECTION_STRING`, `EMAIL_SENDER_ADDRESS` | E-mail real de recuperação de senha via Azure Communication Services (opcionais; sem eles o link só aparece no log) |
+| `BRAPI_TOKEN` | Cotações automáticas de ações, FIIs e ETFs (opcional; sem ele a brapi atende só ativos de teste) |
 
-**Secrets do GitHub:** `AZURE_CLIENT_ID`, `AZURE_TENANT_ID`, `AZURE_SUBSCRIPTION_ID` (login). Opcionais, para o e-mail real da recuperação de senha via Azure Communication Services: `ACS_CONNECTION_STRING` e `EMAIL_SENDER_ADDRESS` — sem eles o backend usa `EMAIL_BACKEND=console` (o link só aparece no log). Também opcional: `BRAPI_TOKEN` (cotações automáticas de ações, FIIs e ETFs; sem ele a brapi atende só ativos de teste). Checklist completo antes do deploy: [`docs/planning/31-checklist-pre-deploy.md`](docs/planning/31-checklist-pre-deploy.md).
+Antes de publicar, siga o [checklist pré-deploy](docs/planning/31-checklist-pre-deploy.md).
 
-## Status
+## Documentação
 
-MVP completo (Marcos 1-6 do roadmap, ver [`docs/planning/13-roadmap.md`](docs/planning/13-roadmap.md)) e em produção no Azure Container Apps, com deploy via GitHub Actions.
+A documentação de discovery e engenharia é versionada junto ao código, em [`docs/planning/`](docs/planning/):
 
-**Demo:** https://cashtrail-frontend.ashydune-a5fddf60.brazilsouth.azurecontainerapps.io
+- [Project brief](docs/planning/00-project-brief.md) — visão geral e definição do projeto
+- [Requisitos](docs/planning/03-requirements.md) — requisitos funcionais, não funcionais e regras de negócio
+- [Arquitetura por vertical slices](docs/planning/09-vertical-slices.md) — organização dos módulos e dependências
+- [Modelo de dados](docs/planning/10-data-model.md) — entidades e relacionamentos
+- [Segurança](docs/planning/11-security.md) — threat model e controles de proteção
+- [Roadmap](docs/planning/13-roadmap.md) — marcos, escopo e evolução
+- [ADRs](docs/planning/decisions/) — decisões arquiteturais e suas justificativas
 
-> Para economizar custo, o banco de dados é desligado automaticamente toda noite (ver [`db-lifecycle.yml`](.github/workflows/db-lifecycle.yml)). Se a demo não responder, o banco provavelmente está desligado.
+---
 
-## Documentação do projeto
-
-Todo o discovery — problema, requisitos, arquitetura, decisões técnicas (ADRs), roadmap e backlog — está em [`docs/planning/`](docs/planning/), começando por [`00-project-brief.md`](docs/planning/00-project-brief.md).
+**CashTrail** — um projeto de engenharia de software orientado a domínio, segurança, consistência financeira e evolução incremental.

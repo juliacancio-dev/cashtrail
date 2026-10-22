@@ -3,8 +3,8 @@ import path from "node:path";
 import fs from "node:fs";
 
 const OUT = path.dirname(new URL(import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, "$1"));
-const API = "http://localhost:8020";
-const WEB = "http://localhost:3000";
+const API = process.env.E2E_API ?? "http://localhost:8020";
+const WEB = process.env.E2E_WEB ?? "http://localhost:3000";
 const email = `m10-${Date.now()}@example.com`;
 const password = "supersecret1";
 const log = (...a) => console.log(...a);

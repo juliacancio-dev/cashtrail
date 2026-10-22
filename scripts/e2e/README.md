@@ -40,7 +40,21 @@ Scripts ad-hoc usados nos Marcos 8 a 15 para provar cada tela num navegador de v
    node e2e-m15.mjs
    ```
 
+## Contra a produção
+
+Os roteiros leem `E2E_API` e `E2E_WEB` (padrão: `localhost`). Cada um cria o próprio usuário `...@example.com`.
+
+```powershell
+$env:E2E_API="https://cashtrail-backend.ashydune-a5fddf60.brazilsouth.azurecontainerapps.io"
+$env:E2E_WEB="https://cashtrail-frontend.ashydune-a5fddf60.brazilsouth.azurecontainerapps.io"
+node e2e-m15.mjs
+```
+
+A produção responde mais devagar que o `localhost` (escala a zero): as esperas fixas (`waitForTimeout`) podem ser curtas e dar falha falsa; em 2026-10-22 bastou multiplicá-las por 4. Espere 65 s entre um roteiro e outro por causa do limite de login.
+
 ## Observações
+
+- O `401` de `POST /auth/refresh` no console é esperado: ao abrir `/login` o app tenta recuperar uma sessão que ainda não existe.
 
 - Use sempre `localhost`, nunca `127.0.0.1`: o cookie de refresh é `SameSite=strict` e os dois contam como sites diferentes.
 - O login tem limite de 5 por minuto; se vários roteiros seguidos derem `429`, espere um minuto.

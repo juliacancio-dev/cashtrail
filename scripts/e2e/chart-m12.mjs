@@ -1,5 +1,5 @@
 import { chromium } from "playwright";
-const API = "http://localhost:8020", WEB = "http://localhost:3000";
+const API = process.env.E2E_API ?? "http://localhost:8020", WEB = process.env.E2E_WEB ?? "http://localhost:3000";
 const email = `m12c-${Date.now()}@example.com`, password = "supersecret1";
 const post = async (p, b, t) => (await fetch(API + p, { method: "POST", headers: { "Content-Type": "application/json", ...(t ? { Authorization: `Bearer ${t}` } : {}) }, body: JSON.stringify(b) })).json();
 await post("/auth/register", { email, password });

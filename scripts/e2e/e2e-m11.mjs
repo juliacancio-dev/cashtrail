@@ -2,8 +2,8 @@ import { chromium } from "playwright";
 import path from "node:path";
 
 const OUT = path.dirname(new URL(import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, "$1"));
-const API = "http://localhost:8020";
-const WEB = "http://localhost:3000";
+const API = process.env.E2E_API ?? "http://localhost:8020";
+const WEB = process.env.E2E_WEB ?? "http://localhost:3000";
 const email = `m11-${Date.now()}@example.com`;
 const password = "supersecret1";
 const log = (...a) => console.log(...a);
@@ -65,7 +65,7 @@ try {
   await form.getByRole("button", { name: "Cadastrar dívida" }).click();
   await page.waitForSelector("text=Emprestimo pessoal");
   const card = await page.locator("main").innerText();
-  check(/Saldo devedor\s*R\$ 1\.000,00/.test(card.replace(/\n/g, " ")), "dívida criada com saldo devedor R$ 1.000,00", "saldo devedor errado: " + card.slice(0, 400));
+  check(/Saldo devedor\s*R\$\s*1\.000,00/.test(card.replace(/\n/g, " ")), "dívida criada com saldo devedor R$ 1.000,00", "saldo devedor errado: " + card.slice(0, 400));
 
   // contas: saldo atual da corrente = 6.000, e a dívida aparece como saldo devedor
   await page.goto(WEB + "/accounts");

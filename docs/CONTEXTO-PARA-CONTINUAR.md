@@ -1,7 +1,5 @@
 # CashTrail — contexto completo para continuar em outra máquina
 
-> Escrito em 2026-10-17 para a Julia retomar o trabalho com o Claude Code em outro computador. Reúne tudo o que o assistente guardava em memória (a pasta de memória fica **só nesta máquina**, em `C:\Users\julia.jesus\.claude\projects\...\memory`, e **não** vai para o Git), mais o que foi feito e decidido nas últimas sessões. **Não contém nenhum segredo** (senhas, tokens, connection strings): esses ficam no portal Azure, nos secrets do GitHub e no `.env` local.
-
 Legenda: **FATO** (verificado no código, no portal ou numa fonte) · **INFERÊNCIA** · **DESCONHECIDO**.
 
 ---
@@ -46,7 +44,7 @@ seção 12. Confirme o estado do git e me diga qual é o próximo passo.
 ## 2. O projeto em uma página
 
 - **Repositório**: `juliacancio-dev/cashtrail`, pasta local `C:\Users\julia.jesus\Documents\projetos-pessoais\cashtrail`.
-- **Estado em 2026-10-22**: os **Marcos 1 a 15 estão implementados e em produção**. O workflow *Deploy* rodou com sucesso em **2026-10-15 18:56 UTC** com o commit `bbe1b52`, e o `/health` devolve esse SHA (conferido em 2026-10-22). Falta o roteiro de fumaça e o e-mail (ACS) (seção 12).
+- **Estado em 2026-10-22**: os **Marcos 1 a 15 estão implementados e em produção**. O workflow *Deploy* rodou com sucesso em **2026-10-15 18:56 UTC** com o commit `bbe1b52`, e de novo em 2026-10-22 com o commit `acc0956` (e-mail pelo ACS ligado e testado). Roteiro de fumaça feito em 2026-10-22 (seção 12).
 - **Testes**: 735 no backend (Testcontainers com Postgres real), lint/tsc/build do frontend limpos.
 - **Módulos** (visão do usuário): contas, categorias, lançamentos, dashboard, orçamentos, metas, recorrências, importação de extrato CSV, recuperação de senha, contas a pagar/receber, transferências, cartões e faturas, saldo por conta, DRE, fluxo de caixa, dívidas e financiamentos, bens, patrimônio, investimentos, imposto de renda (apoio à declaração), seguros e independência financeira.
 
@@ -225,7 +223,7 @@ Cadeia de migrações (em `backend/alembic/versions/`, em ordem). As acima da li
 
 **Decisões fechadas em 2026-10-15** (também no doc 31): D1 banco 06h–23h; D2 criar o ACS do zero na mesma sessão; D3 deploy sem token da brapi; D4 publicar com a UI atual; D5 dados são de teste.
 
-**Atualização de 2026-10-22:** o **Deploy já foi feito** (2026-10-15 18:56 UTC, commit `bbe1b52`, `/health` confirma). `push` e CI verdes. O ACS ainda **não** existe (só há os 3 secrets do OIDC no repositório). Descoberto que o agendamento do banco atrasava de 4 a 7 horas no GitHub (na prática ficava ligado de ~11h20 a ~03h55 em Brasília); a Julia escolheu adiantar os crons e tirá-los da hora cheia (seção 11). **Próximo:** criar o ACS (passo B), rodar o Deploy de novo para aplicar os secrets de e-mail, e fazer o roteiro de fumaça.
+**Atualização de 2026-10-22:** o **Deploy já foi feito** (2026-10-15 18:56 UTC, commit `bbe1b52`, `/health` confirma). `push` e CI verdes. O ACS ainda **não** existe (só há os 3 secrets do OIDC no repositório). Descoberto que o agendamento do banco atrasava de 4 a 7 horas no GitHub (na prática ficava ligado de ~11h20 a ~03h55 em Brasília); a Julia escolheu adiantar os crons e tirá-los da hora cheia (seção 11). Ainda em 2026-10-22: **ACS criado** (`cashtrail-email` + `cashtrail-comm`, domínio gratuito do Azure), secrets `ACS_CONNECTION_STRING` e `EMAIL_SENDER_ADDRESS` no GitHub, **novo Deploy** (`acc0956`, `/health` confirma) e **"Esqueci a senha" testado em produção pela Julia: o e-mail chegou e a troca de senha funcionou** (o backend `acs` não precisou de ajuste). **Roteiro de fumaça (2026-10-22, em produção, usuários de teste `...@example.com`):** os 8 roteiros de `scripts/e2e/` passaram (Marcos 8 a 15, com brapi e Banco Central reais), mais importação de extrato (amostra sintética: 6 linhas, reimportação marca 6/6 duplicadas) e CSVs de DRE, fluxo, patrimônio e IR. Achado: o **"período anterior" do DRE** usa o mesmo número de dias, então outubro (31 dias) é comparado com **31/08 a 30/09**, e não com setembro (o doc 25 promete "comparado com o mês anterior"); aguardando decisão da Julia. Pendente só com ela: conferir os dados antigos da conta dela, o cartão real, o programa da Receita e um extrato real.
 
 **Passo 0 (código na `main`)**: feito.
 

@@ -2,12 +2,14 @@ name: DB Lifecycle
 
 on:
   schedule:
-    # 02:00 UTC (23:00 em Brasília) — todo dia, garante que não fica ligado de madrugada.
-    - cron: "0 2 * * *"
-    # 09:00 UTC (06:00 em Brasília) — todo dia, liga o banco. O texto do cron
-    # abaixo precisa ser idêntico ao usado em ACTION (compara com github.event.schedule).
-    # Janela ligada: 06:00 a 23:00 em Brasília (~17h/dia). Decisão D1 de 2026-10-15.
-    - cron: "0 9 * * *"
+    # 23:17 UTC (20:17 em Brasília) — desliga; com o atraso medido cai entre 00:17 e 03:17.
+    # O texto deste cron precisa ser idêntico ao usado em ACTION (compara com github.event.schedule).
+    - cron: "17 23 * * *"
+    # 03:17, 06:17 e 09:17 UTC (00:17, 03:17 e 06:17 em Brasília) — liga. São três
+    # tentativas porque o atraso varia; a primeira que rodar liga e as outras não fazem nada.
+    - cron: "17 3 * * *"
+    - cron: "17 6 * * *"
+    - cron: "17 9 * * *"
   workflow_dispatch:
     inputs:
       action:
@@ -39,7 +41,7 @@ jobs:
       # start/stop falham se o servidor já está no estado pedido, então checa antes.
       - name: Start or stop Postgres
         env:
-          ACTION: ${{ github.event_name == 'schedule' && (github.event.schedule == '0 9 * * *' && 'start' || 'stop') || inputs.action }}
+          ACTION: ${{ github.event_name == 'schedule' && (github.event.schedule == '17 23 * * *' && 'stop' || 'start') || inputs.action }}
         run: |
           state=$(az postgres flexible-server show --resource-group $RESOURCE_GROUP --name $SERVER_NAME --query state -o tsv)
           echo "Action: $ACTION | current state: $state"

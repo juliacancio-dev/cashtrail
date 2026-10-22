@@ -46,7 +46,7 @@ seção 12. Confirme o estado do git e me diga qual é o próximo passo.
 ## 2. O projeto em uma página
 
 - **Repositório**: `juliacancio-dev/cashtrail`, pasta local `C:\Users\julia.jesus\Documents\projetos-pessoais\cashtrail`.
-- **Estado em 2026-10-17**: os **Marcos 1 a 15 estão implementados** e a `main` contém tudo (último commit `bbe1b52`). **Em produção (Azure) só estão os Marcos 1 a 6** (MVP, deploy de 2026-09-28). Os Marcos 7 a 15 **ainda não foram implantados**: estamos no meio da sessão de Azure (seção 12).
+- **Estado em 2026-10-22**: os **Marcos 1 a 15 estão implementados e em produção**. O workflow *Deploy* rodou com sucesso em **2026-10-15 18:56 UTC** com o commit `bbe1b52`, e o `/health` devolve esse SHA (conferido em 2026-10-22). Falta o roteiro de fumaça e o e-mail (ACS) (seção 12).
 - **Testes**: 735 no backend (Testcontainers com Postgres real), lint/tsc/build do frontend limpos.
 - **Módulos** (visão do usuário): contas, categorias, lançamentos, dashboard, orçamentos, metas, recorrências, importação de extrato CSV, recuperação de senha, contas a pagar/receber, transferências, cartões e faturas, saldo por conta, DRE, fluxo de caixa, dívidas e financiamentos, bens, patrimônio, investimentos, imposto de renda (apoio à declaração), seguros e independência financeira.
 
@@ -130,7 +130,7 @@ Cortes planejados: v2 = 8 a 10, v3 = 11 e 12, v4 = 13 a 15.
 
 ## 8. Banco e migrações
 
-Cadeia de migrações (em `backend/alembic/versions/`, em ordem). As do deploy de 2026-09-28 já estão no Azure; **as 12 abaixo da linha ainda não**.
+Cadeia de migrações (em `backend/alembic/versions/`, em ordem). As acima da linha subiram no deploy de 2026-09-28; **as 12 abaixo da linha subiram no deploy de 2026-10-15** (o backend novo está de pé, então todas aplicaram).
 
 | Revisão | Marco | O que faz |
 |---|---|---|
@@ -206,7 +206,7 @@ Cadeia de migrações (em `backend/alembic/versions/`, em ordem). As do deploy d
 **Workflows (`.github/workflows/`):**
 - `ci.yml`: backend (pytest) + frontend (lint e build).
 - `deploy.yml`: **manual** (`workflow_dispatch`), chama o CI, liga o Postgres se estiver parado, `az acr build` das duas imagens (tag = SHA do commit), `az containerapp update` do backend, espera o `/health` devolver o SHA do deploy, builda o frontend com `NEXT_PUBLIC_API_URL` do FQDN real do backend e atualiza o frontend.
-- `db-lifecycle.yml`: liga o banco às **09:00 UTC** e desliga às **02:00 UTC**, todo dia (também `workflow_dispatch` com `start`/`stop`). Confere o estado antes porque `start`/`stop` falham se já estiver no estado pedido.
+- `db-lifecycle.yml`: liga o banco (3 tentativas: **03:17, 06:17 e 09:17 UTC**) e desliga às **23:17 UTC**, todo dia (também `workflow_dispatch` com `start`/`stop`). Confere o estado antes porque `start`/`stop` falham se já estiver no estado pedido, o que torna as tentativas extras inofensivas. Os horários são adiantados porque o GitHub rodou os agendamentos com **4 a 7 horas de atraso** (medido de 2026-10-02 a 2026-10-22); se o atraso sumir, o banco desliga às 20:17 em Brasília (ligar à mão).
 - Login no Azure por **OIDC**: secrets `AZURE_CLIENT_ID`, `AZURE_TENANT_ID`, `AZURE_SUBSCRIPTION_ID` como **Repository secrets** (não só de environment, senão o db-lifecycle enxerga vazio). Credenciais federadas: `environment:production` (deploy) e `ref:refs/heads/main` (db-lifecycle).
 - Secrets **opcionais** do deploy: `ACS_CONNECTION_STRING` + `EMAIL_SENDER_ADDRESS` (e-mail) e `BRAPI_TOKEN` (cotações).
 
@@ -225,7 +225,9 @@ Cadeia de migrações (em `backend/alembic/versions/`, em ordem). As do deploy d
 
 **Decisões fechadas em 2026-10-15** (também no doc 31): D1 banco 06h–23h; D2 criar o ACS do zero na mesma sessão; D3 deploy sem token da brapi; D4 publicar com a UI atual; D5 dados são de teste.
 
-**Passo 0 (código na `main`)**: feito no Git (`main` está em `bbe1b52`). Falta ela confirmar o `push` e o CI verde.
+**Atualização de 2026-10-22:** o **Deploy já foi feito** (2026-10-15 18:56 UTC, commit `bbe1b52`, `/health` confirma). `push` e CI verdes. O ACS ainda **não** existe (só há os 3 secrets do OIDC no repositório). Descoberto que o agendamento do banco atrasava de 4 a 7 horas no GitHub (na prática ficava ligado de ~11h20 a ~03h55 em Brasília); a Julia escolheu adiantar os crons e tirá-los da hora cheia (seção 11). **Próximo:** criar o ACS (passo B), rodar o Deploy de novo para aplicar os secrets de e-mail, e fazer o roteiro de fumaça.
+
+**Passo 0 (código na `main`)**: feito.
 
 **Passo A (conferências no portal) — feito, resultados:**
 - PostgreSQL **16.15**, estado **Stopped**, Burstable B1ms.

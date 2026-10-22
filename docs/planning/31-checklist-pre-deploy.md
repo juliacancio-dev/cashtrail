@@ -38,6 +38,8 @@ Legenda: **FATO** (verificado no código ou nos arquivos) · **INFERÊNCIA** · 
 | D5 | O que está em produção são **dados de teste/demo**: backup continua recomendado, o ensaio das migrações em banco temporário pode ser dispensado |
 | Sessão | **Agora**, guiada passo a passo |
 
+> **Atualização de 2026-10-22:** o Deploy rodou em 2026-10-15 (commit `bbe1b52`). O D1 foi ajustado porque o GitHub atrasava os agendamentos de 4 a 7 horas: agora o banco liga às 03:17, 06:17 e 09:17 UTC (três tentativas) e desliga às 23:17 UTC; ver o comentário em `db-lifecycle.yml`.
+
 ## 3. Bloqueadores técnicos (fazer antes de rodar o Deploy)
 
 | ID | Item | Estado | Como fechar |

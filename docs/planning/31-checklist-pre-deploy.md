@@ -102,7 +102,7 @@ Estas **não bloqueiam o deploy**, mas aparecem na tela de IRPF como "premissas 
 - PLR: as fontes divergem na faixa isenta; o sistema usa o valor do informe.
 - ETF, BDR, cripto e fundos não são apurados.
 - **Anual:** criar `backend/src/features/tax/parameters/<ano>.json` a cada ano-calendário, a partir da página oficial de tabelas da Receita.
-- Termos de uso da brapi (D3).
+- Termos de uso da brapi (D3). **Lidos em 2026-10-22** ([termos](https://brapi.dev/legal/terms-of-use), atualizados em 07/06/2025): licença limitada e revogável dentro dos limites do plano (Gratuito incluso); **proibido** revender, redistribuir ou sublicenciar os dados a terceiros, criar proxy/espelho de acesso público, ou exceder os limites do plano (rescisão imediata); token **confidencial**, nunca no código do cliente; dados "como estão", sem garantia; sem exigência de atribuição. **FATO:** o CashTrail cumpre a parte técnica (token só no backend, teto mensal de 10.000 abaixo dos 15.000 do plano). **INFERÊNCIA:** uso pessoal da Julia é compatível; se outras pessoas se cadastrarem no app público e virem cotações, isso pode ser lido como redistribuição, e os termos não tratam desse caso.
 
 ## 8. O que **nunca** foi visto por ela no navegador
 

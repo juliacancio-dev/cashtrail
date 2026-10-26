@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
+import { ThemeToggle } from "@/components/theme-toggle";
+
 const links = [
   { href: "/dashboard", label: "Dashboard" },
   { href: "/accounts", label: "Contas" },
@@ -30,7 +32,7 @@ export function AppNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="flex flex-wrap gap-x-4 gap-y-1 text-sm">
+    <nav className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
       {links.map((link) => (
         <Link
           key={link.href}
@@ -44,6 +46,7 @@ export function AppNav() {
           {link.label}
         </Link>
       ))}
+      <ThemeToggle />
     </nav>
   );
 }

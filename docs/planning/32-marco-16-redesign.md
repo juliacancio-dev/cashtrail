@@ -106,6 +106,19 @@ Contrastes calculados pela fórmula WCAG em 2026-10-23. O destaque claro do prot
 - **O QUE PRECISA SER VALIDADO:** as cores de **receita, despesa e transferência** nas telas densas (lançamentos, DRE) e as **cores dos gráficos** (Recharts) nos dois temas. O K quase não usa verde e vermelho; as outras telas precisam. Escolher na etapa 5, sempre com sinal + e −, nunca só cor.
 - **"Dia apertado":** no protótipo, abaixo de R$ 12.500 (valor fixo de exemplo). Proposta para o código: os dias com saldo no **quarto mais baixo do mês** (relativo, funciona para qualquer renda). **CONFIANÇA:** Média; é regra nova, ela decide.
 
+### Cores de dinheiro e gráficos (etapa 5, 2026-10-29)
+
+| Token | Claro | Escuro | Uso |
+|---|---|---|---|
+| `--income` | `#146C3C` | `#5BD38A` | receita, situação "paga" |
+| `--expense` (= `--destructive`) | `#B42318` | `#FF8A7A` | despesa, atraso, erro |
+| `--warning` | `#8A5300` | `#F5C451` | vence hoje, fatura fechada, alertas |
+| `--info` | `#1F5BB8` | `#8DB4FF` | pago em parte, fatura aberta |
+
+Contraste calculado ≥ 5,3:1 sobre fundo, cartão, muted, dia apertado e chip (12% da própria cor) e **medido no navegador** pelo `e2e-m16-cores.mjs` (menor valor: 4,93:1 no chip "paga" claro). Transferência usa o tom apagado do texto. Todas as cores cruas do Tailwind (`text-green-600`, que dava 3,16:1, `amber`, `blue`, `red`) viraram esses tokens.
+
+Gráficos: `--chart-1..8` = paleta categórica da skill de dataviz, passos claro e escuro, **validada com o script nas superfícies de cartão do app** (`#FFFFFF` e `#18181B`: todas as checagens passam; no claro, 3 cores ficam abaixo de 3:1 e exigem rótulo visível). Grade e eixos em `--chart-grid`/`--chart-axis`, texto dos eixos em `muted-foreground` (6,6:1 em vez dos 3,6:1 do cinza de referência), caixa de detalhe no `popover` do tema (`lib/chart-theme.ts`). **Corrigido:** o gráfico de gastos por categoria pintava cada barra de uma cor, em ciclo; categorias são uma série só e agora usam uma cor.
+
 ## 4. Fora do escopo (backlog)
 
 - **Colchão** (o mínimo em caixa, conceito H): configuração nova por usuário e alerta "a previsão fura o colchão no dia X".

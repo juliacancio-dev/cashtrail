@@ -1,6 +1,7 @@
 "use client";
 
 import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import { SERIES_1, chartAxis, chartGrid, chartTooltip } from "@/lib/chart-theme";
 import type { BalancePoint } from "@/features/dashboard/schemas";
 
 function formatCurrency(value: number): string {
@@ -17,16 +18,15 @@ export function BalanceEvolutionChart({ data }: { data: BalancePoint[] }) {
   return (
     <ResponsiveContainer width="100%" height={280}>
       <LineChart data={chartData} margin={{ left: 8, right: 8 }}>
-        <CartesianGrid strokeDasharray="3 3" stroke="#e1e0d9" vertical={false} />
-        <XAxis dataKey="date" tick={{ fill: "#898781", fontSize: 12 }} axisLine={{ stroke: "#c3c2b7" }} />
+        <CartesianGrid {...chartGrid} />
+        <XAxis dataKey="date" {...chartAxis} />
         <YAxis
-          tick={{ fill: "#898781", fontSize: 12 }}
-          axisLine={{ stroke: "#c3c2b7" }}
+          {...chartAxis}
           tickFormatter={(value: number) => formatCurrency(value)}
           width={80}
         />
-        <Tooltip formatter={(value) => formatCurrency(Number(value))} />
-        <Line type="monotone" dataKey="balance" stroke="#2a78d6" strokeWidth={2} dot={{ r: 3 }} />
+        <Tooltip {...chartTooltip} formatter={(value) => formatCurrency(Number(value))} />
+        <Line type="monotone" dataKey="balance" stroke={SERIES_1} strokeWidth={2} dot={{ r: 3 }} />
       </LineChart>
     </ResponsiveContainer>
   );

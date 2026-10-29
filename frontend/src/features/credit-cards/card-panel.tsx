@@ -76,7 +76,7 @@ export function CardPanel({
         {limit !== null && (
           <div className="flex flex-col gap-1">
             <div className="bg-muted h-2 w-full overflow-hidden rounded-full">
-              <div className={card.over_limit ? "bg-destructive h-full" : "h-full bg-green-600"} style={{ width: `${percent}%` }} />
+              <div className={card.over_limit ? "bg-destructive h-full" : "h-full bg-income"} style={{ width: `${percent}%` }} />
             </div>
             <p className={`text-sm ${card.over_limit ? "text-destructive font-medium" : "text-muted-foreground"}`}>
               {card.over_limit

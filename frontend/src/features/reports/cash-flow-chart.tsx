@@ -3,6 +3,7 @@
 import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
 import type { CashFlowMonth } from "@/features/reports/schemas";
+import { SERIES_1, chartAxis, chartGrid, chartTooltip } from "@/lib/chart-theme";
 import { formatCurrency, monthLabel } from "@/lib/format";
 
 /** Linha contínua = realizado, tracejada = projetado (mesma convenção do Conta Azul). */
@@ -17,20 +18,19 @@ export function CashFlowChart({ months }: { months: CashFlowMonth[] }) {
     <div className="flex flex-col gap-2">
       <ResponsiveContainer width="100%" height={280}>
         <LineChart data={data} margin={{ left: 8, right: 16, top: 8 }}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#e1e0d9" vertical={false} />
-          <XAxis dataKey="month" tick={{ fill: "#898781", fontSize: 12 }} axisLine={{ stroke: "#c3c2b7" }} />
+          <CartesianGrid {...chartGrid} />
+          <XAxis dataKey="month" {...chartAxis} />
           <YAxis
-            tick={{ fill: "#898781", fontSize: 12 }}
-            axisLine={{ stroke: "#c3c2b7" }}
+            {...chartAxis}
             tickFormatter={(value: number) => formatCurrency(value)}
             width={96}
           />
-          <Tooltip formatter={(value) => formatCurrency(Number(value))} />
+          <Tooltip {...chartTooltip} formatter={(value) => formatCurrency(Number(value))} />
           <Line
             type="monotone"
             dataKey="projetado"
             name="Projetado"
-            stroke="#2a78d6"
+            stroke={SERIES_1}
             strokeWidth={2}
             strokeDasharray="6 4"
             dot={{ r: 3 }}
@@ -39,7 +39,7 @@ export function CashFlowChart({ months }: { months: CashFlowMonth[] }) {
             type="monotone"
             dataKey="realizado"
             name="Realizado"
-            stroke="#2a78d6"
+            stroke={SERIES_1}
             strokeWidth={3}
             dot={{ r: 4 }}
             connectNulls={false}

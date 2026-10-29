@@ -13,13 +13,13 @@ export function SummaryCards({ summary }: { summary: DashboardSummary }) {
       <Card>
         <CardContent className="py-4">
           <p className="text-muted-foreground text-sm">Receitas</p>
-          <p className="text-xl font-semibold text-green-600">{formatCurrency(summary.income_total)}</p>
+          <p className="text-xl font-semibold text-income">{formatCurrency(summary.income_total)}</p>
         </CardContent>
       </Card>
       <Card>
         <CardContent className="py-4">
           <p className="text-muted-foreground text-sm">Despesas</p>
-          <p className="text-destructive text-xl font-semibold">{formatCurrency(summary.expense_total)}</p>
+          <p className="text-expense text-xl font-semibold">{formatCurrency(summary.expense_total)}</p>
         </CardContent>
       </Card>
       <Card>

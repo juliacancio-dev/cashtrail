@@ -136,7 +136,7 @@ export default function DrePage() {
       {error && <p className="text-destructive text-sm">{error}</p>}
 
       {dre && dre.ungrouped_count > 0 && (
-        <p className="rounded-md border border-amber-500/50 bg-amber-500/10 p-3 text-sm">
+        <p className="rounded-md border border-warning/50 bg-warning/10 p-3 text-sm">
           {dre.ungrouped_count} categoria(s) com movimento estão sem grupo e aparecem à parte. Classifique em{" "}
           <Link href="/categories" className="underline">
             Categorias

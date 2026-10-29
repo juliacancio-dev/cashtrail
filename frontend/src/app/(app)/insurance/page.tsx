@@ -283,7 +283,7 @@ export default function InsurancePage() {
             </p>
           )}
           {summary.renewals_soon.length > 0 && (
-            <p className="rounded-md border border-amber-500/50 bg-amber-500/10 p-3">
+            <p className="rounded-md border border-warning/50 bg-warning/10 p-3">
               Renova em até 30 dias: {summary.renewals_soon.map((p) => `${p.name} (${formatDate(p.renews_on)})`).join(", ")}.
             </p>
           )}
@@ -348,7 +348,7 @@ export default function InsurancePage() {
                         policy.renewal_status === "overdue"
                           ? "text-destructive"
                           : policy.renewal_status === "soon"
-                            ? "text-amber-600"
+                            ? "text-warning"
                             : "text-muted-foreground"
                       }`}
                     >

@@ -43,8 +43,8 @@ export function TransactionList({
             <p
               className={
                 transaction.type === "expense"
-                  ? "text-destructive font-medium"
-                  : "font-medium text-green-600"
+                  ? "text-expense font-medium"
+                  : "font-medium text-income"
               }
             >
               {formatAmount(transaction.amount, transaction.type)}

@@ -181,7 +181,7 @@ export default function TaxPage() {
           </p>
 
           {dossier.warnings.map((warning) => (
-            <p key={warning} className="rounded-md border border-amber-500/50 bg-amber-500/10 p-3 text-sm">
+            <p key={warning} className="rounded-md border border-warning/50 bg-warning/10 p-3 text-sm">
               {warning}
             </p>
           ))}
@@ -388,7 +388,7 @@ export default function TaxPage() {
                 </div>
               )}
               {dossier.day_trade_flags.map((flag) => (
-                <p key={flag} className="rounded-md border border-amber-500/50 bg-amber-500/10 p-2 text-xs">
+                <p key={flag} className="rounded-md border border-warning/50 bg-warning/10 p-2 text-xs">
                   {flag}
                 </p>
               ))}

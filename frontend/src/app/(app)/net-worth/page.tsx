@@ -127,7 +127,7 @@ export default function NetWorthPage() {
           </Card>
 
           {worth.warnings.map((warning) => (
-            <p key={warning} className="rounded-md border border-amber-500/50 bg-amber-500/10 p-3 text-sm">
+            <p key={warning} className="rounded-md border border-warning/50 bg-warning/10 p-3 text-sm">
               {warning}{" "}
               {warning.includes("bens") && (
                 <Link href="/assets" className="underline">

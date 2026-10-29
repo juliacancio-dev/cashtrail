@@ -45,7 +45,7 @@ export function BudgetList({
               </div>
               <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
                 <div
-                  className={budget.is_exceeded ? "h-full bg-destructive" : "h-full bg-green-600"}
+                  className={budget.is_exceeded ? "h-full bg-destructive" : "h-full bg-income"}
                   style={{ width: `${percent}%` }}
                 />
               </div>

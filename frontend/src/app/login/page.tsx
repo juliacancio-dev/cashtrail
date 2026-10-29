@@ -28,7 +28,7 @@ export default function LoginPage() {
     setFormError(null);
     try {
       await login(values.email, values.password);
-      router.push("/accounts");
+      router.push("/calendar");
     } catch {
       setFormError("e-mail ou senha invalidos");
     }

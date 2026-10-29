@@ -40,7 +40,7 @@ try {
   await page.fill("#email", email);
   await page.fill("#password", password);
   await page.getByRole("button", { name: "Entrar" }).click();
-  await page.waitForURL("**/accounts");
+  await page.waitForURL("**/calendar");
 
   await page.goto(WEB + "/debts");
   await page.getByRole("button", { name: "Nova dívida" }).click();

@@ -19,10 +19,10 @@ type Option = { id: string; name: string; is_archived?: boolean };
 
 const badgeClass: Record<InvoiceStatus, string> = {
   future: "bg-muted text-muted-foreground",
-  open: "bg-blue-500/15 text-blue-700 dark:text-blue-400",
-  closed: "bg-amber-500/15 text-amber-700 dark:text-amber-400",
+  open: "bg-info/12 text-info",
+  closed: "bg-warning/12 text-warning",
   overdue: "bg-destructive/10 text-destructive",
-  paid: "bg-green-600/15 text-green-700 dark:text-green-400",
+  paid: "bg-income/12 text-income",
 };
 
 export function InvoiceRow({
@@ -139,7 +139,7 @@ export function InvoiceRow({
                   {purchase.moved && <span className="text-muted-foreground"> · fatura escolhida</span>}
                 </span>
                 <span className="flex items-center gap-2">
-                  <span className={purchase.type === "income" ? "text-green-700 dark:text-green-400" : ""}>
+                  <span className={purchase.type === "income" ? "text-income" : ""}>
                     {purchase.type === "income" ? "+ " : "− "}
                     {formatCurrency(purchase.amount)}
                   </span>

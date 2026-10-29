@@ -45,7 +45,7 @@ export function GoalList({
                   <p className="font-medium">
                     {goal.name}
                     {goal.is_achieved && (
-                      <span className="text-sm font-normal text-green-600"> · atingida</span>
+                      <span className="text-sm font-normal text-income"> · atingida</span>
                     )}
                   </p>
                   <p className="text-muted-foreground text-sm">
@@ -68,7 +68,7 @@ export function GoalList({
                 </div>
               </div>
               <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
-                <div className="h-full bg-green-600" style={{ width: `${percent}%` }} />
+                <div className="h-full bg-income" style={{ width: `${percent}%` }} />
               </div>
               {isOpen && (
                 <ContributionForm

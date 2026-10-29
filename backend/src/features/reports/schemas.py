@@ -158,3 +158,32 @@ class NetWorthPointRead(BaseModel):
     total_assets: Decimal
     total_liabilities: Decimal
     net_worth: Decimal
+
+
+class CalendarEventRead(BaseModel):
+    kind: Literal["realized", "planned"]
+    direction: Literal["in", "out"]
+    amount: Decimal
+    source: str
+    description: str
+    category_name: str | None
+
+
+class CalendarDayRead(BaseModel):
+    day: date
+    status: Literal["past", "today", "future"]
+    balance: Decimal
+    net: Decimal
+    is_tight: bool
+    events: list[CalendarEventRead]
+
+
+class MoneyCalendarRead(BaseModel):
+    month: str
+    today: date
+    cash_today: Decimal
+    opening_balance: Decimal
+    closing_balance: Decimal
+    tightest_day: date
+    tightest_balance: Decimal
+    days: list[CalendarDayRead]

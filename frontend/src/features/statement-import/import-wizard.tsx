@@ -193,7 +193,7 @@ export function ImportWizard({ accounts, categories }: { accounts: Option[]; cat
       </div>
 
       {preview.previously_imported_at && (
-        <p className="rounded-md border border-amber-500/50 bg-amber-500/10 p-3 text-sm">
+        <p className="rounded-md border border-warning/50 bg-warning/10 p-3 text-sm">
           Este mesmo arquivo já foi importado nesta conta em{" "}
           {formatDate(preview.previously_imported_at.slice(0, 10))}. As linhas já importadas aparecem
           como possíveis duplicatas e vêm desmarcadas.

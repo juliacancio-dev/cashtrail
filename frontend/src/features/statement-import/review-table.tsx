@@ -44,7 +44,7 @@ export function ReviewTable({
         </thead>
         <tbody>
           {rows.map((row) => (
-            <tr key={row.row_number} className={row.duplicate_of ? "bg-amber-500/10" : undefined}>
+            <tr key={row.row_number} className={row.duplicate_of ? "bg-warning/10" : undefined}>
               <td className="p-2">
                 <input
                   type="checkbox"
@@ -58,7 +58,7 @@ export function ReviewTable({
               <td className="p-2">{row.description ?? "—"}</td>
               <td
                 className={`p-2 text-right whitespace-nowrap ${
-                  row.type === "income" ? "text-green-600" : "text-red-600"
+                  row.type === "income" ? "text-income" : "text-expense"
                 }`}
               >
                 {row.type === "expense" ? "−" : "+"} {currency.format(Number(row.amount))}
@@ -77,7 +77,7 @@ export function ReviewTable({
                   ))}
                 </select>
               </td>
-              <td className="p-2 text-xs text-amber-700 dark:text-amber-400">
+              <td className="p-2 text-xs text-warning">
                 {row.duplicate_of &&
                   `Possível duplicata de ${formatDate(row.duplicate_of.occurred_at)}${
                     row.duplicate_of.description ? ` — ${row.duplicate_of.description}` : ""

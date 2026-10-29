@@ -30,10 +30,10 @@ const active = (options: Option[]) => options.filter((option) => !option.is_arch
 
 const badgeClass: Record<CommitmentStatus, string> = {
   open: "bg-muted text-muted-foreground",
-  due_today: "bg-amber-500/15 text-amber-700 dark:text-amber-400",
+  due_today: "bg-warning/12 text-warning",
   overdue: "bg-destructive/10 text-destructive",
-  partially_paid: "bg-blue-500/15 text-blue-700 dark:text-blue-400",
-  paid: "bg-green-600/15 text-green-700 dark:text-green-400",
+  partially_paid: "bg-info/12 text-info",
+  paid: "bg-income/12 text-income",
   canceled: "bg-muted text-muted-foreground line-through",
 };
 
@@ -106,7 +106,7 @@ function CommitmentRow({
           </div>
 
           <div className="text-right">
-            <p className={`font-medium ${payable ? "" : "text-green-700 dark:text-green-400"}`}>
+            <p className={`font-medium ${payable ? "" : "text-income"}`}>
               {payable ? "− " : "+ "}
               {formatCurrency(commitment.amount)}
             </p>

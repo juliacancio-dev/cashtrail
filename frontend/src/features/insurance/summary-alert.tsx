@@ -15,7 +15,7 @@ export function InsuranceAlert({ summary }: { summary: InsuranceSummary }) {
     <Link
       href="/insurance"
       className={`rounded-lg border p-4 text-sm ${
-        overdue.length > 0 ? "border-destructive/40 bg-destructive/5" : "border-amber-500/40 bg-amber-500/5"
+        overdue.length > 0 ? "border-destructive/40 bg-destructive/5" : "border-warning/40 bg-warning/5"
       }`}
     >
       <p className="font-medium">

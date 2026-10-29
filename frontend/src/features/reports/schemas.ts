@@ -153,3 +153,32 @@ export type NetWorthPoint = {
   total_liabilities: string;
   net_worth: string;
 };
+
+export type CalendarEvent = {
+  kind: "realized" | "planned";
+  direction: "in" | "out";
+  amount: string;
+  source: string;
+  description: string;
+  category_name: string | null;
+};
+
+export type CalendarDay = {
+  day: string;
+  status: "past" | "today" | "future";
+  balance: string;
+  net: string;
+  is_tight: boolean;
+  events: CalendarEvent[];
+};
+
+export type MoneyCalendar = {
+  month: string;
+  today: string;
+  cash_today: string;
+  opening_balance: string;
+  closing_balance: string;
+  tightest_day: string;
+  tightest_balance: string;
+  days: CalendarDay[];
+};

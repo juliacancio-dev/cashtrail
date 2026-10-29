@@ -3,6 +3,7 @@ export type NavTab = { href: string; label: string };
 export type NavModule = { name: string; tabs: NavTab[] };
 
 export const MODULES: NavModule[] = [
+  { name: "Calendário", tabs: [{ href: "/calendar", label: "Calendário" }] },
   {
     name: "Caixa",
     tabs: [

@@ -42,7 +42,7 @@ try {
   await page.fill("#email", email);
   await page.fill("#password", password);
   await page.getByRole("button", { name: "Entrar" }).click();
-  await page.waitForURL("**/accounts");
+  await page.waitForURL("**/calendar");
   await shot("m16-escuro");
   await page.getByRole("button", { name: "Mudar para o modo claro" }).click();
   s = await html();

@@ -79,11 +79,19 @@ def _dated_events(items: list[FlowItem], today: date) -> list[tuple[date, Calend
 
 
 def _tight_days(balances: list[Decimal]) -> set[int]:
-    """Dia apertado = saldo no quarto mais baixo do mês (decisão 6). Mês sem variação não tem."""
+    """Dia apertado = saldo no quarto mais baixo do mês (decisão 6). Mês sem variação não tem.
+
+    Se os empates no valor de corte passariam de um quarto do mês (um saldo parado por
+    semanas), só entram os dias abaixo dele: marcar o mês quase inteiro não diz nada.
+    """
     if not balances or min(balances) == max(balances):
         return set()
-    threshold = sorted(balances)[math.ceil(len(balances) / 4) - 1]
-    return {i for i, b in enumerate(balances) if b <= threshold}
+    quarter = math.ceil(len(balances) / 4)
+    threshold = sorted(balances)[quarter - 1]
+    tight = {i for i, b in enumerate(balances) if b <= threshold}
+    if len(tight) > quarter:
+        tight = {i for i, b in enumerate(balances) if b < threshold}
+    return tight
 
 
 def build_calendar(db: Session, user_id: uuid.UUID, month: date, today: date | None = None) -> MoneyCalendar:

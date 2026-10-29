@@ -149,6 +149,18 @@ def test_tight_days_are_the_lowest_quarter_of_the_month(client, db_session):
     assert tight == [1, 2, 3, 4, 28, 29, 30, 31]  # ceil(31/4) = 8 dias, os de menor saldo
 
 
+def test_a_long_flat_stretch_is_not_marked_tight_as_a_whole(client, db_session):
+    # Saldo parado de 02 a 30: o corte do quarto cai nesse valor, e os empates marcariam 29 dias.
+    w = make_world(client, "cal16@example.com", savings_opening="0.00")  # 1000 em caixa
+    w.tx(w.checking, w.salary, "income", "3000.00", "2026-08-01")
+    w.tx(w.checking, w.market, "expense", "400.00", "2026-08-02")
+    w.post("/commitments", direction="payable", description="Internet", amount="120.00", due_date="2026-08-31", category_id=w.rent)
+
+    cal = _cal(db_session, w)
+
+    assert [d.day.day for d in cal.days if d.is_tight] == [31]
+
+
 def test_month_without_movements_has_no_tight_day(client, db_session):
     w = make_world(client, "cal12@example.com")
 

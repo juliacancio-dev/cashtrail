@@ -7,6 +7,7 @@ import type {
   FlowColumn,
   FlowDirection,
   FlowItem,
+  MoneyCalendar,
   NetWorth,
   NetWorthPoint,
 } from "@/features/reports/schemas";
@@ -82,4 +83,10 @@ export async function getNetWorthHistory(months: number): Promise<NetWorthPoint[
 
 export function netWorthCsvPath(asOf?: string): string {
   return `/reports/net-worth.csv${asOf ? `?as_of=${asOf}` : ""}`;
+}
+
+export async function getCalendar(month: string): Promise<MoneyCalendar> {
+  const response = await apiClient.get(`/reports/calendar?month=${month}`);
+  if (!response.ok) return apiFail(response, "erro ao carregar o calendário");
+  return response.json() as Promise<MoneyCalendar>;
 }

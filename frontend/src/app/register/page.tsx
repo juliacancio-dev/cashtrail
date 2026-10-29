@@ -28,7 +28,7 @@ export default function RegisterPage() {
     setFormError(null);
     try {
       await registerUser(values.email, values.password);
-      router.push("/accounts");
+      router.push("/calendar");
     } catch (error) {
       setFormError(error instanceof Error ? error.message : "erro ao registrar");
     }

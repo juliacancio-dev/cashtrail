@@ -27,7 +27,7 @@ export function AppHeader() {
   return (
     <header className="border-b border-border">
       <div className="mx-auto flex w-full max-w-5xl items-center gap-2 px-6 py-3">
-        <Link href="/dashboard" className="mr-auto text-[17px] font-semibold">
+        <Link href="/calendar" className="mr-auto text-[17px] font-semibold">
           CashTrail
         </Link>
         <nav aria-label="Módulos" className="hidden items-center gap-1 md:flex">
@@ -61,7 +61,19 @@ export function AppHeader() {
         <nav id="menu-celular" aria-label="Módulos" className="border-t border-border px-6 py-2 md:hidden">
           {MODULES.map((m) => (
             <div key={m.name} className="border-b border-border py-3 last:border-b-0">
-              <p className="text-lg font-medium">{m.name}</p>
+              {m.tabs.length === 1 ? (
+                <Link
+                  href={m.tabs[0].href}
+                  onClick={() => setMenuOpen(false)}
+                  aria-current={isCurrent(pathname, m.tabs[0].href) ? "page" : undefined}
+                  className="flex min-h-11 items-center text-lg font-medium"
+                >
+                  {m.name}
+                </Link>
+              ) : (
+                <p className="text-lg font-medium">{m.name}</p>
+              )}
+              {m.tabs.length > 1 && (
               <ul className="mt-1 flex flex-col">
                 {m.tabs.map((t) => (
                   <li key={t.href}>
@@ -76,6 +88,7 @@ export function AppHeader() {
                   </li>
                 ))}
               </ul>
+              )}
             </div>
           ))}
           <Button variant="outline" className="my-3 min-h-11 w-full" onClick={signOut}>
@@ -84,7 +97,7 @@ export function AppHeader() {
         </nav>
       )}
 
-      {active && (
+      {active && active.tabs.length > 1 && (
         <nav aria-label={`Telas de ${active.name}`} className="mx-auto w-full max-w-5xl overflow-x-auto px-6">
           <ul className="flex min-w-max gap-1">
             {active.tabs.map((t) => {

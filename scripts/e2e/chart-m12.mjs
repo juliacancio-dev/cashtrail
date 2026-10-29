@@ -11,7 +11,7 @@ const page = await b.newPage({ viewport: { width: 1280, height: 900 } });
 await page.goto(WEB + "/login");
 await page.fill("#email", email); await page.fill("#password", password);
 await page.getByRole("button", { name: "Entrar" }).click();
-await page.waitForURL("**/accounts");
+await page.waitForURL("**/calendar");
 await page.goto(WEB + "/net-worth");
 await page.waitForSelector("svg.recharts-surface", { timeout: 15000 });
 await page.waitForTimeout(1500);

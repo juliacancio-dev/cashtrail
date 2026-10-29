@@ -75,6 +75,7 @@ Categorias fica em Caixa, logo depois de Lançamentos, porque é o cadastro que 
 - **TRADE-OFFS:** (a) mantém a conta de dinheiro no backend, onde há testes de propriedade, e deixa o frontend simples. (b) evita uma rota, mas espalha conta de dinheiro no navegador, que não tem teste unitário.
 - **RECOMENDAÇÃO:** **(a)**.
 - **Testes de propriedade propostos:** o saldo de hoje no calendário é igual ao `cash_total` de `/reports/balances`; o saldo do último dia é igual ao saldo inicial do mês mais a soma de todos os movimentos do mês.
+- **Como ficou (etapa 3, 2026-10-29):** `reports/calendar_view.py` + `GET /reports/calendar?month=AAAA-MM` (padrão: mês atual), 14 testes em `tests/test_calendar.py`. Regra do dia: saldo no fim do dia d = saldo inicial + realizados até d + o que resta dos previstos entre hoje e d. Por isso o **dia de hoje** mostra o saldo **depois** do que vence hoje ou está vencido e não pago, enquanto `cash_today` (o número grande do topo) é só o realizado e bate com `/reports/balances`. Propriedades testadas: `cash_today` = `cash_total`; cada dia = anterior + movimento do dia; o mês seguinte abre onde este fechou; o fechamento do mês = `closing_projected` do fluxo de caixa. "Dia apertado" = os `ceil(dias/4)` menores saldos (empates entram); mês sem variação não tem dia apertado.
 - **CONFIANÇA:** Alta.
 
 ### DECISÃO 5 — O que a previsão não sabe

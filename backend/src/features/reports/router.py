@@ -7,12 +7,13 @@ from sqlalchemy.orm import Session
 
 from src.core.database import get_db
 from src.core.dependencies import CurrentUser
-from src.features.reports import balances_dre, cash_flow, csv_export, net_worth
+from src.features.reports import balances_dre, calendar_view, cash_flow, csv_export, net_worth
 from src.features.reports.schemas import (
     BalancesRead,
     CashFlowRead,
     DreRead,
     FlowItemRead,
+    MoneyCalendarRead,
     NetWorthPointRead,
     NetWorthRead,
 )
@@ -105,6 +106,17 @@ def get_cash_flow_csv(
 ) -> Response:
     flow = cash_flow.build_cash_flow(db, current_user.id, _month(start_month, _default_start_month()), months)
     return _csv_response(csv_export.cash_flow_csv(flow), f"fluxo-de-caixa-{flow.start_month}.csv")
+
+
+@router.get("/calendar", response_model=MoneyCalendarRead)
+def get_calendar(
+    current_user: CurrentUser,
+    db: Annotated[Session, Depends(get_db)],
+    month: str | None = Query(default=None, description="AAAA-MM; padrão: o mês atual"),
+) -> MoneyCalendarRead:
+    """Calendário do dinheiro: saldo em caixa no fim de cada dia do mês (Marco 16)."""
+    result = calendar_view.build_calendar(db, current_user.id, _month(month, date.today().replace(day=1)))
+    return MoneyCalendarRead(**asdict(result))
 
 
 @router.get("/cash-flow/items", response_model=list[FlowItemRead])

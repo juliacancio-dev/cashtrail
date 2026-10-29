@@ -13,6 +13,7 @@ Scripts ad-hoc usados nos Marcos 8 a 15 para provar cada tela num navegador de v
 | `e2e-m14.mjs` | imposto de renda (Marco 14) |
 | `e2e-m15.mjs` | seguros e independência financeira (Marco 15) |
 | `e2e-m16-tema.mjs` | modo claro e escuro, fonte e `lang` (Marco 16, etapa 1) |
+| `e2e-m16-menu.mjs` | menu de módulos, abas, alinhamento e menu do celular nas 20 telas (Marco 16, etapa 2) |
 
 ## Como rodar (PowerShell, na raiz do repositório)
 

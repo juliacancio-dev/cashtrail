@@ -17,6 +17,15 @@
   --color-chart-8: var(--chart-8);
   --color-chart-grid: var(--chart-grid);
   --color-chart-axis: var(--chart-axis);
+  --color-nav: var(--nav);
+  --color-nav-foreground: var(--nav-foreground);
+  --color-nav-muted: var(--nav-muted);
+  --color-nav-accent: var(--nav-accent);
+  --color-nav-accent-foreground: var(--nav-accent-foreground);
+  --color-nav-field: var(--nav-field);
+  --color-nav-hover: var(--nav-hover);
+  --color-nav-section: var(--nav-section);
+  --color-nav-edge: var(--nav-edge);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
@@ -97,6 +106,16 @@
   --chart-8: #e34948;
   --chart-grid: #e1e0d9;
   --chart-axis: #c3c2b7;
+  /* Navegação (doc 33, decisão 8): cápsula e gaveta em tinta, com o âmbar marcando onde você está. */
+  --nav: #18181b;
+  --nav-foreground: #f4f4f5;
+  --nav-muted: #a1a1aa;
+  --nav-accent: #f2b53a;
+  --nav-accent-foreground: #18181b;
+  --nav-field: #232326;
+  --nav-hover: #2e2e33;
+  --nav-section: #3a3a41;
+  --nav-edge: transparent;
   --radius: 0.625rem;
   --sidebar: oklch(0.985 0 0);
   --sidebar-foreground: oklch(0.145 0 0);
@@ -143,6 +162,16 @@
   --chart-8: #e66767;
   --chart-grid: #2c2c2a;
   --chart-axis: #383835;
+  /* #18181b sumiria no fundo #111113: um grafite mais claro e um fio de borda. */
+  --nav: #26262b;
+  --nav-foreground: #f4f4f5;
+  --nav-muted: #a1a1aa;
+  --nav-accent: #f2b53a;
+  --nav-accent-foreground: #18181b;
+  --nav-field: #1c1c20;
+  --nav-hover: #34343a;
+  --nav-section: #3d3d44;
+  --nav-edge: #34343a;
   --sidebar: oklch(0.205 0 0);
   --sidebar-foreground: oklch(0.985 0 0);
   --sidebar-primary: oklch(0.488 0.243 264.376);
@@ -162,5 +191,25 @@
   }
   html {
     @apply font-sans;
+  }
+}
+/* Anel que pisca duas vezes em volta do logo ao carregar: avisa que o logo é o botão do menu (doc 33, decisão 8). */
+@keyframes nav-ping {
+  0% {
+    opacity: 0.7;
+    transform: scale(0.9);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.35);
+  }
+}
+.nav-ping {
+  opacity: 0;
+  animation: nav-ping 1.6s cubic-bezier(0.2, 0.8, 0.2, 1) 0.6s 2;
+}
+@media (prefers-reduced-motion: reduce) {
+  .nav-ping {
+    animation: none;
   }
 }

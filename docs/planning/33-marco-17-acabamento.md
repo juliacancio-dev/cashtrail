@@ -1,6 +1,9 @@
 # Marco 17 — Acabamento: Resumo do mês e telas densas no estilo calmo
 
-> Status: **APROVADO pela Julia em 2026-11-04** (decisões 1 a 7 como recomendadas). Etapa 1 feita.
+> Status: **APROVADO pela Julia em 2026-11-04** (decisões 1 a 7 como recomendadas; decisão 8, a navegação, depois
+> de 5 rodadas de protótipo). Etapa 1 feita.
+> Protótipos: telas https://claude.ai/artifact/Gt9MK8wu4X9jDbFVUDoykw · cápsula e gaveta
+> https://claude.ai/artifact/Q8DKAi4wjzztyztvMUfHHS
 > Continua o Marco 16 (doc 32), que trocou as cores e o menu mas deixou o miolo das telas como estava.
 > O colchão (doc 32, backlog) fica para o Marco 18.
 
@@ -99,17 +102,65 @@ de qualquer código das etapas 2 a 5. A etapa 1 (defeitos) não depende do prot�
 - A4: todas as datas na tela via `formatDate`.
 - A6: tirar o e-mail das 7 telas (ele já está implícito no "Sair").
 
+### Decisão 8 — Navegação: cápsula Tinta + âmbar com gaveta no logo
+
+**APROVADA pela Julia em 2026-11-04**, depois de 5 rodadas de protótipo no mesmo dia (o protótipo das 4 telas
+aprovado mostrou que o cabeçalho do Marco 16 não agradava: "tudo da mesma cor").
+
+**Como fica**
+- **Cápsula flutuante** no topo (substitui o cabeçalho de duas linhas do Marco 16): logo, os 6 módulos como pílulas,
+  tema e Sair. O módulo atual é uma pílula âmbar. Embaixo da cápsula, fora dela, as telas do módulo com a atual
+  sublinhada: é o **acesso rápido** (um clique para trocar de módulo ou de tela).
+- **Logo "C" é o botão do menu** (`aria-label="Abrir menu"`, `aria-expanded`): ao lado do "C", três tracinhos
+  de tamanhos diferentes que ficam iguais no hover e viram X com o menu aberto; dica "Menu" no hover; um anel
+  âmbar pisca duas vezes ao carregar, só como aviso.
+- **Gaveta** (animação escolhida, entre "nasce do logo" e "gaveta"): desliza da esquerda em ~300 ms, itens em
+  cascata, fundo escurecido; fecha com Esc, clique fora ou ao escolher uma tela. Sem movimento com
+  `prefers-reduced-motion`.
+- **Conteúdo da gaveta:** busca "Ir para uma tela" (tecla `/` abre direto nela; Enter vai para a primeira
+  encontrada), as 20 telas agrupadas por módulo com ícone, **cabeçalho de cada seção numa faixa mais escura** que
+  as telas clicáveis (pedido dela: "de uma cor só não dá pra entender que são seções"), tela atual marcada, tema e
+  Sair no pé.
+- **Celular:** a cápsula mostra só o logo, o módulo atual e o tema; a gaveta ocupa ~86% da largura.
+
+**Cores (paleta "A · Tinta + âmbar")**
+
+| Elemento | Claro | Escuro |
+|---|---|---|
+| Fundo da cápsula e da gaveta | `#18181b` (o preto dos botões, `--foreground`) | `#26262b` + fio de borda `#34343a` (o `#18181b` some no fundo `#111113`) |
+| Texto / texto apagado | `#f4f4f5` / `#a1a1aa` | igual |
+| Pílula do módulo atual e quadrado do "C" | `#f2b53a` com texto `#18181b` (~10:1) | igual |
+| Cabeçalho de seção na gaveta | `#3a3a41`, texto branco | `#3d3d44` |
+| Busca / hover | `#232326` / `#2e2e33` | `#1c1c20` / `#34343a` |
+| Sublinhado da aba atual | `--accent-money` | `--accent-money` |
+
+Forma leve: sem borda colorida, sombra `0 2px 8px` com 8% de opacidade, raio 14 px (o mesmo dos quadros).
+
+**ALTERNATIVAS vistas e descartadas:** 4 estruturas na cor do fundo (rodada 1); 6 faixas coloridas (rodada 2:
+escolheu Areia); 7 estruturas em Areia (rodada 3: escolheu cápsula + lateral); 8 paletas para a cápsula
+(rodada 4: Areia descartada, escolheu "Tinta + ardósia A"); ardósia aplicada nas 4 telas "não casou" (rodada 5).
+**Por que não casou** (diagnóstico confirmado por uma segunda opinião que ela trouxe): azul frio sobre app quente;
+o azul já significa "informação" nos chips e no gráfico; três cores disputando o papel de "ativo"; a barra mais
+forte que o número principal. Também vistas: "aba preta" (âmbar só no logo e na pílula) e "clara" (cartão +
+pílula preta, perde personalidade).
+
+**TRADE-OFF:** o âmbar passa a ser marca **e** destaque de dinheiro. Ela aceitou; se cansar, a variante "aba
+preta" é a saída sem refazer nada. **Regra:** azul fica só para informação e gráficos.
+
 ## 4. Plano (uma branch por etapa, merge `--no-ff` no fim do marco)
 
 | Etapa | O que | Verificação |
 |---|---|---|
 | 1. Defeitos | A1 (backend, um ponto por dia + teste), A3, A4, A5, A6 | `pytest` da slice `dashboard`; teste do fuso no navegador com `timezoneId` em America/Sao_Paulo às 22h; `lint`/`tsc`/`build` |
-| 2. Resumo do mês | Decisões 1 e 2 | roteiro de navegador nos dois temas, números conferidos com a API |
-| 3. Lançamentos | Decisão 3 | roteiro: troca de mês, agrupamento por dia, criar lançamento, celular sem rolagem horizontal |
-| 4. Compromissos | Decisão 4 | roteiro: filtros, agrupamento, pagar, editar, desfazer baixa (repete o e2e do Marco 8) |
-| 5. Cartões | Decisão 5 | roteiro: fatura atual aberta, pagar fatura, mover compra (repete o e2e do Marco 9) |
+| 2. Navegação | Decisão 8: cápsula, gaveta no logo, busca, celular; substitui o `AppHeader` do Marco 16 nas 20 telas | roteiro: as 20 telas pela cápsula, pelas abas e pela gaveta; busca e `/`; Esc e foco voltando ao logo; celular sem rolagem horizontal; contraste medido nos dois temas; `prefers-reduced-motion` |
+| 3. Resumo do mês | Decisões 1 e 2 | roteiro de navegador nos dois temas, números conferidos com a API |
+| 4. Lançamentos | Decisão 3 | roteiro: troca de mês, agrupamento por dia, criar lançamento, celular sem rolagem horizontal |
+| 5. Compromissos | Decisão 4 | roteiro: filtros, agrupamento, pagar, editar, desfazer baixa (repete o e2e do Marco 8) |
+| 6. Cartões | Decisão 5 | roteiro: fatura atual aberta, pagar fatura, mover compra (repete o e2e do Marco 9) |
 
-**Estimativa (por analogia com o Marco 16, não medida):** 14 a 24 horas; a etapa 4 é a maior.
+A navegação vem antes das telas porque todas ficam embaixo dela.
+
+**Estimativa (por analogia com o Marco 16, não medida):** 18 a 30 horas; as etapas 2 e 5 são as maiores.
 
 ## 5. Riscos
 
@@ -137,3 +188,20 @@ de qualquer código das etapas 2 a 5. A etapa 1 (defeitos) não depende do prot�
 - Verificado: `pytest` de `dashboard` e `reports` (100 ok), `lint`, `tsc`, `build`;
   `scripts/e2e/e2e-m17-defeitos.mjs` 13/13 com o relógio do navegador às 22h30 do último dia do mês em São Paulo
   (UTC já no mês seguinte); regressão `e2e-m16-menu` e `e2e-m16-calendario` ok.
+
+**Etapa 2 (navegação) — feita em 2026-11-04, branch `marco-17-etapa-2-navegacao`.**
+- `globals.css`: tokens `--nav*` nos dois temas (tabela da decisão 8) e o anel `nav-ping` (desligado com
+  `prefers-reduced-motion`).
+- `app-shell/app-header.tsx`: cápsula com o logo-botão (três tracinhos que viram X, dica "Menu"), pílulas dos
+  módulos (no celular só a atual), tema e Sair; linha de abas embaixo com sublinhado `accent-money`; atalho `/`
+  que abre a gaveta na busca (ignorado enquanto se digita).
+- `app-shell/nav-drawer.tsx` (novo): gaveta `role="dialog"` com `inert` + `aria-hidden` quando fechada, foco no
+  Fechar ao abrir, Tab preso, Esc e clique fora fecham com o foco voltando ao logo; busca sem acento com Enter
+  para a primeira tela; seções com faixa `--nav-section`; itens em cascata; tema e Sair no pé.
+- `nav-config.ts`: ícone lucide por módulo; o calendário aparece como "Calendário do dinheiro".
+- `theme-toggle.tsx`: aceita `className` para seguir a cápsula.
+- Verificado: `lint`, `tsc`, `build`; `scripts/e2e/e2e-m17-navegacao.mjs` 27/27 (contraste mínimo 5,9:1 no
+  escuro); regressão `e2e-m16-tema`, `e2e-m16-calendario`, `e2e-m16-cores` e `e2e-m17-defeitos` ok.
+  `e2e-m16-menu.mjs` removido: testava o cabeçalho antigo (botão "Menu" do celular, nome alinhado ao título).
+- Contagem corrigida: são **21** telas (o calendário + 20).
+

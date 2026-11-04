@@ -15,8 +15,8 @@ Scripts ad-hoc usados nos Marcos 8 a 15 para provar cada tela num navegador de v
 | `e2e-m16-tema.mjs` | modo claro e escuro, fonte e `lang` (Marco 16, etapa 1) |
 | `e2e-m16-calendario.mjs` | calendário do dinheiro: números da tela × API, detalhe do dia, troca de mês, escuro e celular (Marco 16, etapa 4) |
 | `e2e-m16-cores.mjs` | cores de dinheiro, chips e gráficos nos dois temas, com contraste medido na tela (Marco 16, etapa 5) |
-| `e2e-m16-menu.mjs` | menu de módulos, abas, alinhamento e menu do celular nas 20 telas (Marco 16, etapa 2) |
 | `e2e-m17-defeitos.mjs` | datas dd/mm/aaaa, data padrão dos formulários no fuso local (relógio preso às 22h30 do último dia do mês em São Paulo), título do Resumo, sem e-mail no subtítulo (Marco 17, etapa 1) |
+| `e2e-m17-navegacao.mjs` | cápsula Tinta + âmbar, gaveta no logo (foco, Tab preso, Esc, clique fora), busca e atalho `/`, as 21 telas pela cápsula e pelas abas, contraste medido nos dois temas, celular e "reduzir movimento" (Marco 17, etapa 2; substitui o `e2e-m16-menu.mjs`) |
 
 ## Como rodar (PowerShell, na raiz do repositório)
 

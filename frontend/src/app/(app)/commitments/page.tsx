@@ -126,7 +126,6 @@ export default function CommitmentsPage() {
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <h1 className="text-2xl font-semibold">Contas a pagar e a receber</h1>
-          <p className="text-muted-foreground text-sm">{user.email}</p>
         </div>
         <Button onClick={() => setShowForm((value) => !value)} disabled={!ready}>
           {showForm ? "Fechar formulário" : "Nova conta"}

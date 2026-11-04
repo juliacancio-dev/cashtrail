@@ -25,6 +25,7 @@ import type { Dashboard } from "@/features/dashboard/schemas";
 import { SummaryCards } from "@/features/dashboard/summary-cards";
 import { CategorySpendingChart } from "@/features/dashboard/category-spending-chart";
 import { BalanceEvolutionChart } from "@/features/dashboard/balance-evolution-chart";
+import { formatDate } from "@/lib/format";
 
 export default function DashboardPage() {
   const { user, isLoading } = useAuth();
@@ -77,10 +78,10 @@ export default function DashboardPage() {
   return (
     <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-6 p-6">
       <div>
-        <h1 className="text-2xl font-semibold">Dashboard</h1>
+        <h1 className="text-2xl font-semibold">Resumo do mês</h1>
         {dashboard && (
           <p className="text-muted-foreground text-sm">
-            {dashboard.start_date} a {dashboard.end_date}
+            {formatDate(dashboard.start_date)} a {formatDate(dashboard.end_date)}
           </p>
         )}
       </div>

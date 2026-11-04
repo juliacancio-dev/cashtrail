@@ -2,6 +2,7 @@
 
 import { Card, CardContent } from "@/components/ui/card";
 import type { Transaction } from "@/features/transactions/schemas";
+import { formatDate } from "@/lib/format";
 
 type Option = { id: string; name: string };
 
@@ -37,7 +38,7 @@ export function TransactionList({
               </p>
               <p className="text-muted-foreground text-sm">
                 {accountName(transaction.account_id)} · {categoryName(transaction.category_id)} ·{" "}
-                {transaction.occurred_at}
+                {formatDate(transaction.occurred_at)}
               </p>
             </div>
             <p

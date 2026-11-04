@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import type { Budget } from "@/features/budgets/schemas";
+import { monthLabel } from "@/lib/format";
 
 function formatCurrency(value: string): string {
   return Number(value).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
@@ -35,7 +36,7 @@ export function BudgetList({
                     )}
                   </p>
                   <p className="text-muted-foreground text-sm">
-                    {budget.month} · {formatCurrency(budget.spent_amount)} de{" "}
+                    {monthLabel(budget.month)} · {formatCurrency(budget.spent_amount)} de{" "}
                     {formatCurrency(budget.limit_amount)} ({budget.percent_consumed}%)
                   </p>
                 </div>

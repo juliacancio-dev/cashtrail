@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { frequencyOptions, type Recurring } from "@/features/recurring/schemas";
+import { formatDate } from "@/lib/format";
 
 type Option = { id: string; name: string };
 
@@ -47,7 +48,7 @@ export function RecurringList({
               <p className="text-muted-foreground text-sm">
                 {accountName(item.account_id)} · {categoryName(item.category_id)} ·{" "}
                 {frequencyLabel(item.frequency)} · {formatCurrency(item.amount)} · próxima em{" "}
-                {item.next_occurrence_date}
+                {formatDate(item.next_occurrence_date)}
                 {item.generate_as_commitment && " · gera conta a pagar/receber"}
               </p>
             </div>

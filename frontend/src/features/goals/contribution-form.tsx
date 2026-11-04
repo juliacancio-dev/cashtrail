@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/select";
 import { contributionSchema, type ContributionFormValues } from "@/features/goals/schemas";
 import { transactionTypeOptions } from "@/features/transactions/schemas";
+import { todayIso } from "@/lib/format";
 
 type Option = { id: string; name: string };
 
@@ -39,7 +40,7 @@ export function ContributionForm({
       category_id: "",
       type: "expense",
       amount: "",
-      occurred_at: new Date().toISOString().slice(0, 10),
+      occurred_at: todayIso(),
     },
   });
 

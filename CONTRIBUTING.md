@@ -13,21 +13,21 @@ Antes de começar, leia a seção [Licença das contribuições](#licença-das-c
 | Bug | Abra uma issue com os passos para reproduzir, o resultado esperado e o obtido |
 | Sugestão de funcionalidade | Abra uma issue descrevendo o problema que ela resolve, antes de escrever código |
 | Correção ou melhoria | Siga o [fluxo de pull request](#fluxo-de-pull-request) |
-| Documentação | Pull requests de documentação seguem o mesmo fluxo e não exigem issue prévia |
+| Documentação | Pull requests de documentação seguem o mesmo fluxo e não exigem issue prévia; veja as [convenções](docs/README.md#convenções) |
 
-**Falhas de segurança não devem ser relatadas em issues públicas.** Entre em contato diretamente com a mantenedora pelo perfil do GitHub, descrevendo o problema e como reproduzi-lo.
+**Falhas de segurança não devem ser relatadas em issues públicas.** Siga a [política de segurança](SECURITY.md).
 
 ## Antes de escrever código
 
 O CashTrail foi construído a partir de um discovery documentado. Mudanças de comportamento precisam ser coerentes com ele:
 
-- [Requisitos e regras de negócio](docs/planning/03-requirements.md)
-- [Arquitetura por vertical slices](docs/planning/09-vertical-slices.md)
-- [Modelo de dados](docs/planning/10-data-model.md)
-- [Segurança](docs/planning/11-security.md)
-- [ADRs](docs/planning/decisions/)
+- [Regras de negócio](docs/produto/regras-de-negocio.md) e [catálogo de requisitos](docs/referencia/requisitos.md)
+- [Arquitetura e vertical slices](docs/arquitetura/visao-geral.md)
+- [Modelo de dados](docs/arquitetura/modelo-de-dados.md)
+- [Segurança](docs/arquitetura/seguranca.md)
+- [ADRs](docs/decisoes/README.md)
 
-Para funcionalidades novas ou mudanças de arquitetura, **abra uma issue e aguarde alinhamento antes de implementar**. Um pull request que contradiga um ADR precisa vir acompanhado de um novo ADR propondo a mudança.
+Para funcionalidades novas ou mudanças de arquitetura, **abra uma issue e aguarde alinhamento antes de implementar**. Um pull request que contradiga um ADR precisa vir acompanhado de um novo ADR propondo a mudança ([como escrever](docs/decisoes/README.md#como-escrever)). O ciclo completo de um marco está em [Como trabalhamos](docs/processo/como-trabalhamos.md).
 
 ## Ambiente de desenvolvimento
 
@@ -35,6 +35,7 @@ Siga os guias de cada parte:
 
 - [Backend](backend/README.md#executando): Docker Compose, ambiente virtual Python, migrações e testes
 - [Frontend](frontend/README.md#executando): Node.js 22, `npm run dev`
+- [Ambiente local](docs/guias/ambiente-local.md): a stack inteira junta e as armadilhas conhecidas
 
 ## Fluxo de pull request
 
@@ -80,7 +81,7 @@ Toda mudança que afete valores deve preservar a regra de **contagem única**: t
 
 ## Testes
 
-Um pull request está pronto quando atende à [Definition of Done](docs/planning/19-definition-ready-done.md). Em especial:
+Um pull request está pronto quando atende à [Definition of Done](docs/processo/como-trabalhamos.md#definition-of-done). Em especial:
 
 - **Testes de integração com PostgreSQL real** (Testcontainers) para regras de negócio e rotas novas; não use mocks de banco.
 - **Teste de isolamento** para toda rota nova que acesse dados do usuário, no padrão `test_user_cannot_access_another_users_*`.

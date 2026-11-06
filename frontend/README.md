@@ -78,7 +78,7 @@ Os módulos `features/<nome>/api.ts` expõem funções tipadas sobre o `apiClien
 
 ## Autenticação
 
-Segue a [ADR-006](../docs/planning/decisions/ADR-006-jwt-httponly-cookie.md):
+Segue a [ADR-006](../docs/decisoes/ADR-006-jwt-httponly-cookie.md):
 
 - O **access token fica apenas em memória**, numa variável do `api-client`. Nunca vai para `localStorage`, `sessionStorage` ou cookies legíveis por JavaScript.
 - O **refresh token** fica num cookie `httpOnly` definido pelo backend, inacessível ao JavaScript.
@@ -146,6 +146,8 @@ Não há testes automatizados de interface no CI. Cada tela dos Marcos 8 a 15 fo
 
 ## Referências
 
-- [Pesquisa de UI](../docs/planning/21-ui-research.md)
-- [ADR-006: tokens e cookies](../docs/planning/decisions/ADR-006-jwt-httponly-cookie.md)
-- [Segurança](../docs/planning/11-security.md)
+- [Redesign: calendário, tema e cores](../docs/marcos/32-marco-16-redesign.md) e [navegação](../docs/marcos/33-marco-17-acabamento.md)
+- [ADR-008: site estático](../docs/decisoes/ADR-008-frontend-estatico-container-apps.md) e [ADR-021: tema](../docs/decisoes/ADR-021-tema-com-script-proprio.md)
+- [ADR-006: tokens e cookies](../docs/decisoes/ADR-006-jwt-httponly-cookie.md)
+- [Segurança](../docs/arquitetura/seguranca.md)
+- [Ambiente local e armadilhas](../docs/guias/ambiente-local.md)

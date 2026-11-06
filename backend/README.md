@@ -16,7 +16,7 @@ Visão geral do produto, ADRs e infraestrutura estão no [README principal](../R
 | Configuração | pydantic-settings (variáveis de ambiente e `.env`) |
 | Autenticação | PyJWT + Argon2 (`argon2-cffi`) |
 | Rate limiting | slowapi |
-| Jobs agendados | APScheduler, dentro do próprio processo da API ([ADR-005](../docs/planning/decisions/ADR-005-apscheduler-over-celery.md)) |
+| Jobs agendados | APScheduler, dentro do próprio processo da API ([ADR-005](../docs/decisoes/ADR-005-apscheduler-over-celery.md)) |
 | E-mail | Azure Communication Services (ou console em desenvolvimento) |
 | Testes | pytest + httpx + Testcontainers |
 
@@ -72,12 +72,12 @@ Slices com cálculos mais densos isolam essa lógica em módulos puros, testáve
 
 ### Regras de dependência
 
-- `transactions` é o núcleo do domínio ([ADR-007](../docs/planning/decisions/ADR-007-vertical-slices-transactions-kernel.md)): as outras slices dependem dela, nunca o contrário.
+- `transactions` é o núcleo do domínio ([ADR-007](../docs/decisoes/ADR-007-vertical-slices-transactions-kernel.md)): as outras slices dependem dela, nunca o contrário.
 - Uma slice chama outra **apenas pelo `service`**, nunca pelo `repository`.
 - O router nunca acessa o repository diretamente.
 - `core/` não contém regra de negócio; a única ponte para `features/` é `dependencies.py`, que carrega o usuário autenticado pela slice `auth`.
 
-O diagrama completo de dependências está em [`09-vertical-slices.md`](../docs/planning/09-vertical-slices.md).
+O diagrama de dependências entre as slices está em [Arquitetura](../docs/arquitetura/visao-geral.md#dependências-entre-slices).
 
 ### Autenticação nas rotas
 
@@ -211,7 +211,9 @@ O container executa `alembic upgrade head` antes de iniciar o Uvicorn, então o 
 
 ## Referências
 
-- [Arquitetura](../docs/planning/08-architecture.md) e [vertical slices](../docs/planning/09-vertical-slices.md)
-- [Modelo de dados](../docs/planning/10-data-model.md)
-- [Segurança](../docs/planning/11-security.md)
-- [Stack e justificativas](../docs/planning/07-stack.md)
+- [Arquitetura e vertical slices](../docs/arquitetura/visao-geral.md)
+- [Modelo de dados e migrações](../docs/arquitetura/modelo-de-dados.md)
+- [Regras de negócio](../docs/produto/regras-de-negocio.md)
+- [Segurança](../docs/arquitetura/seguranca.md)
+- [Decisões (ADRs)](../docs/decisoes/README.md)
+- [Ambiente local e armadilhas](../docs/guias/ambiente-local.md)

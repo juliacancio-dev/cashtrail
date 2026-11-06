@@ -6,7 +6,7 @@ Uma plataforma de gestão financeira pessoal desenvolvida com foco em organizaç
 
 O CashTrail nasceu de um processo de discovery que abrangeu o problema, a pesquisa de soluções existentes, os requisitos funcionais e não funcionais, a arquitetura, os registros de decisões técnicas (ADRs) e o planejamento de implementação.
 
-**[Acessar demonstração](https://cashtrail-frontend.ashydune-a5fddf60.brazilsouth.azurecontainerapps.io)** · **[Explorar a documentação](docs/planning/00-project-brief.md)**
+**[Acessar demonstração](https://cashtrail-frontend.ashydune-a5fddf60.brazilsouth.azurecontainerapps.io)** · **[Explorar a documentação](docs/README.md)**
 
 > O banco de dados fica ligado das 06h às 23h (horário de Brasília). Fora dessa janela, a demonstração não responde.
 
@@ -26,7 +26,7 @@ O projeto também funciona como um estudo prático de engenharia de software: da
 |---|---|---|
 | [`backend/`](backend/) | API em FastAPI, organizada em vertical slices, com migrações Alembic e testes contra PostgreSQL real | [README do backend](backend/README.md) |
 | [`frontend/`](frontend/) | Aplicação Next.js exportada como site estático e servida por nginx | [README do frontend](frontend/README.md) |
-| [`docs/planning/`](docs/planning/) | Discovery, requisitos, arquitetura, ADRs, roadmap e planejamento de cada marco | [Project brief](docs/planning/00-project-brief.md) |
+| [`docs/`](docs/) | Produto, arquitetura, decisões (ADRs), guias, roadmap e o desenho de cada marco | [Índice da documentação](docs/README.md) |
 | [`scripts/e2e/`](scripts/e2e/) | Roteiros Playwright usados para verificar cada tela num navegador real | [README dos roteiros](scripts/e2e/README.md) |
 | [`.github/workflows/`](.github/workflows/) | CI, deploy e ciclo de vida do banco | [CI/CD](#cicd-e-infraestrutura) |
 
@@ -61,7 +61,7 @@ O projeto também funciona como um estudo prático de engenharia de software: da
 
 Uma regra atravessa todas as áreas: **cada movimentação conta uma única vez**. Transferências, pagamento de fatura, compra de investimento e amortização de principal não são receita nem despesa; só o fato econômico (a compra no cartão, os juros, o provento) entra nos relatórios.
 
-A importação de extratos cobre CSV; OFX está fora do escopo da primeira versão. Os marcos e o detalhamento de cada um estão no [roadmap](docs/planning/13-roadmap.md).
+A importação de extratos cobre CSV; OFX está fora do escopo da primeira versão. O que vem a seguir está no [roadmap](docs/roadmap.md), e o que mudou em cada marco, no [CHANGELOG](CHANGELOG.md).
 
 ## Arquitetura
 
@@ -73,7 +73,7 @@ O módulo `transactions` funciona como núcleo do domínio financeiro. Os demais
 
 O frontend espelha a mesma divisão em `frontend/src/features/<nome>/`.
 
-**Detalhes:** [anatomia de uma slice](backend/README.md#anatomia-de-uma-slice) · [arquitetura por vertical slices](docs/planning/09-vertical-slices.md)
+**Detalhes:** [anatomia de uma slice](backend/README.md#anatomia-de-uma-slice) · [arquitetura por vertical slices](docs/arquitetura/visao-geral.md#vertical-slices)
 
 ### Decisões arquiteturais
 
@@ -81,13 +81,17 @@ As decisões de maior impacto foram registradas em ADRs, com justificativas e al
 
 | ADR | Decisão |
 |---|---|
-| [001](docs/planning/decisions/ADR-001-cloud-provider-azure.md) | Azure como provedor de nuvem |
-| [002](docs/planning/decisions/ADR-002-multi-user-from-start.md) | Aplicação multiusuário desde o início, mesmo sendo de uso pessoal |
-| [003](docs/planning/decisions/ADR-003-sqlalchemy-over-sqlmodel.md) | SQLAlchemy 2.0 em vez de SQLModel |
-| [004](docs/planning/decisions/ADR-004-custom-auth-implementation.md) | Autenticação implementada no projeto em vez de biblioteca pronta |
-| [005](docs/planning/decisions/ADR-005-apscheduler-over-celery.md) | APScheduler em vez de Celery + Redis para os jobs agendados |
-| [006](docs/planning/decisions/ADR-006-jwt-httponly-cookie.md) | Access token só em memória e refresh token em cookie `httpOnly`, nunca em `localStorage` |
-| [007](docs/planning/decisions/ADR-007-vertical-slices-transactions-kernel.md) | Vertical slices com `transactions` como núcleo desacoplado |
+| [001](docs/decisoes/ADR-001-cloud-provider-azure.md) | Azure como provedor de nuvem |
+| [002](docs/decisoes/ADR-002-multi-user-from-start.md) | Aplicação multiusuário desde o início, mesmo sendo de uso pessoal |
+| [003](docs/decisoes/ADR-003-sqlalchemy-over-sqlmodel.md) | SQLAlchemy 2.0 em vez de SQLModel |
+| [004](docs/decisoes/ADR-004-custom-auth-implementation.md) | Autenticação implementada no projeto em vez de biblioteca pronta |
+| [005](docs/decisoes/ADR-005-apscheduler-over-celery.md) | APScheduler em vez de Celery + Redis para os jobs agendados |
+| [006](docs/decisoes/ADR-006-jwt-httponly-cookie.md) | Access token só em memória e refresh token em cookie `httpOnly`, nunca em `localStorage` |
+| [007](docs/decisoes/ADR-007-vertical-slices-transactions-kernel.md) | Vertical slices com `transactions` como núcleo desacoplado |
+| [010](docs/decisoes/ADR-010-transferencia-como-conceito-proprio.md) | Transferência como conceito próprio, neutra no resultado |
+| [013](docs/decisoes/ADR-013-dre-competencia-fluxo-caixa.md) | DRE por competência e fluxo por caixa |
+
+A lista completa, com 21 decisões, está em [docs/decisoes](docs/decisoes/README.md).
 
 ## Segurança e integridade dos dados
 
@@ -99,9 +103,9 @@ Segurança e consistência financeira são requisitos de arquitetura, não funci
 - **Recuperação de senha:** apenas o hash do token é armazenado, e a resposta não revela se uma conta existe.
 - **Importação de arquivos:** só CSV, até 2 MB e 5.000 linhas; erros de parsing viram mensagens por linha.
 - **Acesso ao banco:** SQLAlchemy ORM exclusivamente, sem SQL montado por concatenação.
-- **Gestão de segredos:** variáveis de ambiente e Azure Key Vault, sem credenciais no código-fonte.
+- **Gestão de segredos:** *secrets* do Container App e do GitHub, login no Azure por OIDC, sem credenciais no código-fonte.
 
-**Detalhes:** [threat model e requisitos de segurança](docs/planning/11-security.md)
+**Detalhes:** [threat model e controles](docs/arquitetura/seguranca.md). Para relatar uma vulnerabilidade, veja a [política de segurança](SECURITY.md).
 
 ## Stack tecnológica
 
@@ -147,19 +151,20 @@ O login no Azure usa OIDC com credenciais federadas, sem segredo de longa duraç
 | `ACS_CONNECTION_STRING`, `EMAIL_SENDER_ADDRESS` | E-mail real de recuperação de senha via Azure Communication Services (opcionais; sem eles o link só aparece no log) |
 | `BRAPI_TOKEN` | Cotações automáticas de ações, FIIs e ETFs (opcional; sem ele a brapi atende só ativos de teste) |
 
-Antes de publicar, siga o [checklist pré-deploy](docs/planning/31-checklist-pre-deploy.md).
+Passo a passo de publicação, roteiro de fumaça e reversão: [Deploy e operação](docs/guias/deploy-e-operacao.md).
 
 ## Documentação
 
-A documentação de discovery e engenharia é versionada junto ao código, em [`docs/planning/`](docs/planning/):
+A documentação é versionada junto ao código, em [`docs/`](docs/README.md), organizada por tipo de leitura:
 
-- [Project brief](docs/planning/00-project-brief.md) — visão geral e definição do projeto
-- [Requisitos](docs/planning/03-requirements.md) — requisitos funcionais, não funcionais e regras de negócio
-- [Arquitetura por vertical slices](docs/planning/09-vertical-slices.md) — organização dos módulos e dependências
-- [Modelo de dados](docs/planning/10-data-model.md) — entidades e relacionamentos
-- [Segurança](docs/planning/11-security.md) — threat model e controles de proteção
-- [Roadmap](docs/planning/13-roadmap.md) — marcos, escopo e evolução
-- [ADRs](docs/planning/decisions/) — decisões arquiteturais e suas justificativas
+| Quero... | Leia |
+|---|---|
+| Entender o produto e suas regras de dinheiro | [Visão do produto](docs/produto/visao-geral.md) · [Regras de negócio](docs/produto/regras-de-negocio.md) |
+| Entender a arquitetura | [Arquitetura](docs/arquitetura/visao-geral.md) · [Modelo de dados](docs/arquitetura/modelo-de-dados.md) · [Segurança](docs/arquitetura/seguranca.md) |
+| Saber por que algo foi decidido | [Decisões (ADRs)](docs/decisoes/README.md) |
+| Rodar, testar e publicar | [Ambiente local](docs/guias/ambiente-local.md) · [Deploy e operação](docs/guias/deploy-e-operacao.md) |
+| Acompanhar a evolução | [Roadmap](docs/roadmap.md) · [CHANGELOG](CHANGELOG.md) · [Documentos de marco](docs/marcos/README.md) |
+| Ver como o projeto foi pensado | [Discovery original](docs/historico/README.md) |
 
 ## Contribuindo
 

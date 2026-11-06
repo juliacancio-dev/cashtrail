@@ -112,7 +112,12 @@ export function AppHeader() {
 
           <div className="ml-auto flex shrink-0 items-center gap-0.5">
             <ThemeToggle className={capButton} />
-            <button type="button" onClick={signOut} className={`${capButton} hidden w-auto gap-2 px-3 text-[15px] md:inline-flex`}>
+            {/* No celular o Sair fica só na gaveta. */}
+            <button
+              type="button"
+              onClick={signOut}
+              className="hidden min-h-10 items-center gap-2 rounded-xl px-3 text-[15px] text-nav-muted transition-colors hover:bg-nav-hover hover:text-nav-foreground focus-visible:outline-2 focus-visible:outline-nav-accent md:inline-flex"
+            >
               Sair
               <LogOut className="size-4" aria-hidden="true" />
             </button>

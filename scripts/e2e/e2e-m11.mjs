@@ -103,7 +103,7 @@ try {
 
   // dashboard mostra o alerta
   await page.goto(WEB + "/dashboard");
-  await page.waitForSelector("text=Dívidas: saldo devedor");
+  await page.waitForSelector("text=Saldo devedor em 1 dívida");
   log("OK  dashboard mostra o resumo das dívidas");
 } catch (e) {
   fail(String(e).slice(0, 600));

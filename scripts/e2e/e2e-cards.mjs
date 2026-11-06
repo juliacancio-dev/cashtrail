@@ -135,7 +135,7 @@ try {
 
   // 8. alerta no dashboard
   await page.goto(WEB + "/dashboard");
-  await page.waitForSelector("text=/fatura\\(s\\) de cartão vencida\\(s\\)/", { timeout: 15000 });
+  await page.waitForSelector("text=/faturas? de cartão vencidas?/", { timeout: 15000 });
   log("OK  alerta de faturas vencidas no dashboard");
   await shot("c4-dashboard");
 } catch (e) {

@@ -113,21 +113,15 @@ try {
     check(oc.ratio >= 4.5, `${tag}: chip "vencida" legível (${oc.ratio.toFixed(2)}:1)`, `${tag}: chip vencida ${oc.ratio.toFixed(2)}:1`);
     await page.screenshot({ path: path.join(OUT, `m16-cores-${tag}-compromissos.png`), fullPage: true });
 
-    // Resumo do mês: barras de categoria numa cor só, a do token, e eixos legíveis.
+    // Resumo do mês (desde o Marco 17, etapa 3: barras horizontais em HTML): numa cor só, a do token, e valores legíveis.
     await page.goto(WEB + "/dashboard");
-    await page.locator(".recharts-bar-rectangle path").first().waitFor({ timeout: 15000 });
-    const fills = await page.locator(".recharts-bar-rectangle path").evaluateAll((els) => els.map((e) => getComputedStyle(e).fill));
+    await page.locator("[data-bar]").first().waitFor({ timeout: 15000 });
+    const fills = await page.locator("[data-bar]").evaluateAll((els) => els.map((e) => getComputedStyle(e).backgroundColor));
     const expected = await page.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue("--chart-1").trim());
     check(expected === t.chart1, `${tag}: --chart-1 é ${t.chart1}`, `${tag}: --chart-1 = ${expected}`);
     check(fills.length >= 2 && new Set(fills).size === 1, `${tag}: ${fills.length} barras de categoria na mesma cor`, `${tag}: cores das barras ${[...new Set(fills)].join(", ")}`);
-    const tick = await contrastOf(page.locator(".recharts-cartesian-axis-tick-value").first());
-    check(tick.ratio >= 4.5, `${tag}: texto dos eixos legível (${tick.ratio.toFixed(2)}:1)`, `${tag}: eixo ${tick.ratio.toFixed(2)}:1`);
-    await page.locator(".recharts-bar-rectangle").first().hover();
-    const tooltip = page.locator(".recharts-default-tooltip").first();
-    await tooltip.waitFor();
-    const tipBg = await tooltip.evaluate((el) => getComputedStyle(el).backgroundColor);
-    const tipText = await contrastOf(tooltip.locator(".recharts-tooltip-item").first());
-    check(tipText.ratio >= 4.5, `${tag}: caixa do gráfico (${tipBg}) legível (${tipText.ratio.toFixed(2)}:1)`, `${tag}: caixa ${tipBg}, texto ${tipText.ratio.toFixed(2)}:1`);
+    const value = await contrastOf(page.getByRole("region", { name: "Gasto por categoria" }).locator("li > span:last-child").first());
+    check(value.ratio >= 4.5, `${tag}: valores das categorias legíveis (${value.ratio.toFixed(2)}:1)`, `${tag}: valor ${value.ratio.toFixed(2)}:1`);
     await page.screenshot({ path: path.join(OUT, `m16-cores-${tag}-resumo.png`), fullPage: true });
   }
 } catch (e) {

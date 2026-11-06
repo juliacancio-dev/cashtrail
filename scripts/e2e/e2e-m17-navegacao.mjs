@@ -192,6 +192,7 @@ try {
   await page.locator("main h1").first().waitFor();
   const visiblePills = await modulesNav.getByRole("link").evaluateAll((els) => els.filter((e) => e.offsetParent !== null).map((e) => e.textContent));
   check(visiblePills.length === 1 && visiblePills[0] === "Caixa", "celular: a cápsula mostra só o módulo atual", "celular: pílulas visíveis " + visiblePills.join(", "));
+  check(!(await capsule.locator("xpath=..").getByRole("button", { name: "Sair" }).isVisible()), "celular: Sair fora da cápsula (fica na gaveta)", "celular: Sair visível na cápsula");
   await logo.click();
   await page.waitForTimeout(500);
   const box = await drawer.boundingBox();

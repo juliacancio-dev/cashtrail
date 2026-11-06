@@ -65,10 +65,10 @@ try {
   await page.goto(WEB + "/dashboard");
   const h1 = page.locator("main h1").first();
   await h1.waitFor();
-  check((await h1.innerText()) === "Resumo do mês", "título 'Resumo do mês' (não 'Dashboard')", `título: ${await h1.innerText()}`);
-  const subtitle = page.locator("main h1 + p");
-  await subtitle.waitFor();
-  check(/^\d{2}\/\d{2}\/\d{4} a \d{2}\/\d{2}\/\d{4}$/.test(await subtitle.innerText()), `período formatado (${await subtitle.innerText()})`, `período: ${await subtitle.innerText()}`);
+  // Desde a etapa 3 o título diz o mês ("Resumo de novembro") e não há mais subtítulo com o período.
+  check(/^Resumo de [a-zç]+$/.test(await h1.innerText()), `título com o nome do mês (${await h1.innerText()}), não 'Dashboard'`, `título: ${await h1.innerText()}`);
+  await page.getByRole("region", { name: "Resultado do mês" }).waitFor();
+  check(!/\d{4}-\d{2}-\d{2}/.test(await page.locator("main").innerText()), "Resumo sem datas cruas", "data crua no Resumo");
 
   // Lançamentos: data padrão local e datas da lista formatadas
   await page.goto(WEB + "/transactions");

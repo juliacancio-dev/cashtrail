@@ -1,7 +1,5 @@
 "use client";
 
-import Link from "next/link";
-
 import { Card, CardContent } from "@/components/ui/card";
 import type { CommitmentSummary, DirectionSummary } from "@/features/commitments/schemas";
 import { formatCurrency } from "@/lib/format";
@@ -33,31 +31,5 @@ export function CommitmentSummaryCards({ summary }: { summary: CommitmentSummary
       <SummaryCard title="A pagar (em aberto)" data={summary.payable} days={summary.days} />
       <SummaryCard title="A receber (em aberto)" data={summary.receivable} days={summary.days} />
     </div>
-  );
-}
-
-/** Alerta do dashboard (RF-021): só aparece quando há algo atrasado ou perto de vencer. */
-export function CommitmentsAlert({ summary }: { summary: CommitmentSummary }) {
-  const overdue = summary.payable.overdue_count + summary.receivable.overdue_count;
-  const soon = summary.payable.due_soon_count + summary.receivable.due_soon_count;
-  if (overdue === 0 && soon === 0) return null;
-
-  return (
-    <Link
-      href="/commitments"
-      className={`rounded-lg border p-4 text-sm ${
-        overdue > 0 ? "border-destructive/40 bg-destructive/5" : "border-warning/40 bg-warning/5"
-      }`}
-    >
-      <p className="font-medium">
-        {overdue > 0 && `${overdue} conta(s) atrasada(s)`}
-        {overdue > 0 && soon > 0 && " · "}
-        {soon > 0 && `${soon} vence(m) em ${summary.days} dias`}
-      </p>
-      <p className="text-muted-foreground">
-        A pagar atrasado: {formatCurrency(summary.payable.overdue_amount)} · A receber atrasado:{" "}
-        {formatCurrency(summary.receivable.overdue_amount)}. Ver contas a pagar e a receber.
-      </p>
-    </Link>
   );
 }

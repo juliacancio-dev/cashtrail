@@ -1,35 +1,31 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { useAuth } from "@/features/auth/auth-context";
 import { getCommitmentSummary } from "@/features/commitments/api";
 import type { CommitmentSummary } from "@/features/commitments/schemas";
-import { CommitmentsAlert } from "@/features/commitments/summary-cards";
 import { getCardsSummary } from "@/features/credit-cards/api";
+import type { CardsSummary } from "@/features/credit-cards/schemas";
+import { getDashboard } from "@/features/dashboard/api";
+import { AttentionList, CategoryBars, MonthHero, NetWorthLine, buildNotices } from "@/features/dashboard/month-summary";
+import type { Dashboard } from "@/features/dashboard/schemas";
 import { getDebtsSummary } from "@/features/debts/api";
 import type { DebtsSummary } from "@/features/debts/schemas";
-import { DebtsAlert } from "@/features/debts/summary-alert";
 import { getInsuranceSummary } from "@/features/insurance/api";
 import type { InsuranceSummary } from "@/features/insurance/schemas";
-import { InsuranceAlert } from "@/features/insurance/summary-alert";
 import { getNetWorthHistory } from "@/features/reports/api";
-import { NetWorthCard } from "@/features/reports/net-worth-card";
 import type { NetWorthPoint } from "@/features/reports/schemas";
-import type { CardsSummary } from "@/features/credit-cards/schemas";
-import { CardsAlert } from "@/features/credit-cards/summary-alert";
-import { getDashboard } from "@/features/dashboard/api";
-import type { Dashboard } from "@/features/dashboard/schemas";
-import { SummaryCards } from "@/features/dashboard/summary-cards";
-import { CategorySpendingChart } from "@/features/dashboard/category-spending-chart";
-import { BalanceEvolutionChart } from "@/features/dashboard/balance-evolution-chart";
-import { formatDate } from "@/lib/format";
+import { currentMonthIso, monthName, shiftMonth } from "@/lib/format";
 
+// Resumo do mês (doc 33, decisões 1 e 2). Os avisos e o patrimônio falam de hoje, então só aparecem no mês atual.
 export default function DashboardPage() {
   const { user, isLoading } = useAuth();
   const router = useRouter();
+  const [month, setMonth] = useState(() => currentMonthIso());
   const [dashboard, setDashboard] = useState<Dashboard | null>(null);
   const [commitments, setCommitments] = useState<CommitmentSummary | null>(null);
   const [cards, setCards] = useState<CardsSummary | null>(null);
@@ -39,32 +35,32 @@ export default function DashboardPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!isLoading && !user) {
-      router.push("/login");
-    }
+    if (!isLoading && !user) router.push("/login");
   }, [isLoading, user, router]);
 
   useEffect(() => {
     if (!user) return;
-    getDashboard()
-      .then(setDashboard)
-      .catch(() => setError("nao foi possivel carregar o dashboard"));
-    // O alerta de vencimentos é um extra: se falhar, o dashboard segue sem ele.
-    getCommitmentSummary()
-      .then(setCommitments)
-      .catch(() => setCommitments(null));
-    getCardsSummary()
-      .then(setCards)
-      .catch(() => setCards(null));
-    getDebtsSummary()
-      .then(setDebts)
-      .catch(() => setDebts(null));
-    getInsuranceSummary()
-      .then(setInsurance)
-      .catch(() => setInsurance(null));
-    getNetWorthHistory(2)
-      .then(setNetWorth)
-      .catch(() => setNetWorth([]));
+    let active = true;
+    getDashboard(month)
+      .then((data) => {
+        if (!active) return;
+        setDashboard(data);
+        setError(null);
+      })
+      .catch(() => active && setError("Não foi possível carregar o resumo do mês."));
+    return () => {
+      active = false;
+    };
+  }, [user, month]);
+
+  // Os avisos são extras: se algum falhar, o resumo segue sem ele.
+  useEffect(() => {
+    if (!user) return;
+    getCommitmentSummary().then(setCommitments).catch(() => setCommitments(null));
+    getCardsSummary().then(setCards).catch(() => setCards(null));
+    getDebtsSummary().then(setDebts).catch(() => setDebts(null));
+    getInsuranceSummary().then(setInsurance).catch(() => setInsurance(null));
+    getNetWorthHistory(2).then(setNetWorth).catch(() => setNetWorth([]));
   }, [user]);
 
   if (isLoading || !user) {
@@ -75,44 +71,45 @@ export default function DashboardPage() {
     );
   }
 
+  const isCurrent = month === currentMonthIso();
+  const year = Number(month.slice(0, 4));
+  const title = `Resumo de ${monthName(month)}${year !== new Date().getFullYear() ? ` de ${year}` : ""}`;
+  const ready = dashboard && dashboard.start_date.slice(0, 7) === month;
+
   return (
-    <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-6 p-6">
-      <div>
-        <h1 className="text-2xl font-semibold">Resumo do mês</h1>
-        {dashboard && (
-          <p className="text-muted-foreground text-sm">
-            {formatDate(dashboard.start_date)} a {formatDate(dashboard.end_date)}
-          </p>
-        )}
+    <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-8 p-6">
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+        <h1 className="text-2xl font-semibold">{title}</h1>
+        <div className="flex gap-1">
+          <Button variant="ghost" className="size-11 rounded-full" aria-label="Mês anterior" onClick={() => setMonth((m) => shiftMonth(m, -1))}>
+            ‹
+          </Button>
+          {!isCurrent && (
+            <Button variant="ghost" className="min-h-11 rounded-full" onClick={() => setMonth(currentMonthIso())}>
+              Este mês
+            </Button>
+          )}
+          <Button variant="ghost" className="size-11 rounded-full" aria-label="Próximo mês" onClick={() => setMonth((m) => shiftMonth(m, 1))}>
+            ›
+          </Button>
+        </div>
       </div>
 
       {error && <p className="text-destructive text-sm">{error}</p>}
 
-      <NetWorthCard points={netWorth} />
-      {commitments && <CommitmentsAlert summary={commitments} />}
-      {cards && <CardsAlert summary={cards} />}
-      {debts && <DebtsAlert summary={debts} />}
-      {insurance && <InsuranceAlert summary={insurance} />}
-
-      {!dashboard ? (
+      {!ready ? (
         <p className="text-muted-foreground text-sm">Carregando...</p>
       ) : (
         <>
-          <SummaryCards summary={dashboard.summary} />
-
-          <Card>
-            <CardContent className="py-4">
-              <h2 className="mb-3 text-sm font-medium">Gasto por categoria</h2>
-              <CategorySpendingChart data={dashboard.by_category} />
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="py-4">
-              <h2 className="mb-3 text-sm font-medium">Evolução de saldo</h2>
-              <BalanceEvolutionChart data={dashboard.balance_evolution} />
-            </CardContent>
-          </Card>
+          <MonthHero summary={dashboard.summary} month={month} isCurrent={isCurrent} />
+          {isCurrent && <AttentionList notices={buildNotices({ commitments, cards, debts, insurance })} />}
+          <CategoryBars data={dashboard.by_category} />
+          <div className="flex flex-col gap-4">
+            {isCurrent && <NetWorthLine points={netWorth} />}
+            <Link href="/calendar" className="text-muted-foreground hover:text-foreground w-fit text-sm underline underline-offset-4">
+              Ver o saldo dia a dia no calendário
+            </Link>
+          </div>
         </>
       )}
     </main>

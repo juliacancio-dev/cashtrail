@@ -29,7 +29,8 @@ def build_dashboard(db: Session, user_id: uuid.UUID, start_date: date, end_date:
     expense_total = Decimal("0")
     category_totals: dict[uuid.UUID, Decimal] = {}
     running_balance = Decimal("0")
-    balance_evolution: list[tuple[date, Decimal]] = []
+    # Um ponto por dia: o acumulado depois do último lançamento do dia (lista vem ordenada por data).
+    balance_by_day: dict[date, Decimal] = {}
 
     for transaction in transactions:
         if transaction.type == TransactionType.INCOME:
@@ -41,7 +42,7 @@ def build_dashboard(db: Session, user_id: uuid.UUID, start_date: date, end_date:
             category_totals[transaction.category_id] = (
                 category_totals.get(transaction.category_id, Decimal("0")) + transaction.amount
             )
-        balance_evolution.append((transaction.occurred_at, running_balance))
+        balance_by_day[transaction.occurred_at] = running_balance
 
     by_category = [
         (category_id, category_names.get(category_id, ""), total)
@@ -53,5 +54,5 @@ def build_dashboard(db: Session, user_id: uuid.UUID, start_date: date, end_date:
         "expense_total": expense_total,
         "balance": income_total - expense_total,
         "by_category": by_category,
-        "balance_evolution": balance_evolution,
+        "balance_evolution": list(balance_by_day.items()),
     }

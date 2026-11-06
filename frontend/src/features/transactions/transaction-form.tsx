@@ -18,6 +18,7 @@ import {
   transactionTypeOptions,
   type CreateTransactionFormValues,
 } from "@/features/transactions/schemas";
+import { todayIso } from "@/lib/format";
 
 type Option = { id: string; name: string };
 
@@ -44,7 +45,7 @@ export function TransactionForm({
       type: "expense",
       amount: "",
       description: "",
-      occurred_at: new Date().toISOString().slice(0, 10),
+      occurred_at: todayIso(),
     },
   });
 

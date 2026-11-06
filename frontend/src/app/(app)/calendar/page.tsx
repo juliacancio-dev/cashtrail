@@ -6,15 +6,9 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/features/auth/auth-context";
 import { getCalendar } from "@/features/reports/api";
-import { BalanceLine, DayDetail, MonthGrid, MoneySummary, monthName } from "@/features/reports/money-calendar";
+import { BalanceLine, DayDetail, MonthGrid, MoneySummary } from "@/features/reports/money-calendar";
 import type { MoneyCalendar } from "@/features/reports/schemas";
-import { currentMonthIso } from "@/lib/format";
-
-function shiftMonth(month: string, offset: number): string {
-  const [year, number] = month.split("-").map(Number);
-  const shifted = new Date(year, number - 1 + offset, 1);
-  return `${shifted.getFullYear()}-${String(shifted.getMonth() + 1).padStart(2, "0")}`;
-}
+import { currentMonthIso, monthName, shiftMonth } from "@/lib/format";
 
 /** Ao abrir um mês: hoje, se o mês é o atual; senão, o dia mais apertado. */
 function defaultDay(calendar: MoneyCalendar): string {

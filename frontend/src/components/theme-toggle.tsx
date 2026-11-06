@@ -11,7 +11,10 @@ function subscribe(onChange: () => void) {
 
 const isDarkNow = () => document.documentElement.classList.contains("dark");
 
-export function ThemeToggle() {
+const defaultClass =
+  "inline-flex size-11 shrink-0 items-center justify-center rounded-full border border-border text-foreground hover:bg-muted focus-visible:outline-2 focus-visible:outline-ring";
+
+export function ThemeToggle({ className = defaultClass }: { className?: string }) {
   const dark = useSyncExternalStore(subscribe, isDarkNow, () => false);
   const label = dark ? "Mudar para o modo claro" : "Mudar para o modo escuro";
 
@@ -33,7 +36,7 @@ export function ThemeToggle() {
       onClick={toggle}
       aria-label={label}
       title={label}
-      className="inline-flex size-11 shrink-0 items-center justify-center rounded-full border border-border text-foreground hover:bg-muted focus-visible:outline-2 focus-visible:outline-ring"
+      className={className}
     >
       {dark ? (
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">

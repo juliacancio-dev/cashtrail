@@ -1,11 +1,14 @@
+import { CalendarDays, ChartColumn, Landmark, ReceiptText, Target, Wallet, type LucideIcon } from "lucide-react";
+
 // Módulos do menu e as telas de cada um (doc 32, decisão 2). O link do módulo leva à primeira tela.
 export type NavTab = { href: string; label: string };
-export type NavModule = { name: string; tabs: NavTab[] };
+export type NavModule = { name: string; icon: LucideIcon; tabs: NavTab[] };
 
 export const MODULES: NavModule[] = [
-  { name: "Calendário", tabs: [{ href: "/calendar", label: "Calendário" }] },
+  { name: "Calendário", icon: CalendarDays, tabs: [{ href: "/calendar", label: "Calendário do dinheiro" }] },
   {
     name: "Caixa",
+    icon: Wallet,
     tabs: [
       { href: "/dashboard", label: "Resumo do mês" },
       { href: "/transactions", label: "Lançamentos" },
@@ -16,6 +19,7 @@ export const MODULES: NavModule[] = [
   },
   {
     name: "Compromissos",
+    icon: ReceiptText,
     tabs: [
       { href: "/commitments", label: "A pagar e a receber" },
       { href: "/cards", label: "Cartões e faturas" },
@@ -25,6 +29,7 @@ export const MODULES: NavModule[] = [
   },
   {
     name: "Patrimônio",
+    icon: Landmark,
     tabs: [
       { href: "/accounts", label: "Contas" },
       { href: "/assets", label: "Bens" },
@@ -34,6 +39,7 @@ export const MODULES: NavModule[] = [
   },
   {
     name: "Planejamento",
+    icon: Target,
     tabs: [
       { href: "/budgets", label: "Orçamentos" },
       { href: "/goals", label: "Metas" },
@@ -43,6 +49,7 @@ export const MODULES: NavModule[] = [
   },
   {
     name: "Relatórios",
+    icon: ChartColumn,
     tabs: [
       { href: "/dre", label: "DRE" },
       { href: "/cash-flow", label: "Fluxo de caixa" },

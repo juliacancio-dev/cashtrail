@@ -107,7 +107,7 @@ try {
   await api("/commitments", { direction: "payable", description: "Luz", amount: "80.00", due_date: iso(-2), category_id: cats[0].id }, access_token);
   await api("/commitments", { direction: "receivable", description: "Freela", amount: "300.00", due_date: iso(3), category_id: cats[0].id }, access_token);
   await page.goto(WEB + "/dashboard");
-  await page.waitForSelector("text=/vence\\(m\\) em 7 dias/", { timeout: 15000 });
+  await page.waitForSelector("text=1 conta atrasada e 1 vence nos próximos 7 dias", { timeout: 15000 });
   log("OK  alerta de vencimentos no dashboard");
   await shot("5-dashboard");
 } catch (e) {

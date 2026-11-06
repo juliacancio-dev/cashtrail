@@ -94,7 +94,7 @@ try {
   await shot("m15-2-independencia");
 
   await page.goto(WEB + "/dashboard");
-  await page.waitForSelector("text=renova(m) em até 30 dias");
+  await page.waitForSelector("text=/seguros? renovam? em até 30 dias/");
   log("OK  dashboard avisa a renovação");
 } catch (e) {
   fail(String(e).slice(0, 700));

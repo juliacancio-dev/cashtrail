@@ -38,6 +38,30 @@ export function lastDayOfCurrentMonthIso(): string {
   return `${last.getFullYear()}-${pad(last.getMonth() + 1)}-${pad(last.getDate())}`;
 }
 
+const MONTH_NAMES = [
+  "janeiro", "fevereiro", "março", "abril", "maio", "junho",
+  "julho", "agosto", "setembro", "outubro", "novembro", "dezembro",
+];
+
+/** "2026-11" -> "novembro". */
+export function monthName(month: string): string {
+  return MONTH_NAMES[Number(month.slice(5, 7)) - 1];
+}
+
+/** "2026-11", -1 -> "2026-10". */
+export function shiftMonth(month: string, offset: number): string {
+  const [year, number] = month.split("-").map(Number);
+  const shifted = new Date(year, number - 1 + offset, 1);
+  return `${shifted.getFullYear()}-${pad(shifted.getMonth() + 1)}`;
+}
+
+/** Primeiro e último dia do mês: "2026-02" -> ["2026-02-01", "2026-02-28"]. */
+export function monthBounds(month: string): [string, string] {
+  const [year, number] = month.split("-").map(Number);
+  const last = new Date(year, number, 0).getDate();
+  return [`${month}-01`, `${month}-${pad(last)}`];
+}
+
 export function todayIso(): string {
   const now = new Date();
   const month = String(now.getMonth() + 1).padStart(2, "0");

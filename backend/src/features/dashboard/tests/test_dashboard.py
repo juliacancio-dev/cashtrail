@@ -96,6 +96,29 @@ def test_dashboard_ignores_transactions_outside_period(client):
     assert response.json()["summary"]["expense_total"] == "10.00"
 
 
+def test_dashboard_balance_evolution_has_one_point_per_day(client):
+    token = _register_and_login(client, "dash5@example.com")
+    account_id = _create_account(client, token)
+    market = _create_category(client, token, "Mercado")
+    salary = _create_category(client, token, "Salario")
+
+    _create_transaction(client, token, account_id, salary, "income", "1000.00", "2026-09-03")
+    _create_transaction(client, token, account_id, market, "expense", "100.00", "2026-09-03")
+    _create_transaction(client, token, account_id, market, "expense", "40.00", "2026-09-03")
+    _create_transaction(client, token, account_id, market, "expense", "60.00", "2026-09-08")
+
+    response = client.get(
+        "/dashboard",
+        params={"start_date": "2026-09-01", "end_date": "2026-09-30"},
+        headers=_auth_headers(token),
+    )
+
+    assert response.json()["balance_evolution"] == [
+        {"date": "2026-09-03", "balance": "860.00"},
+        {"date": "2026-09-08", "balance": "800.00"},
+    ]
+
+
 def test_dashboard_requires_authentication(client):
     response = client.get("/dashboard")
 

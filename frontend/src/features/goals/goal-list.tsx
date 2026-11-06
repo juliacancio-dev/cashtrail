@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import type { ContributionFormValues, Goal } from "@/features/goals/schemas";
 import { ContributionForm } from "@/features/goals/contribution-form";
+import { formatDate } from "@/lib/format";
 
 type Option = { id: string; name: string };
 
@@ -51,7 +52,7 @@ export function GoalList({
                   <p className="text-muted-foreground text-sm">
                     {formatCurrency(goal.current_amount)} de {formatCurrency(goal.target_amount)} (
                     {goal.percent_achieved}%)
-                    {goal.target_date && ` · prazo ${goal.target_date}`}
+                    {goal.target_date && ` · prazo ${formatDate(goal.target_date)}`}
                   </p>
                 </div>
                 <div className="flex gap-2">

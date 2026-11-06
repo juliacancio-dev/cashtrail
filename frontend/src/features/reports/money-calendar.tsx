@@ -1,6 +1,6 @@
 "use client";
 
-import { formatCurrency } from "@/lib/format";
+import { formatCurrency, monthName } from "@/lib/format";
 
 import type { CalendarDay, CalendarEvent, MoneyCalendar } from "./schemas";
 
@@ -22,10 +22,6 @@ function weekday(iso: string): number {
 
 function dayNumber(iso: string): number {
   return Number(iso.slice(8, 10));
-}
-
-export function monthName(month: string): string {
-  return MONTH_NAMES[Number(month.slice(5, 7)) - 1];
 }
 
 function signedAmount(event: CalendarEvent): string {

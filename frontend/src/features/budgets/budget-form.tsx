@@ -14,12 +14,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { createBudgetSchema, type CreateBudgetFormValues } from "@/features/budgets/schemas";
+import { currentMonthIso } from "@/lib/format";
 
 type Option = { id: string; name: string };
-
-function currentMonth(): string {
-  return new Date().toISOString().slice(0, 7);
-}
 
 export function BudgetForm({
   categories,
@@ -37,7 +34,7 @@ export function BudgetForm({
     formState: { errors, isSubmitting },
   } = useForm<CreateBudgetFormValues>({
     resolver: zodResolver(createBudgetSchema),
-    defaultValues: { category_id: "", month: currentMonth(), limit_amount: "" },
+    defaultValues: { category_id: "", month: currentMonthIso(), limit_amount: "" },
   });
 
   async function onSubmit(values: CreateBudgetFormValues) {

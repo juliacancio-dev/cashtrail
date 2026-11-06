@@ -19,6 +19,7 @@ import {
   type CreateRecurringFormValues,
 } from "@/features/recurring/schemas";
 import { transactionTypeOptions } from "@/features/transactions/schemas";
+import { todayIso } from "@/lib/format";
 
 type Option = { id: string; name: string };
 
@@ -47,7 +48,7 @@ export function RecurringForm({
       amount: "",
       description: "",
       frequency: "monthly",
-      next_occurrence_date: new Date().toISOString().slice(0, 10),
+      next_occurrence_date: todayIso(),
       generate_as_commitment: false,
     },
   });

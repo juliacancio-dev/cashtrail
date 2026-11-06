@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { ChevronRight } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card as UiCard, CardContent } from "@/components/ui/card";
@@ -25,14 +26,13 @@ export function CardPanel({
   categories: Option[];
   onCardChanged: () => Promise<void>;
 }) {
-  const [open, setOpen] = useState(true);
   const [mode, setMode] = useState<Mode>(null);
+  const [showOthers, setShowOthers] = useState(false);
   const [invoices, setInvoices] = useState<Invoice[] | null>(null);
   const [reloadKey, setReloadKey] = useState(0);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!open) return;
     let cancelled = false;
     listInvoices(card.id)
       .then((data) => {
@@ -44,7 +44,7 @@ export function CardPanel({
     return () => {
       cancelled = true;
     };
-  }, [open, card.id, reloadKey, card.debt]);
+  }, [card.id, reloadKey, card.debt]);
 
   async function changed() {
     setReloadKey((key) => key + 1);
@@ -56,6 +56,13 @@ export function CardPanel({
   const percent = limit ? Math.min(Math.max((used / limit) * 100, 0), 100) : 0;
   const activeAccounts = accounts.filter((a) => !a.is_archived && a.id !== card.account_id);
   const activeCategories = categories.filter((c) => !c.is_archived);
+
+  // Fatura atual (doc 33, decisão 5): a fechada ainda não paga mais antiga (a mais urgente); se não houver, a aberta.
+  const byClosing = [...(invoices ?? [])].sort((a, b) => a.closing_date.localeCompare(b.closing_date));
+  const unpaidClosed = byClosing.find((i) => (i.status === "overdue" || i.status === "closed") && Number(i.balance) > 0);
+  const current = unpaidClosed ?? byClosing.find((i) => i.status === "open") ?? null;
+  const others = (invoices ?? []).filter((i) => i !== current);
+  const othersId = `faturas-${card.id}`;
 
   return (
     <UiCard>
@@ -90,11 +97,8 @@ export function CardPanel({
           <Button size="sm" onClick={() => setMode(mode === "purchase" ? null : "purchase")}>
             Nova compra
           </Button>
-          <Button size="sm" variant="outline" onClick={() => setMode(mode === "edit" ? null : "edit")}>
+          <Button size="sm" variant="ghost" onClick={() => setMode(mode === "edit" ? null : "edit")}>
             Editar cartão
-          </Button>
-          <Button size="sm" variant="ghost" onClick={() => setOpen((value) => !value)}>
-            {open ? "Ocultar faturas" : "Mostrar faturas"}
           </Button>
         </div>
 
@@ -126,18 +130,42 @@ export function CardPanel({
           />
         )}
 
-        {open && invoices && (
+        {current && (
+          <InvoiceRow card={card} invoice={current} accounts={accounts} categories={categories} onChanged={changed} />
+        )}
+        {invoices && !current && others.length === 0 && (
+          <p className="text-muted-foreground text-sm">Nenhuma fatura ainda. Registre uma compra para começar.</p>
+        )}
+
+        {others.length > 0 && (
           <div className="flex flex-col gap-3">
-            {invoices.map((invoice) => (
-              <InvoiceRow
-                key={invoice.closing_date}
-                card={card}
-                invoice={invoice}
-                accounts={accounts}
-                categories={categories}
-                onChanged={changed}
+            <button
+              type="button"
+              aria-expanded={showOthers}
+              aria-controls={othersId}
+              onClick={() => setShowOthers((value) => !value)}
+              className="text-muted-foreground hover:text-foreground flex min-h-11 w-fit items-center gap-1.5 text-sm"
+            >
+              <ChevronRight
+                aria-hidden="true"
+                className={`size-4 transition-transform motion-reduce:transition-none ${showOthers ? "rotate-90" : ""}`}
               />
-            ))}
+              Faturas anteriores e futuras · {others.length}
+            </button>
+            {showOthers && (
+              <div id={othersId} className="flex flex-col gap-3">
+                {others.map((invoice) => (
+                  <InvoiceRow
+                    key={invoice.closing_date}
+                    card={card}
+                    invoice={invoice}
+                    accounts={accounts}
+                    categories={categories}
+                    onChanged={changed}
+                  />
+                ))}
+              </div>
+            )}
           </div>
         )}
       </CardContent>

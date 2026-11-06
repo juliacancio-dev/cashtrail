@@ -70,6 +70,8 @@ try {
   await page.getByRole("option", { name: "Compras" }).click();
   await shot("c1-compra");
   await purchase.getByRole("button", { name: "Registrar compra" }).click();
+  // Desde o Marco 17 só a fatura atual fica aberta; as outras ficam em "Faturas anteriores e futuras".
+  await page.getByRole("button", { name: /Faturas anteriores e futuras/ }).click();
   await page.waitForSelector("text=fecha em 05/05/2026");
   check((await debtText()).includes("300,00"), "dívida do cartão = R$ 300,00 (limite consumido pelo valor total)", "dívida não bateu: " + (await debtText()));
   const closings = await page.locator("text=/Fatura que fecha em/").allInnerTexts();
@@ -99,6 +101,7 @@ try {
   // 5. mover uma compra para a fatura seguinte
   await page.goto(WEB + "/cards");
   await page.waitForSelector("text=fecha em 05/04/2026");
+  await page.getByRole("button", { name: /Faturas anteriores e futuras/ }).click();
   await invoiceRow("05/04/2026").getByRole("button", { name: "Ver compras e pagamentos" }).click();
   await page.waitForSelector("text=Notebook (2/3)");
   await invoiceRow("05/04/2026").getByRole("button", { name: "Mover para a fatura seguinte" }).click();

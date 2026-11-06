@@ -255,3 +255,11 @@ A navegação vem antes das telas porque todas ficam embaixo dela.
 - Verificado: `lint`, `tsc`, `build`; `scripts/e2e/e2e-m17-compromissos.mjs`; `e2e-m16-cores` ajustado (filtro
   agora dentro de "Filtros").
 
+**Etapa 6 (Cartões) — feita em 2026-11-06, branch `marco-17-etapa-6-cartoes`.**
+- `features/credit-cards/card-panel.tsx`: só a fatura atual aberta — a fechada ainda não paga **mais antiga**
+  (a API lista da mais nova para a mais antiga, então a escolha ordena antes; achado pelo `e2e-cards`); se não
+  houver, a aberta. As outras ficam em "Faturas anteriores e futuras · N" (`aria-expanded`). Saiu o
+  "Ocultar faturas"; "Editar cartão" ficou discreto.
+- Verificado: `lint`, `tsc`, `build`; `scripts/e2e/e2e-m17-cartoes.mjs`; `e2e-cards` ajustado (abre a lista
+  recolhida antes de conferir as faturas).
+

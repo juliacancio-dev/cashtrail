@@ -8,7 +8,7 @@ Scripts ad-hoc usados nos Marcos 8 a 15 para provar cada tela num navegador de v
 | `e2e-cards.mjs` | cartões e faturas (Marco 9) |
 | `e2e-m10.mjs` | saldo inicial, DRE e fluxo de caixa (Marco 10) |
 | `e2e-m11.mjs` | dívidas, parcelas, amortização (Marco 11) |
-| `e2e-m12.mjs`, `chart-m12.mjs` | bens e patrimônio (Marco 12) |
+| `e2e-m12.mjs` | bens e patrimônio (Marco 12) |
 | `e2e-m13.mjs` | investimentos, com brapi e Banco Central **reais** (Marco 13) |
 | `e2e-m14.mjs` | imposto de renda (Marco 14) |
 | `e2e-m15.mjs` | seguros e independência financeira (Marco 15) |
@@ -16,10 +16,11 @@ Scripts ad-hoc usados nos Marcos 8 a 15 para provar cada tela num navegador de v
 | `e2e-m16-calendario.mjs` | calendário do dinheiro: números da tela × API, detalhe do dia, troca de mês, escuro e celular (Marco 16, etapa 4) |
 | `e2e-m16-cores.mjs` | cores de dinheiro, chips e gráficos nos dois temas, com contraste medido na tela (Marco 16, etapa 5) |
 | `e2e-m17-defeitos.mjs` | datas dd/mm/aaaa, data padrão dos formulários no fuso local (relógio preso às 22h30 do último dia do mês em São Paulo), título do Resumo, sem e-mail no subtítulo (Marco 17, etapa 1) |
-| `e2e-m17-navegacao.mjs` | cápsula Tinta + âmbar, gaveta no logo (foco, Tab preso, Esc, clique fora), busca e atalho `/`, as 21 telas pela cápsula e pelas abas, contraste medido nos dois temas, celular e "reduzir movimento" (Marco 17, etapa 2; substitui o `e2e-m16-menu.mjs`) |
+| `e2e-m17-navegacao.mjs` | cápsula Tinta + âmbar, gaveta no logo (foco, Tab preso, Esc, clique fora), busca e atalho `/`, as 21 telas pela cápsula e pelas abas, contraste medido nos dois temas, celular e "reduzir movimento" (Marco 17, etapa 2) |
 | `e2e-m17-resumo.mjs` | Resumo do mês: número e frase × API, avisos numa lista (gravidade também em texto), categorias em ordem com "Outras", patrimônio, mês negativo, mês vazio, troca de mês, escuro e celular (Marco 17, etapa 3) |
 | `e2e-m17-lancamentos.mjs` | Lançamentos um mês por vez: frase de totais × API, agrupado por dia (hoje/ontem, total do dia), troca de mês, mês vazio, formulário atrás do botão, lançamento novo no dia certo e com data de outro mês, celular (Marco 17, etapa 4) |
 | `e2e-m17-compromissos.mjs` | Compromissos: frase × API, filtros recolhidos com contador e "Limpar", grupos Vencidas / Próximos 7 dias / Mais tarde / Encerradas, só a ação principal na linha, pagar, direção, celular (Marco 17, etapa 5) |
+| `e2e-m17-cartoes.mjs` | Cartões: só a fatura atual aberta (a fechada não paga mais antiga, senão a aberta), as outras recolhidas com contagem, celular (Marco 17, etapa 6) |
 
 ## Como rodar (PowerShell, na raiz do repositório)
 
@@ -58,12 +59,11 @@ $env:E2E_WEB="https://cashtrail-frontend.ashydune-a5fddf60.brazilsouth.azurecont
 node e2e-m15.mjs
 ```
 
-A produção responde mais devagar que o `localhost` (escala a zero): as esperas fixas (`waitForTimeout`) podem ser curtas e dar falha falsa; em 2026-10-22 bastou multiplicá-las por 4. Espere 65 s entre um roteiro e outro por causa do limite de login.
+A produção responde mais devagar que o `localhost` (escala a zero): se uma espera fixa (`waitForTimeout`) der falha falsa, multiplique-a por 4. Espere 65 s entre um roteiro e outro por causa do limite de login.
 
 ## Observações
 
 - O `401` de `POST /auth/refresh` no console é esperado: ao abrir `/login` o app tenta recuperar uma sessão que ainda não existe.
-
 - Use sempre `localhost`, nunca `127.0.0.1`: o cookie de refresh é `SameSite=strict` e os dois contam como sites diferentes.
 - O login tem limite de 5 por minuto; se vários roteiros seguidos derem `429`, espere um minuto.
 - Os `404` de `__next.*.txt` no console são só arquivos de prefetch que o servidor estático de teste não serve.

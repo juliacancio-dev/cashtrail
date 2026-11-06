@@ -101,8 +101,9 @@ try {
     // A pagar e a receber: chips de situação (vencida, paga).
     await page.goto(WEB + "/commitments");
     await page.getByText("IPTU").first().waitFor();
-    // A tela abre em "Em aberto"; "Todos" traz também a conta quitada.
-    await page.getByRole("combobox").nth(0).click();
+    // A tela abre em "Em aberto"; "Todos" traz também a conta quitada (desde o Marco 17 o filtro fica em "Filtros").
+    await page.getByRole("button", { name: /^Filtros/ }).click();
+    await page.getByRole("group", { name: "Filtros" }).getByRole("combobox").nth(0).click();
     await page.getByRole("option", { name: "Todos", exact: true }).click();
     await page.getByText("Internet").first().waitFor();
     const paidChip = page.locator("[class*='bg-income/12']").first();

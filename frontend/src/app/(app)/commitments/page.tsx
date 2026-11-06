@@ -29,7 +29,6 @@ import {
   type Direction,
   type StatusFilter,
 } from "@/features/commitments/schemas";
-import { CommitmentSummaryCards } from "@/features/commitments/summary-cards";
 import { formatCurrency } from "@/lib/format";
 
 const ALL = "all";
@@ -47,6 +46,7 @@ export default function CommitmentsPage() {
   const [dueFrom, setDueFrom] = useState("");
   const [dueTo, setDueTo] = useState("");
   const [showForm, setShowForm] = useState(false);
+  const [showFilters, setShowFilters] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [reloadKey, setReloadKey] = useState(0);
@@ -119,6 +119,14 @@ export default function CommitmentsPage() {
   const activeAccounts = accounts.filter((a) => !a.is_archived);
   const activeCategories = categories.filter((c) => !c.is_archived);
   const ready = activeAccounts.length > 0 && activeCategories.length > 0;
+  const activeFilters =
+    (status !== "pending" ? 1 : 0) + (categoryId !== ALL ? 1 : 0) + (dueFrom ? 1 : 0) + (dueTo ? 1 : 0);
+  const clearFilters = () => {
+    setStatus("pending");
+    setCategoryId(ALL);
+    setDueFrom("");
+    setDueTo("");
+  };
   const categoryItems = [{ value: ALL, label: "Todas as categorias" }, ...categories.map((c) => ({ value: c.id, label: c.name }))];
 
   return (
@@ -138,7 +146,7 @@ export default function CommitmentsPage() {
         </p>
       )}
 
-      {summary && <CommitmentSummaryCards summary={summary} />}
+      {summary && <SummarySentence summary={summary} />}
 
       {showForm && ready && (
         <>
@@ -152,8 +160,8 @@ export default function CommitmentsPage() {
         </>
       )}
 
-      <div className="flex flex-wrap items-end gap-3" role="group" aria-label="Filtros">
-        <div className="flex gap-1">
+      <div className="flex flex-wrap items-center gap-2">
+        <div role="group" aria-label="Direção" className="flex gap-1">
           {([[ALL, "Todas"], ["payable", "A pagar"], ["receivable", "A receber"]] as const).map(([value, label]) => (
             <Button
               key={value}
@@ -166,60 +174,88 @@ export default function CommitmentsPage() {
             </Button>
           ))}
         </div>
-
-        <div className="flex flex-col gap-1">
-          <Label>Situação</Label>
-          <Select value={status} onValueChange={(value) => setStatus(value as StatusFilter | typeof ALL)} items={statusFilterOptions}>
-            <SelectTrigger className="w-48">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {statusFilterOptions.map((option) => (
-                <SelectItem key={option.value} value={option.value}>
-                  {option.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div className="flex flex-col gap-1">
-          <Label>Categoria</Label>
-          <Select value={categoryId} onValueChange={(value) => setCategoryId(value as string)} items={categoryItems}>
-            <SelectTrigger className="w-48">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {categoryItems.map((item) => (
-                <SelectItem key={item.value} value={item.value}>
-                  {item.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div className="flex flex-col gap-1">
-          <Label htmlFor="due-from">Vence de</Label>
-          <Input id="due-from" type="date" value={dueFrom} onChange={(event) => setDueFrom(event.target.value)} />
-        </div>
-        <div className="flex flex-col gap-1">
-          <Label htmlFor="due-to">até</Label>
-          <Input id="due-to" type="date" value={dueTo} onChange={(event) => setDueTo(event.target.value)} />
-        </div>
+        <Button
+          size="sm"
+          variant="outline"
+          aria-expanded={showFilters}
+          aria-controls="filtros"
+          onClick={() => setShowFilters((value) => !value)}
+        >
+          {activeFilters > 0 ? `Filtros · ${activeFilters}` : "Filtros"}
+        </Button>
       </div>
+
+      {showFilters && (
+        <div id="filtros" role="group" aria-label="Filtros" className="border-border bg-card flex flex-wrap items-end gap-3 rounded-xl border p-4">
+          <div className="flex flex-col gap-1">
+            <Label>Situação</Label>
+            <Select value={status} onValueChange={(value) => setStatus(value as StatusFilter | typeof ALL)} items={statusFilterOptions}>
+              <SelectTrigger className="w-48">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {statusFilterOptions.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="flex flex-col gap-1">
+            <Label>Categoria</Label>
+            <Select value={categoryId} onValueChange={(value) => setCategoryId(value as string)} items={categoryItems}>
+              <SelectTrigger className="w-48">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {categoryItems.map((item) => (
+                  <SelectItem key={item.value} value={item.value}>
+                    {item.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="flex flex-col gap-1">
+            <Label htmlFor="due-from">Vence de</Label>
+            <Input id="due-from" type="date" value={dueFrom} onChange={(event) => setDueFrom(event.target.value)} />
+          </div>
+          <div className="flex flex-col gap-1">
+            <Label htmlFor="due-to">até</Label>
+            <Input id="due-to" type="date" value={dueTo} onChange={(event) => setDueTo(event.target.value)} />
+          </div>
+          {activeFilters > 0 && (
+            <Button size="sm" variant="ghost" onClick={clearFilters}>
+              Limpar filtros
+            </Button>
+          )}
+        </div>
+      )}
 
       {error && <p className="text-destructive text-sm">{error}</p>}
 
       {data && (
         <>
-          <p className="text-muted-foreground text-sm">
-            {data.totals.count} conta(s) · saldo a pagar {formatCurrency(data.totals.payable_balance)} · saldo a
-            receber {formatCurrency(data.totals.receivable_balance)}
-          </p>
           <CommitmentList items={data.items} accounts={accounts} categories={categories} onChanged={refresh} />
         </>
       )}
     </main>
+  );
+}
+
+/** Uma frase no lugar dos cartões de resumo (doc 33, decisão 4). */
+function SummarySentence({ summary }: { summary: CommitmentSummary }) {
+  const { payable, receivable } = summary;
+  const late = (n: number, word: string) => (n > 0 ? <>, sendo <strong className="text-expense font-semibold">{n} {word}</strong></> : null);
+  return (
+    <p className="text-muted-foreground text-base">
+      A pagar <strong className="text-foreground font-mono font-semibold">{formatCurrency(payable.open_amount)}</strong>
+      {late(payable.overdue_count, payable.overdue_count === 1 ? "vencida" : "vencidas")}. A receber{" "}
+      <strong className="text-foreground font-mono font-semibold">{formatCurrency(receivable.open_amount)}</strong>
+      {late(receivable.overdue_count, receivable.overdue_count === 1 ? "atrasada" : "atrasadas")}.
+    </p>
   );
 }

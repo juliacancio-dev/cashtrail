@@ -19,6 +19,7 @@ Scripts ad-hoc usados nos Marcos 8 a 15 para provar cada tela num navegador de v
 | `e2e-m17-navegacao.mjs` | cápsula Tinta + âmbar, gaveta no logo (foco, Tab preso, Esc, clique fora), busca e atalho `/`, as 21 telas pela cápsula e pelas abas, contraste medido nos dois temas, celular e "reduzir movimento" (Marco 17, etapa 2; substitui o `e2e-m16-menu.mjs`) |
 | `e2e-m17-resumo.mjs` | Resumo do mês: número e frase × API, avisos numa lista (gravidade também em texto), categorias em ordem com "Outras", patrimônio, mês negativo, mês vazio, troca de mês, escuro e celular (Marco 17, etapa 3) |
 | `e2e-m17-lancamentos.mjs` | Lançamentos um mês por vez: frase de totais × API, agrupado por dia (hoje/ontem, total do dia), troca de mês, mês vazio, formulário atrás do botão, lançamento novo no dia certo e com data de outro mês, celular (Marco 17, etapa 4) |
+| `e2e-m17-compromissos.mjs` | Compromissos: frase × API, filtros recolhidos com contador e "Limpar", grupos Vencidas / Próximos 7 dias / Mais tarde / Encerradas, só a ação principal na linha, pagar, direção, celular (Marco 17, etapa 5) |
 
 ## Como rodar (PowerShell, na raiz do repositório)
 

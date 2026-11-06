@@ -245,3 +245,13 @@ A navegação vem antes das telas porque todas ficam embaixo dela.
 - Verificado: `lint`, `tsc`, `build`; `scripts/e2e/e2e-m17-lancamentos.mjs` 16/16. `e2e-m17-defeitos` ajustado
   (formulário atrás do botão; dia por extenso no lugar de dd/mm/aaaa).
 
+**Etapa 5 (Compromissos) — feita em 2026-11-06, branch `marco-17-etapa-5-compromissos`.**
+- Página: os 2 cartões de resumo e a linha de totais viraram uma frase ("A pagar R$ X, sendo N vencida. A receber
+  R$ Y."); visíveis só Todas / A pagar / A receber e o botão "Filtros" (mostra "Filtros · N" com filtros fora do
+  padrão; painel com Situação, Categoria, datas e "Limpar filtros"). `CommitmentSummaryCards` removido.
+- Lista: grupos Vencidas / Próximos 7 dias / Mais tarde / Encerradas (o protótipo dizia "Esta semana"; "Próximos
+  7 dias" é o que o filtro calcula de fato), linhas finas; vencimento como "hoje", "amanhã", "sexta, 06/11";
+  na linha só Pagar/Receber; abrir a linha (`aria-expanded`) mostra detalhes, Editar, Baixas e Cancelar conta.
+- Verificado: `lint`, `tsc`, `build`; `scripts/e2e/e2e-m17-compromissos.mjs`; `e2e-m16-cores` ajustado (filtro
+  agora dentro de "Filtros").
+

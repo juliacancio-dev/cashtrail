@@ -50,7 +50,6 @@ docs/
 │   └── como-trabalhamos.md      # ciclo de um marco, formato de decisão, DoR/DoD
 │
 ├── marcos/                      # documentos de desenho de cada marco (registro)
-├── historico/                   # discovery original, congelado
 └── exemplos/                    # arquivos de amostra (extrato CSV)
 ```
 
@@ -59,7 +58,7 @@ docs/
 - **Idioma:** português do Brasil; identificadores de código entre crases e em inglês, como no código.
 - **Nomes de arquivo:** `kebab-case`, sem acento. Cada pasta tem um `README.md` quando precisa de índice.
 - **Uma fonte de verdade por assunto.** Se um fato já está num documento, os outros apontam para ele em vez de repetir. Variáveis de ambiente, por exemplo, ficam só nos READMEs de backend e frontend.
-- **Documentação viva × registro.** `produto/`, `arquitetura/`, `referencia/`, `guias/` e `roadmap.md` descrevem o sistema **como ele é hoje** e mudam no mesmo pull request que muda o código. `decisoes/`, `marcos/` e `historico/` são **registros**: não se reescreve o passado, cria-se um documento novo que substitui o antigo.
+- **Documentação viva × registro.** `produto/`, `arquitetura/`, `referencia/`, `guias/` e `roadmap.md` descrevem o sistema **como ele é hoje** e mudam no mesmo pull request que muda o código. `decisoes/` e `marcos/` são **registros**: não se reescreve o passado, cria-se um documento novo que substitui o antigo.
 - **Fatos externos têm fonte e data.** Preços, limites de API e regras fiscais citam a fonte oficial e a data da consulta; o que não foi verificado aparece como tal.
 - **Diagramas** em [Mermaid](https://mermaid.js.org/), que o GitHub desenha direto no Markdown.
 

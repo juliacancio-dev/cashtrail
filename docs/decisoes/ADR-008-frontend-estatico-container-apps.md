@@ -2,7 +2,6 @@
 
 - **Status:** Aceita
 - **Data:** 2026-09-18
-- **Contexto de origem:** Marco 2, primeiro deploy
 
 ## Contexto e problema
 

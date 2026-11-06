@@ -26,51 +26,35 @@ As datas são de conclusão do marco. A coluna "produção" diz quando a entrega
 
 ## Marco 15 — Seguros e independência financeira — 2026-10-15 · produção 2026-10-15
 
-[Documento](docs/marcos/30-marco-15-seguros-e-aposentadoria.md)
-
 - **Adicionado:** apólices com prêmio gerando contas a pagar, alerta de renovação e de bens sem seguro.
 - **Adicionado:** simulador de independência financeira em valores reais, com cenários de taxa de retirada × retorno.
 
 ## Marco 14 — Imposto de renda — 2026-10-15 · produção 2026-10-15
 
-[Documento](docs/marcos/29-marco-14-irpf.md)
-
 - **Adicionado:** apoio ao IRPF: marca fiscal nas categorias, informes de rendimentos, dependentes, bens em 31/12, estimativa completa × simplificada e apuração mensal de ações e FIIs com DARF.
 
 ## Marco 13 — Investimentos — 2026-10-15 · produção 2026-10-15
-
-[Documento](docs/marcos/28-marco-13-investimentos.md)
 
 - **Adicionado:** carteira com compras, vendas e proventos, custo médio, cotações pela brapi, CDI pelo Banco Central e investimentos no balanço.
 
 ## Marco 12 — Patrimônio — 2026-10-15 · produção 2026-10-15
 
-[Documento](docs/marcos/27-marco-12-patrimonio-e-balanco.md)
-
 - **Adicionado:** bens com histórico de avaliações, balanço pessoal (ativos − passivos) e evolução mensal do patrimônio.
 
 ## Marco 11 — Dívidas e financiamentos — 2026-10-09 · produção 2026-10-15
 
-[Documento](docs/marcos/26-marco-11-dividas-e-financiamentos.md)
-
 - **Adicionado:** empréstimos e financiamentos (Price, SAC, sem juros), baixa separando principal e encargos, quitação e amortização extra com recálculo.
 
 ## Marco 10 — Fluxo de caixa e DRE — 2026-10-09 · produção 2026-10-15
-
-[Documento](docs/marcos/25-marco-10-fluxo-de-caixa-e-dre.md)
 
 - **Adicionado:** saldo inicial por conta, grupo de DRE nas categorias, DRE por competência, fluxo de caixa previsto × realizado com projeção, exportação CSV.
 - **Corrigido (2026-10-22):** o "período anterior" do DRE compara meses inteiros com meses inteiros (outubro com setembro).
 
 ## Marco 9 — Cartões, faturas e transferências — 2026-10-09 · produção 2026-10-15
 
-[Documento](docs/marcos/24-marco-9-cartoes-e-faturas.md)
-
 - **Adicionado:** transferências entre contas, cartões com faturas por ciclo, compras parceladas, pagamento de fatura como transferência, limite.
 
 ## Marco 8 — Contas a pagar e a receber — 2026-10-08 · produção 2026-10-15
-
-[Documento](docs/marcos/23-marco-8-contas-a-pagar-receber.md)
 
 - **Adicionado:** compromissos com baixa parcial, parcelamento, situação calculada, alerta de vencimentos; recorrência pode gerar compromisso.
 
@@ -90,4 +74,4 @@ As datas são de conclusão do marco. A coluna "produção" diz quando a entrega
 
 ## Marco 1 — Discovery — 2026-09-16
 
-- **Adicionado:** discovery completo (fases 0 a 20), ADRs 001 a 007 e roadmap inicial ([histórico](docs/historico/README.md)).
+- **Adicionado:** discovery completo (fases 0 a 20), ADRs 001 a 007 e roadmap inicial (histórico).

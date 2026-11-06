@@ -2,7 +2,6 @@
 
 - **Status:** Aceita
 - **Data:** 2026-10-06
-- **Contexto de origem:** discovery do "ERP pessoal" ([doc 22, decisão 3](../marcos/22-erp-pessoal-discovery.md))
 
 ## Contexto e problema
 

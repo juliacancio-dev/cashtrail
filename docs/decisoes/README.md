@@ -28,8 +28,6 @@ Cada arquivo registra **uma** decisão difícil de desfazer: o contexto, as opç
 | [020](ADR-020-calendario-como-tela-inicial.md) | Calendário do dinheiro como tela inicial, calculado no backend | Aceita | 2026-10-26 |
 | [021](ADR-021-tema-com-script-proprio.md) | Tema claro e escuro com script próprio, sem biblioteca | Aceita | 2026-10-26 |
 
-As datas dos ADRs 008 a 021 são as da decisão original; eles foram escritos em 2026-11-04, a partir dos [documentos de marco](../marcos/README.md), quando a documentação foi reorganizada.
-
 ## Quando escrever um ADR
 
 Escreva quando a decisão:

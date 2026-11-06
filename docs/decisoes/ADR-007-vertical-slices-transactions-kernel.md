@@ -2,7 +2,6 @@
 
 - **Status:** Aceita
 - **Data:** 2026-09-16
-- **Contexto de origem:** discovery, FASE 9 ([09-vertical-slices](../historico/discovery/09-vertical-slices.md))
 
 ## Contexto e problema
 

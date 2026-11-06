@@ -2,7 +2,6 @@
 
 - **Status:** Aceita
 - **Data:** 2026-09-16
-- **Contexto de origem:** discovery, FASE 11 ([11-security](../historico/discovery/11-security.md))
 
 ## Contexto e problema
 

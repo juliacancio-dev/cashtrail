@@ -2,7 +2,6 @@
 
 - **Status:** Aceita
 - **Data:** 2026-09-16
-- **Contexto de origem:** discovery, FASE 0 ([brief](../historico/discovery/00-project-brief.md))
 
 ## Contexto e problema
 
@@ -25,7 +24,6 @@ Escolhida: **Azure**, porque reduz o custo real a quase zero no primeiro ano e �
 
 ## Mais informações
 
-- Pesquisa de serviços e custos: [05-integrations](../historico/discovery/05-integrations.md), [06-costs](../historico/discovery/06-costs.md).
 - Infraestrutura atual: [Deploy e operação](../guias/deploy-e-operacao.md).
 
 > **Nota (2026-11-04):** o texto original listava Static Web Apps e Blob Storage entre os serviços previstos. Nenhum dos dois é usado: o frontend roda em Container Apps ([ADR-008](ADR-008-frontend-estatico-container-apps.md)) e os extratos importados não são guardados (só o resultado da importação vai para o banco).

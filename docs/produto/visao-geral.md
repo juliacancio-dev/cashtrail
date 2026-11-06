@@ -48,7 +48,7 @@ O detalhe de cada marco está no [CHANGELOG](../../CHANGELOG.md); o que vem a se
 
 | Item | Por quê |
 |---|---|
-| Integração bancária automática (Open Finance) | Agregadores custam de R$ 2.500 a R$ 6.000 por mês (pesquisa de 2026-09, [02-market-research](../historico/discovery/02-market-research.md)) |
+| Integração bancária automática (Open Finance) | Agregadores custam de R$ 2.500 a R$ 6.000 por mês (pesquisa de 2026-09, 02-market-research) |
 | Importação OFX | O CSV cobre os bancos testados; OFX fica para quando houver necessidade real |
 | Partidas dobradas | Complexidade sem ganho proporcional para uso pessoal ([ADR-009](../decisoes/ADR-009-partida-simples.md)) |
 | Gerar ou transmitir a declaração do IRPF | Risco legal e formato proprietário; o produto é apoio ([ADR-016](../decisoes/ADR-016-parametros-fiscais-por-ano.md)) |

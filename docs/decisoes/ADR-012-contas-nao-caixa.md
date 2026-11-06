@@ -2,7 +2,6 @@
 
 - **Status:** Aceita
 - **Data:** 2026-10-09 (dívidas), estendida em 2026-10-15 (investimentos)
-- **Contexto de origem:** Marco 11 ([doc 26, decisão 1](../marcos/26-marco-11-dividas-e-financiamentos.md)) e Marco 13 ([doc 28, decisão 1](../marcos/28-marco-13-investimentos.md))
 
 ## Contexto e problema
 

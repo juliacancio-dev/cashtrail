@@ -2,7 +2,6 @@
 
 - **Status:** Aceita
 - **Data:** 2026-10-08
-- **Contexto de origem:** Marco 8 ([doc 23, decisão 4](../marcos/23-marco-8-contas-a-pagar-receber.md)), reforçada no Marco 11 (risco R-11.1)
 
 ## Contexto e problema
 

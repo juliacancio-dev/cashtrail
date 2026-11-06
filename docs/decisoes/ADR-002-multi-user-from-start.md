@@ -2,7 +2,6 @@
 
 - **Status:** Aceita
 - **Data:** 2026-09-16
-- **Contexto de origem:** discovery, FASE 1 ([01-discovery](../historico/discovery/01-discovery.md))
 
 ## Contexto e problema
 

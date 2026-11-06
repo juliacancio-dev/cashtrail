@@ -2,7 +2,6 @@
 
 - **Status:** Aceita
 - **Data:** 2026-10-15
-- **Contexto de origem:** Marco 13 ([doc 28, decisões 2 e 3](../marcos/28-marco-13-investimentos.md))
 
 ## Contexto e problema
 

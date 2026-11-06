@@ -2,7 +2,6 @@
 
 - **Status:** Aceita
 - **Data:** 2026-10-09
-- **Contexto de origem:** Marco 9 ([doc 24, decisão 1](../marcos/24-marco-9-cartoes-e-faturas.md))
 
 ## Contexto e problema
 

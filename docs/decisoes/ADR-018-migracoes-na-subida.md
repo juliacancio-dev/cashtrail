@@ -2,7 +2,6 @@
 
 - **Status:** Aceita
 - **Data:** 2026-09-28
-- **Contexto de origem:** deploy automatizado do MVP (workflow `deploy.yml`)
 
 ## Contexto e problema
 

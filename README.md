@@ -164,7 +164,6 @@ A documentação é versionada junto ao código, em [`docs/`](docs/README.md), o
 | Saber por que algo foi decidido | [Decisões (ADRs)](docs/decisoes/README.md) |
 | Rodar, testar e publicar | [Ambiente local](docs/guias/ambiente-local.md) · [Deploy e operação](docs/guias/deploy-e-operacao.md) |
 | Acompanhar a evolução | [Roadmap](docs/roadmap.md) · [CHANGELOG](CHANGELOG.md) · [Documentos de marco](docs/marcos/README.md) |
-| Ver como o projeto foi pensado | [Discovery original](docs/historico/README.md) |
 
 ## Contribuindo
 

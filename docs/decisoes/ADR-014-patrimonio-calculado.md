@@ -2,7 +2,6 @@
 
 - **Status:** Aceita
 - **Data:** 2026-10-15
-- **Contexto de origem:** Marco 12 ([doc 27, decisões 1 e 3](../marcos/27-marco-12-patrimonio-e-balanco.md))
 
 ## Contexto e problema
 

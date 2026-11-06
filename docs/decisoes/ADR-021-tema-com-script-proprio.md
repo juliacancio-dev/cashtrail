@@ -2,7 +2,6 @@
 
 - **Status:** Aceita
 - **Data:** 2026-10-26
-- **Contexto de origem:** Marco 16 ([doc 32, decisão 3](../marcos/32-marco-16-redesign.md))
 
 ## Contexto e problema
 

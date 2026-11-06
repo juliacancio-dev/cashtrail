@@ -2,7 +2,6 @@
 
 - **Status:** Aceita
 - **Data:** 2026-10-09
-- **Contexto de origem:** Marco 10 ([doc 25, decisões 1, 2, 3 e 8](../marcos/25-marco-10-fluxo-de-caixa-e-dre.md))
 
 ## Contexto e problema
 

@@ -2,7 +2,6 @@
 
 - **Status:** Aceita
 - **Data:** 2026-10-08
-- **Contexto de origem:** Marco 7 (recuperação de senha, RF-013)
 
 ## Contexto e problema
 

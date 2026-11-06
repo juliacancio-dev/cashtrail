@@ -26,147 +26,147 @@ Os RFs do Marco 10 (RF-031 a RF-037) não foram tabelados no documento do marco;
 
 | ID | Requisito | Origem |
 |---|---|---|
-| RF-001 | Cadastro com e-mail e senha | [03](../historico/discovery/03-requirements.md) |
-| RF-002 | Login com JWT (access + refresh), sem revelar qual campo errou | [03](../historico/discovery/03-requirements.md) |
-| RF-003 | CRUD de contas; arquivada não recebe lançamento novo, mantém histórico | [03](../historico/discovery/03-requirements.md) |
-| RF-004 | CRUD de categorias; com lançamentos, só arquiva | [03](../historico/discovery/03-requirements.md) |
-| RF-005 | CRUD de lançamentos manuais (receita/despesa) | [03](../historico/discovery/03-requirements.md) |
-| RF-006 | Dashboard mensal: resumo, gasto por categoria, evolução | [03](../historico/discovery/03-requirements.md) |
-| RF-007 | Orçamento por categoria e mês, real × planejado | [03](../historico/discovery/03-requirements.md) |
-| RF-008 | Alerta de orçamento ultrapassado (RF-008a: só na tela) | [03](../historico/discovery/03-requirements.md), [12](../historico/discovery/12-mvp.md) |
-| RF-009 | Metas de economia com progresso pelos lançamentos vinculados | [03](../historico/discovery/03-requirements.md) |
-| RF-010 | Lançamento recorrente com geração automática | [03](../historico/discovery/03-requirements.md) |
-| RF-011 | Importação de extrato (só CSV na implementação) | [03](../historico/discovery/03-requirements.md) |
-| RF-012 | Prevenção de duplicatas na importação | [03](../historico/discovery/03-requirements.md), [04](../historico/discovery/04-usecases.md) |
-| RF-013 | Recuperação de senha por link de uso único e expiração curta | [11](../historico/discovery/11-security.md) |
-| RF-014 | CRUD de compromissos a pagar e a receber | [23](../marcos/23-marco-8-contas-a-pagar-receber.md) |
-| RF-015 | Parcelamento em N compromissos somando exatamente o total | [23](../marcos/23-marco-8-contas-a-pagar-receber.md) |
-| RF-016 | Baixa cria um lançamento realizado | [23](../marcos/23-marco-8-contas-a-pagar-receber.md) |
-| RF-017 | Baixa parcial mantém o saldo em aberto | [23](../marcos/23-marco-8-contas-a-pagar-receber.md) |
-| RF-018 | Situação calculada (aberto, vence hoje, atrasado, pago, parcial, cancelado) | [23](../marcos/23-marco-8-contas-a-pagar-receber.md) |
-| RF-019 | Listagem com filtros e totais | [23](../marcos/23-marco-8-contas-a-pagar-receber.md) |
-| RF-020 | Cancelar compromisso sem apagar | [23](../marcos/23-marco-8-contas-a-pagar-receber.md) |
-| RF-021 | Alerta de vencimentos no dashboard | [23](../marcos/23-marco-8-contas-a-pagar-receber.md) |
-| RF-022 | Recorrência pode gerar compromisso | [23](../marcos/23-marco-8-contas-a-pagar-receber.md) |
-| RF-023 | Transferência entre contas (criar, listar, desfazer) | [24](../marcos/24-marco-9-cartoes-e-faturas.md) |
-| RF-024 | Cadastro de cartão: fechamento, vencimento, limite, conta de pagamento | [24](../marcos/24-marco-9-cartoes-e-faturas.md) |
-| RF-025 | Compra no cartão ligada a uma fatura | [24](../marcos/24-marco-9-cartoes-e-faturas.md) |
-| RF-026 | Compra parcelada, uma despesa por fatura | [24](../marcos/24-marco-9-cartoes-e-faturas.md) |
-| RF-027 | Faturas por ciclo: período, vencimento, total, pago, saldo, situação | [24](../marcos/24-marco-9-cartoes-e-faturas.md) |
-| RF-028 | Pagar fatura (total ou parcial) como transferência; desfazer | [24](../marcos/24-marco-9-cartoes-e-faturas.md) |
-| RF-029 | Limite usado e disponível | [24](../marcos/24-marco-9-cartoes-e-faturas.md) |
-| RF-030 | Alerta de faturas no dashboard | [24](../marcos/24-marco-9-cartoes-e-faturas.md) |
-| RF-031 | Saldo inicial por conta e saldo atual | [25](../marcos/25-marco-10-fluxo-de-caixa-e-dre.md) |
-| RF-032 (M10) | Grupo de DRE nas categorias | [25](../marcos/25-marco-10-fluxo-de-caixa-e-dre.md) |
-| RF-033 (M10) | DRE do período com % da receita e período anterior | [25](../marcos/25-marco-10-fluxo-de-caixa-e-dre.md) |
-| RF-034 (M10) | Fluxo de caixa realizado por mês | [25](../marcos/25-marco-10-fluxo-de-caixa-e-dre.md) |
-| RF-035 (M10) | Fluxo de caixa previsto por mês | [25](../marcos/25-marco-10-fluxo-de-caixa-e-dre.md) |
-| RF-036 (M10) | Projeção e detalhe dos itens de cada número | [25](../marcos/25-marco-10-fluxo-de-caixa-e-dre.md) |
-| RF-037 (M10) | Exportação CSV do DRE e do fluxo | [25](../marcos/25-marco-10-fluxo-de-caixa-e-dre.md) |
-| RF-032 (M11) | Cadastrar dívida (principal, parcelas, 1º vencimento, sistema, taxa) | [26](../marcos/26-marco-11-dividas-e-financiamentos.md) |
-| RF-033 (M11) | Gerar cronograma (Price, SAC, sem juros, informado) | [26](../marcos/26-marco-11-dividas-e-financiamentos.md) |
-| RF-034 (M11) | Editar valor ou vencimento de parcela em aberto | [26](../marcos/26-marco-11-dividas-e-financiamentos.md) |
-| RF-035 (M11) | Receber o dinheiro da dívida como transferência | [26](../marcos/26-marco-11-dividas-e-financiamentos.md) |
-| RF-036 (M11) | Pagar parcela separando principal e encargos; desfazer | [26](../marcos/26-marco-11-dividas-e-financiamentos.md) |
-| RF-037 (M11) | Saldo devedor e resumo da dívida | [26](../marcos/26-marco-11-dividas-e-financiamentos.md) |
-| RF-038 | Quitação antecipada | [26](../marcos/26-marco-11-dividas-e-financiamentos.md) |
-| RF-039 | Saldo devedor total no dashboard e no fluxo | [26](../marcos/26-marco-11-dividas-e-financiamentos.md) |
-| RF-040 | Amortização extra com recálculo | [26](../marcos/26-marco-11-dividas-e-financiamentos.md) |
-| RF-041 | Cadastrar bem | [27](../marcos/27-marco-12-patrimonio-e-balanco.md) |
-| RF-042 | Avaliações do bem por data | [27](../marcos/27-marco-12-patrimonio-e-balanco.md) |
-| RF-043 | Vincular bem a uma dívida | [27](../marcos/27-marco-12-patrimonio-e-balanco.md) |
-| RF-044 | Balanço patrimonial numa data | [27](../marcos/27-marco-12-patrimonio-e-balanco.md) |
-| RF-045 | Evolução do patrimônio por mês | [27](../marcos/27-marco-12-patrimonio-e-balanco.md) |
-| RF-046 | Patrimônio líquido por bem | [27](../marcos/27-marco-12-patrimonio-e-balanco.md) |
-| RF-047 | Exportar balanço em CSV | [27](../marcos/27-marco-12-patrimonio-e-balanco.md) |
-| RF-048 | Patrimônio no dashboard | [27](../marcos/27-marco-12-patrimonio-e-balanco.md) |
-| RF-049 | Conta de investimento e ativos | [28](../marcos/28-marco-13-investimentos.md) |
-| RF-050 | Registrar compra | [28](../marcos/28-marco-13-investimentos.md) |
-| RF-051 | Registrar venda | [28](../marcos/28-marco-13-investimentos.md) |
-| RF-052 | Registrar provento | [28](../marcos/28-marco-13-investimentos.md) |
-| RF-053 | Posição e carteira | [28](../marcos/28-marco-13-investimentos.md) |
-| RF-054 | Cotação com cache | [28](../marcos/28-marco-13-investimentos.md) |
-| RF-055 | Atualizar cotações (botão e job) com teto mensal | [28](../marcos/28-marco-13-investimentos.md) |
-| RF-056 | Valor manual (renda fixa, fundo, outro) | [28](../marcos/28-marco-13-investimentos.md) |
-| RF-057 | Comparativo com o CDI | [28](../marcos/28-marco-13-investimentos.md) |
-| RF-058 | Carteira no balanço patrimonial | [28](../marcos/28-marco-13-investimentos.md) |
-| RF-059 | Marca fiscal nas categorias | [29](../marcos/29-marco-14-irpf.md) |
-| RF-060 | Dependentes (sem CPF) | [29](../marcos/29-marco-14-irpf.md) |
-| RF-061 | Informes de rendimentos | [29](../marcos/29-marco-14-irpf.md) |
-| RF-062 | Bens, direitos e dívidas em 31/12 | [29](../marcos/29-marco-14-irpf.md) |
-| RF-063 | Estimativa anual: completa × simplificada | [29](../marcos/29-marco-14-irpf.md) |
-| RF-064 | Apuração mensal de renda variável | [29](../marcos/29-marco-14-irpf.md) |
-| RF-065 | Parâmetros fiscais por ano, com fonte | [29](../marcos/29-marco-14-irpf.md) |
-| RF-066 | Exportar o dossiê em CSV | [29](../marcos/29-marco-14-irpf.md) |
-| RF-067 | Aviso de limites em toda tela de IRPF | [29](../marcos/29-marco-14-irpf.md) |
-| RF-068 | Cadastrar apólice | [30](../marcos/30-marco-15-seguros-e-aposentadoria.md) |
-| RF-069 | Prêmio gera contas a pagar | [30](../marcos/30-marco-15-seguros-e-aposentadoria.md) |
-| RF-070 | Renovar apólice | [30](../marcos/30-marco-15-seguros-e-aposentadoria.md) |
-| RF-071 | Alertas de renovação e bens sem seguro | [30](../marcos/30-marco-15-seguros-e-aposentadoria.md) |
-| RF-072 | Plano de independência financeira | [30](../marcos/30-marco-15-seguros-e-aposentadoria.md) |
-| RF-073 | Patrimônio-alvo, progresso, tempo e aporte necessário | [30](../marcos/30-marco-15-seguros-e-aposentadoria.md) |
-| RF-074 | Cenários de taxa de retirada × retorno | [30](../marcos/30-marco-15-seguros-e-aposentadoria.md) |
-| RF-075 | Seguros e independência no dashboard | [30](../marcos/30-marco-15-seguros-e-aposentadoria.md) |
+| RF-001 | Cadastro com e-mail e senha | discovery 03 |
+| RF-002 | Login com JWT (access + refresh), sem revelar qual campo errou | discovery 03 |
+| RF-003 | CRUD de contas; arquivada não recebe lançamento novo, mantém histórico | discovery 03 |
+| RF-004 | CRUD de categorias; com lançamentos, só arquiva | discovery 03 |
+| RF-005 | CRUD de lançamentos manuais (receita/despesa) | discovery 03 |
+| RF-006 | Dashboard mensal: resumo, gasto por categoria, evolução | discovery 03 |
+| RF-007 | Orçamento por categoria e mês, real × planejado | discovery 03 |
+| RF-008 | Alerta de orçamento ultrapassado (RF-008a: só na tela) | discovery 03, discovery 12 |
+| RF-009 | Metas de economia com progresso pelos lançamentos vinculados | discovery 03 |
+| RF-010 | Lançamento recorrente com geração automática | discovery 03 |
+| RF-011 | Importação de extrato (só CSV na implementação) | discovery 03 |
+| RF-012 | Prevenção de duplicatas na importação | discovery 03, discovery 04 |
+| RF-013 | Recuperação de senha por link de uso único e expiração curta | discovery 11 |
+| RF-014 | CRUD de compromissos a pagar e a receber | Marco 8 |
+| RF-015 | Parcelamento em N compromissos somando exatamente o total | Marco 8 |
+| RF-016 | Baixa cria um lançamento realizado | Marco 8 |
+| RF-017 | Baixa parcial mantém o saldo em aberto | Marco 8 |
+| RF-018 | Situação calculada (aberto, vence hoje, atrasado, pago, parcial, cancelado) | Marco 8 |
+| RF-019 | Listagem com filtros e totais | Marco 8 |
+| RF-020 | Cancelar compromisso sem apagar | Marco 8 |
+| RF-021 | Alerta de vencimentos no dashboard | Marco 8 |
+| RF-022 | Recorrência pode gerar compromisso | Marco 8 |
+| RF-023 | Transferência entre contas (criar, listar, desfazer) | Marco 9 |
+| RF-024 | Cadastro de cartão: fechamento, vencimento, limite, conta de pagamento | Marco 9 |
+| RF-025 | Compra no cartão ligada a uma fatura | Marco 9 |
+| RF-026 | Compra parcelada, uma despesa por fatura | Marco 9 |
+| RF-027 | Faturas por ciclo: período, vencimento, total, pago, saldo, situação | Marco 9 |
+| RF-028 | Pagar fatura (total ou parcial) como transferência; desfazer | Marco 9 |
+| RF-029 | Limite usado e disponível | Marco 9 |
+| RF-030 | Alerta de faturas no dashboard | Marco 9 |
+| RF-031 | Saldo inicial por conta e saldo atual | Marco 10 |
+| RF-032 (M10) | Grupo de DRE nas categorias | Marco 10 |
+| RF-033 (M10) | DRE do período com % da receita e período anterior | Marco 10 |
+| RF-034 (M10) | Fluxo de caixa realizado por mês | Marco 10 |
+| RF-035 (M10) | Fluxo de caixa previsto por mês | Marco 10 |
+| RF-036 (M10) | Projeção e detalhe dos itens de cada número | Marco 10 |
+| RF-037 (M10) | Exportação CSV do DRE e do fluxo | Marco 10 |
+| RF-032 (M11) | Cadastrar dívida (principal, parcelas, 1º vencimento, sistema, taxa) | Marco 11 |
+| RF-033 (M11) | Gerar cronograma (Price, SAC, sem juros, informado) | Marco 11 |
+| RF-034 (M11) | Editar valor ou vencimento de parcela em aberto | Marco 11 |
+| RF-035 (M11) | Receber o dinheiro da dívida como transferência | Marco 11 |
+| RF-036 (M11) | Pagar parcela separando principal e encargos; desfazer | Marco 11 |
+| RF-037 (M11) | Saldo devedor e resumo da dívida | Marco 11 |
+| RF-038 | Quitação antecipada | Marco 11 |
+| RF-039 | Saldo devedor total no dashboard e no fluxo | Marco 11 |
+| RF-040 | Amortização extra com recálculo | Marco 11 |
+| RF-041 | Cadastrar bem | Marco 12 |
+| RF-042 | Avaliações do bem por data | Marco 12 |
+| RF-043 | Vincular bem a uma dívida | Marco 12 |
+| RF-044 | Balanço patrimonial numa data | Marco 12 |
+| RF-045 | Evolução do patrimônio por mês | Marco 12 |
+| RF-046 | Patrimônio líquido por bem | Marco 12 |
+| RF-047 | Exportar balanço em CSV | Marco 12 |
+| RF-048 | Patrimônio no dashboard | Marco 12 |
+| RF-049 | Conta de investimento e ativos | Marco 13 |
+| RF-050 | Registrar compra | Marco 13 |
+| RF-051 | Registrar venda | Marco 13 |
+| RF-052 | Registrar provento | Marco 13 |
+| RF-053 | Posição e carteira | Marco 13 |
+| RF-054 | Cotação com cache | Marco 13 |
+| RF-055 | Atualizar cotações (botão e job) com teto mensal | Marco 13 |
+| RF-056 | Valor manual (renda fixa, fundo, outro) | Marco 13 |
+| RF-057 | Comparativo com o CDI | Marco 13 |
+| RF-058 | Carteira no balanço patrimonial | Marco 13 |
+| RF-059 | Marca fiscal nas categorias | Marco 14 |
+| RF-060 | Dependentes (sem CPF) | Marco 14 |
+| RF-061 | Informes de rendimentos | Marco 14 |
+| RF-062 | Bens, direitos e dívidas em 31/12 | Marco 14 |
+| RF-063 | Estimativa anual: completa × simplificada | Marco 14 |
+| RF-064 | Apuração mensal de renda variável | Marco 14 |
+| RF-065 | Parâmetros fiscais por ano, com fonte | Marco 14 |
+| RF-066 | Exportar o dossiê em CSV | Marco 14 |
+| RF-067 | Aviso de limites em toda tela de IRPF | Marco 14 |
+| RF-068 | Cadastrar apólice | Marco 15 |
+| RF-069 | Prêmio gera contas a pagar | Marco 15 |
+| RF-070 | Renovar apólice | Marco 15 |
+| RF-071 | Alertas de renovação e bens sem seguro | Marco 15 |
+| RF-072 | Plano de independência financeira | Marco 15 |
+| RF-073 | Patrimônio-alvo, progresso, tempo e aporte necessário | Marco 15 |
+| RF-074 | Cenários de taxa de retirada × retorno | Marco 15 |
+| RF-075 | Seguros e independência no dashboard | Marco 15 |
 
 ## Regras de negócio
 
 | ID | Regra | Origem |
 |---|---|---|
-| RB-001 | Lançamento pertence a exatamente uma conta e uma categoria | [03](../historico/discovery/03-requirements.md) |
-| RB-002 | Um orçamento por categoria e mês, por usuário | [03](../historico/discovery/03-requirements.md) |
-| RB-003 | Progresso da meta = soma dos lançamentos vinculados; conta arquivada não recebe lançamento novo | [03](../historico/discovery/03-requirements.md), [10](../historico/discovery/10-data-model.md) |
-| RB-004 | Recorrência gera até ser desativada | [03](../historico/discovery/03-requirements.md) |
-| RB-005 | Categoria com lançamentos só arquiva | [03](../historico/discovery/03-requirements.md) |
-| RB-006 | Critério de possível duplicata na importação; nunca descartar em silêncio | [04](../historico/discovery/04-usecases.md) |
-| RB-007 | Baixa a pagar gera despesa; a receber gera receita | [23](../marcos/23-marco-8-contas-a-pagar-receber.md) |
-| RB-008 | Saldo do compromisso = valor − baixas; pago no zero | [23](../marcos/23-marco-8-contas-a-pagar-receber.md) |
-| RB-009 | Atrasado é derivado, nunca gravado | [23](../marcos/23-marco-8-contas-a-pagar-receber.md) |
-| RB-010 | Baixa em conta arquivada é rejeitada | [23](../marcos/23-marco-8-contas-a-pagar-receber.md) |
-| RB-011 | Baixa nunca ultrapassa o saldo | [23](../marcos/23-marco-8-contas-a-pagar-receber.md) |
-| RB-012 | Parcelas somam o total; centavos na primeira | [23](../marcos/23-marco-8-contas-a-pagar-receber.md) |
-| RB-013 | Cancelado ou pago não muda valor nem vencimento | [23](../marcos/23-marco-8-contas-a-pagar-receber.md) |
-| RB-014 | Transferência não é receita nem despesa | [24](../marcos/24-marco-9-cartoes-e-faturas.md) |
-| RB-015 | Transferência entre contas diferentes, próprias, não arquivadas | [24](../marcos/24-marco-9-cartoes-e-faturas.md) |
-| RB-016 | Compra no cartão é despesa na data da compra; pagamento da fatura nunca | [24](../marcos/24-marco-9-cartoes-e-faturas.md) |
-| RB-017 | Fatura = compras do ciclo − estornos | [24](../marcos/24-marco-9-cartoes-e-faturas.md) |
-| RB-018 | Pagamento maior que o saldo da fatura é rejeitado | [24](../marcos/24-marco-9-cartoes-e-faturas.md) |
-| RB-019 | Compra até o fechamento, inclusive, entra na fatura que fecha; fatura movível | [24](../marcos/24-marco-9-cartoes-e-faturas.md) |
-| RB-020 | Limite disponível = limite − dívida; ultrapassar só avisa | [24](../marcos/24-marco-9-cartoes-e-faturas.md) |
-| RB-021 | Dias 29 a 31 viram o último dia do mês | [24](../marcos/24-marco-9-cartoes-e-faturas.md) |
-| RB-022 | DRE por competência; transferências fora | [25](../marcos/25-marco-10-fluxo-de-caixa-e-dre.md) |
-| RB-023 (M10) | Fluxo realizado por caixa; compra no cartão só no pagamento | [25](../marcos/25-marco-10-fluxo-de-caixa-e-dre.md) |
-| RB-024 (M10) | Previsto pelo valor bruto no vencimento | [25](../marcos/25-marco-10-fluxo-de-caixa-e-dre.md) |
-| RB-025 (M10) | Atrasado vira pendente no mês atual da projeção | [25](../marcos/25-marco-10-fluxo-de-caixa-e-dre.md) |
-| RB-026 (M10) | Saldo inicial + entradas − saídas = saldo final; fórmula do saldo da conta | [25](../marcos/25-marco-10-fluxo-de-caixa-e-dre.md) |
-| RB-027 (M10) | Projeção não inclui compras futuras não lançadas | [25](../marcos/25-marco-10-fluxo-de-caixa-e-dre.md) |
-| RB-028 (M10) | Categoria sem grupo cai em "Sem grupo" | [25](../marcos/25-marco-10-fluxo-de-caixa-e-dre.md) |
-| RB-029 (M10) | Lançamento no sentido oposto abate o grupo | [25](../marcos/25-marco-10-fluxo-de-caixa-e-dre.md) |
-| RB-023 (M11) | Receber empréstimo e amortizar principal não são receita nem despesa | [26](../marcos/26-marco-11-dividas-e-financiamentos.md) |
-| RB-024 (M11) | Encargos são despesa financeira | [26](../marcos/26-marco-11-dividas-e-financiamentos.md) |
-| RB-025 (M11) | Parcela paga não é editada, só desfeita | [26](../marcos/26-marco-11-dividas-e-financiamentos.md) |
-| RB-026 (M11) | Saldo devedor nunca negativo | [26](../marcos/26-marco-11-dividas-e-financiamentos.md) |
-| RB-027 (M11) | Recálculo só altera parcelas em aberto | [26](../marcos/26-marco-11-dividas-e-financiamentos.md) |
-| RB-028 (M12) | Patrimônio líquido = caixa + bens − cartões − dívidas | [27](../marcos/27-marco-12-patrimonio-e-balanco.md) |
-| RB-029 (M12) | Transferências e pagamentos não mudam o patrimônio por si só | [27](../marcos/27-marco-12-patrimonio-e-balanco.md) |
-| RB-030 | Bem vale zero antes da primeira avaliação | [27](../marcos/27-marco-12-patrimonio-e-balanco.md) |
-| RB-031 | Balanço de uma data usa só movimentos até ela | [27](../marcos/27-marco-12-patrimonio-e-balanco.md) |
-| RB-032 | Patrimônio usa valor de mercado; saldo da conta `investment` fica fora | [28](../marcos/28-marco-13-investimentos.md) |
-| RB-033 | Compra e aporte são transferências | [28](../marcos/28-marco-13-investimentos.md) |
-| RB-034 | Ganho na venda = produto − custo médio × quantidade | [28](../marcos/28-marco-13-investimentos.md) |
-| RB-035 | Provento é receita financeira; não reduz o custo | [28](../marcos/28-marco-13-investimentos.md) |
-| RB-036 | Custo médio ponderado móvel, com taxas | [28](../marcos/28-marco-13-investimentos.md) |
-| RB-037 | Valorização não realizada não entra no DRE | [28](../marcos/28-marco-13-investimentos.md) |
-| RB-038 | Ganho de renda variável fora da base anual | [29](../marcos/29-marco-14-irpf.md) |
-| RB-039 | Vendas de ações até R$ 20 mil no mês: isento no mês | [29](../marcos/29-marco-14-irpf.md) |
-| RB-040 | Prejuízo compensa só a mesma modalidade, acumulando | [29](../marcos/29-marco-14-irpf.md) |
-| RB-041 | Bens e direitos pelo custo | [29](../marcos/29-marco-14-irpf.md) |
-| RB-042 | Parâmetros fiscais versionados por ano | [29](../marcos/29-marco-14-irpf.md) |
-| RB-043 | Nenhum CPF/CNPJ de terceiro armazenado | [29](../marcos/29-marco-14-irpf.md) |
-| RB-044 | Prêmio é despesa do período | [30](../marcos/30-marco-15-seguros-e-aposentadoria.md) |
-| RB-045 | Simulação em valores reais | [30](../marcos/30-marco-15-seguros-e-aposentadoria.md) |
-| RB-046 | Patrimônio-alvo = (renda − benefício) × 12 ÷ taxa de retirada | [30](../marcos/30-marco-15-seguros-e-aposentadoria.md) |
-| RB-047 | Progresso usa só investimentos, salvo escolha | [30](../marcos/30-marco-15-seguros-e-aposentadoria.md) |
-| RB-048 | Retirada e retorno são premissas do usuário | [30](../marcos/30-marco-15-seguros-e-aposentadoria.md) |
+| RB-001 | Lançamento pertence a exatamente uma conta e uma categoria | discovery 03 |
+| RB-002 | Um orçamento por categoria e mês, por usuário | discovery 03 |
+| RB-003 | Progresso da meta = soma dos lançamentos vinculados; conta arquivada não recebe lançamento novo | discovery 03, discovery 10 |
+| RB-004 | Recorrência gera até ser desativada | discovery 03 |
+| RB-005 | Categoria com lançamentos só arquiva | discovery 03 |
+| RB-006 | Critério de possível duplicata na importação; nunca descartar em silêncio | discovery 04 |
+| RB-007 | Baixa a pagar gera despesa; a receber gera receita | Marco 8 |
+| RB-008 | Saldo do compromisso = valor − baixas; pago no zero | Marco 8 |
+| RB-009 | Atrasado é derivado, nunca gravado | Marco 8 |
+| RB-010 | Baixa em conta arquivada é rejeitada | Marco 8 |
+| RB-011 | Baixa nunca ultrapassa o saldo | Marco 8 |
+| RB-012 | Parcelas somam o total; centavos na primeira | Marco 8 |
+| RB-013 | Cancelado ou pago não muda valor nem vencimento | Marco 8 |
+| RB-014 | Transferência não é receita nem despesa | Marco 9 |
+| RB-015 | Transferência entre contas diferentes, próprias, não arquivadas | Marco 9 |
+| RB-016 | Compra no cartão é despesa na data da compra; pagamento da fatura nunca | Marco 9 |
+| RB-017 | Fatura = compras do ciclo − estornos | Marco 9 |
+| RB-018 | Pagamento maior que o saldo da fatura é rejeitado | Marco 9 |
+| RB-019 | Compra até o fechamento, inclusive, entra na fatura que fecha; fatura movível | Marco 9 |
+| RB-020 | Limite disponível = limite − dívida; ultrapassar só avisa | Marco 9 |
+| RB-021 | Dias 29 a 31 viram o último dia do mês | Marco 9 |
+| RB-022 | DRE por competência; transferências fora | Marco 10 |
+| RB-023 (M10) | Fluxo realizado por caixa; compra no cartão só no pagamento | Marco 10 |
+| RB-024 (M10) | Previsto pelo valor bruto no vencimento | Marco 10 |
+| RB-025 (M10) | Atrasado vira pendente no mês atual da projeção | Marco 10 |
+| RB-026 (M10) | Saldo inicial + entradas − saídas = saldo final; fórmula do saldo da conta | Marco 10 |
+| RB-027 (M10) | Projeção não inclui compras futuras não lançadas | Marco 10 |
+| RB-028 (M10) | Categoria sem grupo cai em "Sem grupo" | Marco 10 |
+| RB-029 (M10) | Lançamento no sentido oposto abate o grupo | Marco 10 |
+| RB-023 (M11) | Receber empréstimo e amortizar principal não são receita nem despesa | Marco 11 |
+| RB-024 (M11) | Encargos são despesa financeira | Marco 11 |
+| RB-025 (M11) | Parcela paga não é editada, só desfeita | Marco 11 |
+| RB-026 (M11) | Saldo devedor nunca negativo | Marco 11 |
+| RB-027 (M11) | Recálculo só altera parcelas em aberto | Marco 11 |
+| RB-028 (M12) | Patrimônio líquido = caixa + bens − cartões − dívidas | Marco 12 |
+| RB-029 (M12) | Transferências e pagamentos não mudam o patrimônio por si só | Marco 12 |
+| RB-030 | Bem vale zero antes da primeira avaliação | Marco 12 |
+| RB-031 | Balanço de uma data usa só movimentos até ela | Marco 12 |
+| RB-032 | Patrimônio usa valor de mercado; saldo da conta `investment` fica fora | Marco 13 |
+| RB-033 | Compra e aporte são transferências | Marco 13 |
+| RB-034 | Ganho na venda = produto − custo médio × quantidade | Marco 13 |
+| RB-035 | Provento é receita financeira; não reduz o custo | Marco 13 |
+| RB-036 | Custo médio ponderado móvel, com taxas | Marco 13 |
+| RB-037 | Valorização não realizada não entra no DRE | Marco 13 |
+| RB-038 | Ganho de renda variável fora da base anual | Marco 14 |
+| RB-039 | Vendas de ações até R$ 20 mil no mês: isento no mês | Marco 14 |
+| RB-040 | Prejuízo compensa só a mesma modalidade, acumulando | Marco 14 |
+| RB-041 | Bens e direitos pelo custo | Marco 14 |
+| RB-042 | Parâmetros fiscais versionados por ano | Marco 14 |
+| RB-043 | Nenhum CPF/CNPJ de terceiro armazenado | Marco 14 |
+| RB-044 | Prêmio é despesa do período | Marco 15 |
+| RB-045 | Simulação em valores reais | Marco 15 |
+| RB-046 | Patrimônio-alvo = (renda − benefício) × 12 ÷ taxa de retirada | Marco 15 |
+| RB-047 | Progresso usa só investimentos, salvo escolha | Marco 15 |
+| RB-048 | Retirada e retorno são premissas do usuário | Marco 15 |
 
 ## Não funcionais, segurança, integração e operação
 
@@ -194,11 +194,11 @@ Os RFs do Marco 10 (RF-031 a RF-037) não foram tabelados no documento do marco;
 
 | ID | Risco | Origem |
 |---|---|---|
-| R-009 | Retenção do backup não confirmada (fechado: 7 dias) | [15](../historico/discovery/15-risks.md) |
-| R-11.1 | `ALTER TYPE ... ADD VALUE` em migração | [26](../marcos/26-marco-11-dividas-e-financiamentos.md) |
-| R-11.3 | "Conta de caixa" precisa excluir `loan` (e depois `investment`): um único predicado, `NON_CASH_TYPES` | [26](../marcos/26-marco-11-dividas-e-financiamentos.md) |
-| R-12.1 | Avaliação de bem desatualizada distorce o patrimônio (mostrar a data da última avaliação) | [27](../marcos/27-marco-12-patrimonio-e-balanco.md) |
-| R-12.3 | Saldo inicial é "de hoje para trás": meses anteriores ao uso mostram só o saldo inicial | [27](../marcos/27-marco-12-patrimonio-e-balanco.md) |
-| R-13.5 | Cotação desatualizada passa despercebida (mostrar a data e avisar após 3 dias úteis) | [28](../marcos/28-marco-13-investimentos.md) |
-| R-15.3 | Prêmio duplicado entre recorrência e conta a pagar (a apólice é a única origem) | [30](../marcos/30-marco-15-seguros-e-aposentadoria.md) |
-| R-15.5 | Dado sensível de seguro: só metadados, sem número de apólice nem documentos | [30](../marcos/30-marco-15-seguros-e-aposentadoria.md) |
+| R-009 | Retenção do backup não confirmada (fechado: 7 dias) | discovery 15 |
+| R-11.1 | `ALTER TYPE ... ADD VALUE` em migração | Marco 11 |
+| R-11.3 | "Conta de caixa" precisa excluir `loan` (e depois `investment`): um único predicado, `NON_CASH_TYPES` | Marco 11 |
+| R-12.1 | Avaliação de bem desatualizada distorce o patrimônio (mostrar a data da última avaliação) | Marco 12 |
+| R-12.3 | Saldo inicial é "de hoje para trás": meses anteriores ao uso mostram só o saldo inicial | Marco 12 |
+| R-13.5 | Cotação desatualizada passa despercebida (mostrar a data e avisar após 3 dias úteis) | Marco 13 |
+| R-15.3 | Prêmio duplicado entre recorrência e conta a pagar (a apólice é a única origem) | Marco 15 |
+| R-15.5 | Dado sensível de seguro: só metadados, sem número de apólice nem documentos | Marco 15 |

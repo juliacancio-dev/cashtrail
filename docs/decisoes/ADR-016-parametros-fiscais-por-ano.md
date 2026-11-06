@@ -2,7 +2,6 @@
 
 - **Status:** Aceita
 - **Data:** 2026-10-15
-- **Contexto de origem:** Marco 14 ([doc 29, decisões 1 e 3](../marcos/29-marco-14-irpf.md))
 
 ## Contexto e problema
 

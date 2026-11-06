@@ -2,7 +2,6 @@
 
 - **Status:** Proposta | Aceita | Substituída por ADR-NNN | Descontinuada
 - **Data:** AAAA-MM-DD
-- **Contexto de origem:** marco, documento ou issue em que a decisão foi discutida
 
 ## Contexto e problema
 

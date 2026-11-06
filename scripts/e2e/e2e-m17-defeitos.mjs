@@ -71,11 +71,15 @@ try {
   check(!/\d{4}-\d{2}-\d{2}/.test(await page.locator("main").innerText()), "Resumo sem datas cruas", "data crua no Resumo");
 
   // Lançamentos: data padrão local e datas da lista formatadas
+  // Desde a etapa 4 o formulário fica atrás de "Novo lançamento" e a lista é agrupada por dia ("terça, 3 de novembro").
   await page.goto(WEB + "/transactions");
+  await page.getByRole("button", { name: "Novo lançamento" }).click();
   await page.locator("#occurred_at").waitFor();
   check(await page.locator("#occurred_at").inputValue() === localToday, `lançamento novo sugere hoje no fuso local (${localToday})`, `sugere ${await page.locator("#occurred_at").inputValue()}`);
+  await page.getByText("Feira").waitFor();
   const main = await page.locator("main").innerText();
-  check(main.includes(`03/${pad(month)}/${year}`) && !main.includes(`${ym}-03`), "lista de lançamentos com data dd/mm/aaaa", "data crua na lista");
+  const monthNames = ["janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"];
+  check(main.includes(`, 3 de ${monthNames[month - 1]}`) && !main.includes(`${ym}-03`), "lista de lançamentos com o dia por extenso, sem data crua", "data crua na lista");
   check(!main.includes(email), "sem e-mail no subtítulo (Lançamentos)", "e-mail ainda aparece");
 
   // Recorrências

@@ -234,3 +234,14 @@ A navegação vem antes das telas porque todas ficam embaixo dela.
 - `e2e-m17-defeitos` deu um tempo esgotado uma vez na rodada em lote e passou 13/13 nas duas rodadas seguintes:
   anotado como possível instabilidade.
 
+**Etapa 4 (Lançamentos) — feita em 2026-11-06, branch `marco-17-etapa-4-lancamentos`.**
+- `app/(app)/transactions/page.tsx`: "Lançamentos de novembro" com ‹ Este mês ›; carrega só o mês
+  (`listTransactions(month)` usa `start_date`/`end_date`, que a API já aceitava) — resolve o A7 (antes vinham
+  todos os lançamentos de sempre); frase "N lançamentos · entraram X e saíram Y" com a mesma soma do Resumo;
+  formulário atrás de "Novo lançamento" (`aria-expanded`); ao salvar, a tela vai para o mês do lançamento.
+- `features/transactions/transaction-list.tsx`: agrupado por dia, do mais recente para o mais antigo; cabeçalho
+  "sexta, 6 de novembro · hoje" (e "ontem") com o total do dia; linhas finas com descrição, "Categoria · Conta"
+  e valor em mono com sinal e cor.
+- Verificado: `lint`, `tsc`, `build`; `scripts/e2e/e2e-m17-lancamentos.mjs` 16/16. `e2e-m17-defeitos` ajustado
+  (formulário atrás do botão; dia por extenso no lugar de dd/mm/aaaa).
+
